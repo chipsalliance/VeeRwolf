@@ -1,0 +1,7 @@
+config SOC_SERIES_RISCV32_SWERV
+	bool "SWerVolf - SweRV EH1-based SoC"
+	depends on RISCV32
+	select GPIO_MMIO32 if GPIO
+	select SOC_FAMILY_RISCV_PRIVILEGE
+	help
+	Enable support for SweRV

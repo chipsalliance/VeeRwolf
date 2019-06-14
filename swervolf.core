@@ -1,0 +1,122 @@
+CAPI=2:
+
+name : ::swervolf:0
+
+filesets:
+  core:
+    files:
+      - rtl/dpram64.v
+      - rtl/axi_mem_wrapper.v
+      - rtl/axi_multicon.v
+      - rtl/swervolf_core.v
+    file_type : systemVerilogSource
+    depend :
+      - "pulp-platform.org::axi_mem_if"
+      - "pulp-platform.org::axi_node"
+      - swerv
+
+  tb          : {files: [tb/swervolf_core_tb.v   : {file_type : systemVerilogSource}]}
+  verilator_tb: {files: [tb/tb.cpp : {file_type : cppSource}]}
+
+  nexys_a7_files:
+    files :
+      - data/swervolf_nexys.xdc : {file_type : xdc}
+      - rtl/clk_gen_nexys.v : {file_type : verilogSource}
+      - rtl/swervolf_nexys.v    : {file_type : systemVerilogSource}
+
+  bootrom:
+    files :
+      - sw/zephyr_blinky.vh : {file_type : user, copyto : zephyr_blinky.vh}
+      - sw/jumptoram.vh     : {file_type : user, copyto : jumptoram.vh}
+
+targets:
+  sim:
+    default_tool : verilator
+    filesets :
+      - core
+      - tb
+      - bootrom
+      - "tool_verilator? (verilator_tb)"
+
+    generate : [intercon, swerv_default_config]
+    parameters : [SIMPRINT=true, ram_init_file, rom_init_file, signature, timeout, vcd]
+    tools:
+      modelsim:
+        vlog_options :
+          - -mfcu
+          - -cuautoname=du
+          - config/common_defines.vh
+          - include/def.sv
+      verilator:
+        verilator_options : [--trace, -Wno-fatal]
+    toplevel : swervolf_core_tb
+
+  nexys_a7:
+    default_tool : vivado
+    filesets :
+      - bootrom
+      - core
+      - nexys_a7_files
+    generate : [intercon, swerv_default_config]
+    parameters : [bootrom_file, ram_init_file]
+    tools:
+      vivado: {part : xc7a100tcsg324-1}
+    toplevel : swervolf_nexys_a7
+
+generate:
+  intercon:
+    generator: axi_intercon_gen
+    parameters:
+      masters:
+        ifu:
+        lsu:
+      slaves:
+        rom:
+          offset : 0x80000000
+          size   : 0x00001000
+        multicon:
+          offset : 0x80001000
+          size   : 0x00001000
+        ram:
+          offset : 0x00000000
+          size   : 0x08000000 #128MiB
+
+  swerv_default_config:
+    generator: swerv_config
+    position : first
+    parameters:
+      args : []
+
+parameters:
+  SIMPRINT:
+    datatype    : bool
+    description : Enable simulation character output
+    paramtype   : vlogdefine
+
+  bootrom_file:
+    datatype: file
+    description : Verilog hex file to use as boot ROM
+    paramtype : vlogparam
+
+  ram_init_file:
+    datatype: file
+    description : Verilog hex file to use as initial on-chip RAM contents
+    paramtype : "tool_vivado? (vlogparam) !tool_vivado? (plusarg)"
+
+  rom_init_file:
+    datatype: file
+    description : Verilog hex file to use as initial bootrom RAM contents
+    paramtype : plusarg
+
+  signature:
+    datatype : file
+    paramtype : plusarg
+
+  timeout:
+    datatype : int
+    paramtype : plusarg
+
+  vcd:
+    datatype : bool
+    description : Dump VCD
+    paramtype : plusarg

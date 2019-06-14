@@ -1,0 +1,27 @@
+#ifndef __RISCV32_SWERVOLF_SOC_H_
+#define __RISCV32_SWERVOLF_SOC_H_
+
+#include <soc_common.h>
+
+/* Following defines are needed for LED support until there is
+   devices trees are in place. LED controller is defined in soc.c */
+#define LED0_GPIO_CONTROLLER "LED0"
+#define LED0_GPIO_PIN 0
+
+/* Hard code memory info here until we have device tree support */
+#define DT_SRAM_BASE_ADDRESS 0x00000000
+#define DT_SRAM_SIZE         0x00800000
+
+/* Also define the following for Zephyr 1.14 compatibility */
+#define CONFIG_RISCV_RAM_BASE_ADDR DT_SRAM_BASE_ADDRESS
+#define CONFIG_RISCV_RAM_SIZE      DT_SRAM_SIZE
+
+/* Timer configuration */
+#define SERV_TIMER_BASE             0x80001018
+#define SERV_TIMER_IRQ              7
+
+/* lib-c hooks required RAM defined variables */
+#define RISCV_RAM_BASE               DT_SRAM_BASE_ADDRESS
+#define RISCV_RAM_SIZE               KB(DT_SRAM_SIZE)
+
+#endif /* __RISCV32_SERV_SOC_H_ */

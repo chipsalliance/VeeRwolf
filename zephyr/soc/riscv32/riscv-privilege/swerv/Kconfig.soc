@@ -1,0 +1,9 @@
+choice
+prompt "SweRVolf - SweRV EH1-based SoC"
+depends on SOC_SERIES_RISCV32_SWERV
+
+config SOC_RISCV32_SWERVOLF
+	bool "SWERVOLF"
+	select ATOMIC_OPERATIONS_C
+
+endchoice
