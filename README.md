@@ -1,7 +1,7 @@
 SweRVolf
 ========
 
-SweRVolf is a FuseSoC-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
+is a FuseSoC-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
 
 This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), Zephyr OS or other software in simulators or on FPGA boards. The SoC consists of the SweRV CPU with a boot ROM, on-chip RAM and GPIO.
 
@@ -19,18 +19,20 @@ For simulation targets there are also two extra registers defined. Writing to 0x
 
 ### Prerequisites
 
-1. Create a directory structure consisting of a workspace directory (from now on called `$WORKSPACE`) and a root directory for the SweRV SoC (from now on called `$CORES_ROOT`). All further commands will be run from `$WORKSPACE` unless otherwise stated. The structure will look like this
-├──cores
-└──workspace
+Create a directory structure consisting of a workspace directory (from now on called `$WORKSPACE`) and a root directory for the SweRV SoC (from now on called `$CORES_ROOT`). All further commands will be run from `$WORKSPACE` unless otherwise stated. The structure will look like this
 
-2. Make sure you have [FuseSoC](https://github.com/olofk/fusesoc) installed or install it with `pip install fusesoc`
+    ├──cores
+    └──workspace
+
+1. Make sure you have [FuseSoC](https://github.com/olofk/fusesoc) installed or install it with `pip install fusesoc`
+2. Initialize the FuseSoC base library with `fusesoc init`
 3. From `$CORES_ROOT`, clone the SweRVolf repository `git clone https://github.com/chipsalliance/Cores-SweRVolf`
 4. Add the cores directory as a FuseSoC core library `fusesoc library add swervolf ../cores`
 5. Make sure you have verilator installed to run the simulation
 
 ### Run a precompiled example in simulation
 
-At this point we can now build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim swervolf --ram_init_file=../cores/swervolf/sw/zephyr_hello.vh`.
+At this point we can now build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_hello.vh`.
 
 After running the above command, the simulation model should be built and run. At the end it will output
 
@@ -44,7 +46,9 @@ At this point the simulation can be aborted with `Ctrl-C`.
 
 Another example to run is the Zephyr philosophers demo.
 
-    fusesoc run --target=sim swervolf --ram_init_file=../cores/swervolf/sw/zephyr_philosophers.vh
+    fusesoc run --run --target=sim swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_philosophers.vh
+
+* Note the `--run` option which will prevent rebuilding the simulator model
 
 ### Run RISC-V compliance tests
 
