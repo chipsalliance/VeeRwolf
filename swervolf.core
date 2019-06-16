@@ -13,7 +13,7 @@ filesets:
     depend :
       - "pulp-platform.org::axi_mem_if"
       - "pulp-platform.org::axi_node"
-      - swerv
+      - chipsalliance.org:cores:swerv:1.1
 
   tb          : {files: [tb/swervolf_core_tb.v   : {file_type : systemVerilogSource}]}
   verilator_tb: {files: [tb/tb.cpp : {file_type : cppSource}]}
@@ -85,7 +85,7 @@ generate:
     generator: swerv_config
     position : first
     parameters:
-      args : []
+      args : [-unset=assert_on, -set=reset_vec=0x80000000]
 
 parameters:
   SIMPRINT:

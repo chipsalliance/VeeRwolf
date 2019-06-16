@@ -155,7 +155,7 @@ module swervolf_core
      (
       .clk     (clk),
       .rst_l   (rstn),
-      .rst_vec (31'h00000000),
+      .rst_vec (31'h40000000),
       .nmi_int (1'b0),
       .nmi_vec (31'h8880000),
 
@@ -359,6 +359,13 @@ module swervolf_core
       .jtag_tdi    (1'b0),
       .jtag_trst_n (1'b0),
       .jtag_tdo    (),
+
+   .mpc_debug_halt_req (1'b0), // Async halt request
+   .mpc_debug_run_req (1'b0), // Async run request
+   .mpc_reset_run_req (1'b1), // Run/halt after reset
+   .mpc_debug_halt_ack (), // Halt ack
+   .mpc_debug_run_ack  (), // Run ack
+   .debug_brkpt_status (), // debug breakpoint
 
       .i_cpu_halt_req      (1'b0),
       .o_cpu_halt_ack      (),

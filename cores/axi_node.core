@@ -1,0 +1,99 @@
+CAPI=2:
+
+name : pulp-platform.org::axi_node:1.1.1-r1
+
+filesets:
+  core:
+    files:
+      - src/apb_regs_top.sv
+      - src/axi_address_decoder_AR.sv
+      - src/axi_address_decoder_AW.sv
+      - src/axi_address_decoder_BR.sv
+      - src/axi_address_decoder_BW.sv
+      - src/axi_address_decoder_DW.sv
+      - src/axi_AR_allocator.sv
+      - src/axi_AW_allocator.sv
+      - src/axi_BR_allocator.sv
+      - src/axi_BW_allocator.sv
+      - src/axi_DW_allocator.sv
+      - src/axi_multiplexer.sv
+      - src/axi_node_arbiter.sv
+      - src/axi_node.sv
+      - src/axi_regs_top.sv
+      - src/axi_request_block.sv
+      - src/axi_response_block.sv
+    file_type : systemVerilogSource
+    depend :
+      - ">=pulp-platform.org::common_cells:1.7.5"
+      #Required since axi_B(R/W)_allocator.sv uses axi_pkg::RESP_DECERR
+      - ">=pulp-platform.org::axi:0.4.5"
+
+  interface:
+    files:
+      - src/axi_node_intf_wrap.sv
+      - src/axi_node_wrap_with_slices.sv
+    file_type : systemVerilogSource
+
+generators:
+  axi_intercon_gen:
+    interpreter: python
+    command: axi_intercon_gen.py
+    description: Generate a wrapper around PULP AXI Node interconnect
+    usage: |
+      axi_intercon_gen wraps AXI Node by expanding arrays of signals into
+      human-readable buses. Memory map can be set with generator parameters.
+      It will also generate a verilog include file containing the wire
+      definitions and module instantiation which can be `included in the
+      module where the interconnect wrapper is intended to be used.
+
+      Parameters:
+        masters: A dictionary where each key names a master interface connecting
+                 to the interconnect and the associated value contains
+                 configuration for that interface. Currently, there exists no
+                 master configuration keys and the values can be set to null
+        slaves: A dictionary  where each key names a slave interface connecting
+                 to the interconnect and the associated value contains
+                 configuration for that interface. The following configuration
+                 keys are defined
+
+                   offset (int): Base address for the slave
+                   size   (int): Size of the allocated memory map for the slave
+
+      Example usage:
+        The following config will generate an interconnect wrapper to which two
+        AXI4 master interfaces (dma and ibus) are connected, and connects
+        downstream to three AXI4 slaves (rom, gpio, ram)
+
+        soc_intercon:
+          generator: axi_intercon_gen
+          parameters:
+            masters:
+              dma:
+              ibus:
+            slaves:
+              ram:
+                offset : 0
+                size: 0x10000000
+              gpio:
+                offset: 0x91000000
+                size: 0x1000
+              rom:
+                offset : 0xffff0000
+                size : 32768
+
+targets:
+  default:
+    filesets : [core, interface]
+
+  lint:
+    default_tool : verilator
+    filesets : [core]
+    tools:
+      verilator: {mode : lint-only}
+    toplevel: axi_node
+
+provider:
+  name : github
+  user : olofk
+  repo : axi_node
+  version : fusesoc
