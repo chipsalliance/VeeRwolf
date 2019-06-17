@@ -35,7 +35,8 @@ config XIP
 	bool
 	default n
 
-config SERV_TIMER
+
+config RISCV_MACHINE_TIMER
 	bool
 	default y
 

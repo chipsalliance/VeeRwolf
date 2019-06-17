@@ -12,6 +12,9 @@
 #define DT_SRAM_BASE_ADDRESS 0x00000000
 #define DT_SRAM_SIZE         0x00800000
 
+#define RISCV_MTIME_BASE    0x80001020
+#define RISCV_MTIMECMP_BASE 0x80001028
+
 /* Also define the following for Zephyr 1.14 compatibility */
 #define CONFIG_RISCV_RAM_BASE_ADDR DT_SRAM_BASE_ADDRESS
 #define CONFIG_RISCV_RAM_SIZE      DT_SRAM_SIZE

@@ -97,8 +97,8 @@ module axi_multicon
       .data_o (reg_wdata),
       .data_i (reg_rdata));
 
-   reg [31:0] 	 mtime;
-   reg [31:0] 	 mtimecmp;
+   reg [63:0] 	 mtime;
+   reg [63:0] 	 mtimecmp;
 `ifdef SIMPRINT
    reg [1023:0]  signature_file;
    integer 	f = 0;
@@ -147,7 +147,7 @@ module axi_multicon
    //18 = timer/timecmp
    always @(posedge clk) begin
       if (reg_we)
-	case (reg_addr[4:3])
+	case (reg_addr[5:3])
 `ifdef SIMPRINT
 	  1: begin
 	     if (reg_be[0]) begin
@@ -161,15 +161,24 @@ module axi_multicon
 	  end
 `endif
 	  2 : o_gpio <= reg_wdata[0];
-	  3 : mtimecmp <= reg_wdata[31:0];
+	  5 : begin
+	     if (reg_be[0]) mtimecmp[7:0]   <= reg_wdata[7:0]  ;
+	     if (reg_be[1]) mtimecmp[15:8]  <= reg_wdata[15:8] ;
+	     if (reg_be[2]) mtimecmp[23:16] <= reg_wdata[23:16];
+	     if (reg_be[3]) mtimecmp[31:24] <= reg_wdata[31:24];
+	     if (reg_be[4]) mtimecmp[39:32] <= reg_wdata[39:32];
+	     if (reg_be[5]) mtimecmp[47:40] <= reg_wdata[47:40];
+	     if (reg_be[6]) mtimecmp[55:48] <= reg_wdata[55:48];
+	     if (reg_be[7]) mtimecmp[63:56] <= reg_wdata[63:56];
+	  end
 	endcase
 
-      case (reg_addr[4:3])
+      case (reg_addr[5:3])
 	0 : reg_rdata <= {`SWERVOLF_SHA, version};
-	3 : reg_rdata <= mtime;
+	4 : reg_rdata <= mtime;
       endcase
 
-      mtime <= mtime + 32'd1;
+      mtime <= mtime + 64'd1;
       o_timer_irq <= (mtime >= mtimecmp);
    end
 endmodule
