@@ -46,7 +46,6 @@ targets:
           - -mfcu
           - -cuautoname=du
           - config/common_defines.vh
-          - include/def.sv
       verilator:
         verilator_options : [--trace, -Wno-fatal]
     toplevel : swervolf_core_tb

@@ -20,9 +20,9 @@
 module swervolf_core
   #(parameter bootrom_file  = "",
     parameter ram_init_file = "")
-   (input  clk,
-    input  rstn,
-    output o_gpio);
+   (input wire 	clk,
+    input wire 	rstn,
+    output wire o_gpio);
 
    localparam BOOTROM_SIZE = 32'h1000;
    localparam RAM_SIZE     = 32'h10000;
@@ -158,6 +158,7 @@ module swervolf_core
       .rst_vec (31'h40000000),
       .nmi_int (1'b0),
       .nmi_vec (31'h8880000),
+      .jtag_id (31'd0),
 
       .trace_rv_i_insn_ip      (),
       .trace_rv_i_address_ip   (),
