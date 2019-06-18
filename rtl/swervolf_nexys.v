@@ -1,21 +1,25 @@
-/*  ISC License
- *
- *  SweRV SoC Nexys A7 toplevel
- *
- *  Copyright (C) 2019  Olof Kindgren <olof.kindgren@gmail.com>
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2019 Western Digital Corporation or its affiliates.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//********************************************************************************
+// $Id$
+//
+// Function: SweRVolf toplevel for Nexys A7 board
+// Comments:
+//
+//********************************************************************************
 
 `default_nettype none
 module swervolf_nexys_a7
@@ -27,7 +31,7 @@ module swervolf_nexys_a7
 
    wire 	 clk25;
    wire 	 rst25;
-   
+
    clk_gen_nexys clk_gen
      (.i_clk (clk),
       .i_rst (~rstn),

@@ -1,21 +1,26 @@
-/*  ISC License
- *
- *  SweRV SoC tech-agnostic toplevel
- *
- *  Copyright (C) 2019  Olof Kindgren <olof.kindgren@gmail.com>
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2019 Western Digital Corporation or its affiliates.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//********************************************************************************
+// $Id$
+//
+// Function: SweRVolf tech-agnostic toplevel
+// Comments:
+//
+//********************************************************************************
+
 `default_nettype none
 module swervolf_core
   #(parameter bootrom_file  = "",
@@ -361,12 +366,12 @@ module swervolf_core
       .jtag_trst_n (1'b0),
       .jtag_tdo    (),
 
-   .mpc_debug_halt_req (1'b0), // Async halt request
-   .mpc_debug_run_req (1'b0), // Async run request
-   .mpc_reset_run_req (1'b1), // Run/halt after reset
-   .mpc_debug_halt_ack (), // Halt ack
-   .mpc_debug_run_ack  (), // Run ack
-   .debug_brkpt_status (), // debug breakpoint
+      .mpc_debug_halt_req (1'b0),
+      .mpc_debug_run_req  (1'b0),
+      .mpc_reset_run_req  (1'b1),
+      .mpc_debug_halt_ack (),
+      .mpc_debug_run_ack  (),
+      .debug_brkpt_status (),
 
       .i_cpu_halt_req      (1'b0),
       .o_cpu_halt_ack      (),

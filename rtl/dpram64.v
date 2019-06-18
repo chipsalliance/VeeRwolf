@@ -1,21 +1,26 @@
-/*  ISC License
- *
- *  Basic RAM model with separate read/write ports and byte-wise write enable
- *
- *  Copyright (C) 2019  Olof Kindgren <olof.kindgren@gmail.com>
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2019 Western Digital Corporation or its affiliates.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//********************************************************************************
+// $Id$
+//
+// Function: Basic RAM model with separate read/write ports and byte-wise write enable
+// Comments:
+//
+//********************************************************************************
+
 module dpram64
   #(parameter SIZE=0,
     parameter memfile = "")
@@ -51,16 +56,6 @@ module dpram64
 	if(|memfile) begin
 	   $display("Preloading %m from %s", memfile);
 	   $readmemh(memfile, mem);
-	   /*for (i=0;i<SIZE/8;i=i+1) begin
-	      mem[i][ 7: 0] <= mem0[i+0];
-	      mem[i][15: 8] <= mem0[i+1];
-	      mem[i][23:16] <= mem0[i+2];
-	      mem[i][31:24] <= mem0[i+3];
-	      mem[i][39:32] <= mem0[i+4];
-	      mem[i][47:40] <= mem0[i+5];
-	      mem[i][55:48] <= mem0[i+6];
-	      mem[i][63:56] <= mem0[i+7];
-	   end*/
 	end
    endgenerate
 
