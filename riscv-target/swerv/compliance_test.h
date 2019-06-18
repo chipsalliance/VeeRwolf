@@ -12,13 +12,13 @@
 //-----------------------------------------------------------------------
 
 #define RV_COMPLIANCE_HALT              \
-la a0, data_begin;	 \
+        la a0, data_begin;			\
         la a1, data_end; \
         li a2, 0x80001008;			\
-complience_halt_loop: \
-        beq a0, a1, complience_halt_break; \
+compliance_halt_loop: \
+        beq a0, a1, compliance_halt_break; \
         addi a3, a0, 4; \
-complience_halt_loop2: \
+compliance_halt_loop2: \
         addi a3, a3, -1; \
 	\
         lb a4, 0 (a3); \
@@ -39,14 +39,14 @@ notLetter: \
 notLetter2: \
         addi a5, a5, 0x30; \
         sb a5, 0 (a2); \
-        bne a0, a3,complience_halt_loop2;  \
+        bne a0, a3,compliance_halt_loop2;  \
         addi a0, a0, 4; \
 	\
         li a4, '\n'; \
         sb a4, 0 (a2); \
-        j complience_halt_loop; \
-  j complience_halt_break;		\
-complience_halt_break:; \
+        j compliance_halt_loop; \
+  j compliance_halt_break;		\
+compliance_halt_break:; \
 	li	a0,0x80001009;	\
 	sb	a3,0(a0);
 
