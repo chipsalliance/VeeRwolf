@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef __RISCV32_SWERVOLF_SOC_H_
 #define __RISCV32_SWERVOLF_SOC_H_
 
