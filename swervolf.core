@@ -22,7 +22,16 @@ filesets:
     files :
       - data/swervolf_nexys.xdc : {file_type : xdc}
       - rtl/clk_gen_nexys.v : {file_type : verilogSource}
+
+  nexys_a7_nodram:
+    files :
       - rtl/swervolf_nexys.v    : {file_type : systemVerilogSource}
+
+  nexys_a7_dram:
+    files :
+      - data/ips.tcl : {file_type : tclSource}
+      - rtl/swervolf_nexys_ddr.v : {file_type : systemVerilogSource}
+    depend : [":swervolf:litedram"]
 
   bootrom:
     files :
@@ -56,8 +65,22 @@ targets:
       - bootrom
       - core
       - nexys_a7_files
+      - nexys_a7_nodram
     generate : [intercon, swerv_default_config]
     parameters : [bootrom_file, ram_init_file]
+    tools:
+      vivado: {part : xc7a100tcsg324-1}
+    toplevel : swervolf_nexys_a7
+
+  nexys_a7_ddr:
+    default_tool : vivado
+    filesets :
+      - bootrom
+      - core
+      - nexys_a7_files
+      - nexys_a7_dram
+    generate : [intercon, swerv_default_config]
+    parameters : [bootrom_file]
     tools:
       vivado: {part : xc7a100tcsg324-1}
     toplevel : swervolf_nexys_a7

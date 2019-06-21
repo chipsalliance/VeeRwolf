@@ -1,0 +1,38 @@
+CAPI=2:
+
+name : :swervolf:litedram:0
+
+filesets:
+  common:
+    files:
+      - VexRiscv.v
+      - litedram_top.v
+    file_type : verilogSource
+
+  core:
+    files:
+      - litedram_core.init : {file_type : user, copyto: litedram_core.init}
+      - litedram_core.v
+    file_type : verilogSource
+
+  xdc: {files : [litedram.xdc : {file_type : xdc}]}
+  tb:
+    files:
+      - $(XILINX_VIVADO)/data/verilog/src/glbl.v
+      - sim/ddr2_model_parameters.vh : {is_include_file : true}
+      - sim/ddr2_model.v
+      - litedram_tb.v
+    file_type : verilogSource
+
+targets:
+  default:
+    filesets : [common, core, xdc]
+
+  sim:
+    default_tool : xsim
+    filesets : [core, tb]
+    tools:
+      xsim:
+        xelab_options : [-d, x1Gb, -d, sg25E, -d, x16, -L, unisims_ver, -L secureip, --timescale, 1ns/1ns]
+    toplevel : [glbl, litedram_tb]
+

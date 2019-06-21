@@ -3,7 +3,7 @@ SweRVolf
 
 is a FuseSoC-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
 
-This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), Zephyr OS or other software in simulators or on FPGA boards. The SoC consists of the SweRV CPU with a boot ROM, on-chip RAM and GPIO.
+This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), Zephyr OS or other software in simulators or on FPGA boards. The SoC consists of the SweRV CPU with a boot ROM, DDR2 controller, on-chip RAM and GPIO.
 
 # Memory map
 
@@ -82,6 +82,14 @@ In case you wonder why the LED blinks so fast, the reason is that we want to be 
     25138760: gpio0 is on
 
 To find all available targets, you can run `fusesoc core show swervolf`
+
+### Run on hardware (with DDR2 controller)
+
+As there is yet no way to load an external program, the easiest way to run software is to preload it into the on-chip RAM. But there is also a DDR2 controller that can be enabled instead of the on-chip RAM by using the nexys_a7_ddr target. If the DDR2 controller is used, there is no RAM initialization file and programs have to be preloaded into the bootloader memory instead. Currently, the only supported program in this mode is the memory test application. This configuration can be built with
+
+    fusesoc run --target=nexys_a7_ddr swervolf --bootrom_file=../cores/Cores-SweRVolf/sw/memtest.vh
+
+If the memory test is successful, one LED should light up on the board
 
 ### Build Zephyr applications
 
