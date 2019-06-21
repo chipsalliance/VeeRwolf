@@ -203,5 +203,9 @@ module axi_multicon
 
       mtime <= mtime + 64'd1;
       o_timer_irq <= (mtime >= mtimecmp);
+      if (!rst_n) begin
+	 mtime <= 64'd0;
+	 mtimecmp <= 64'd0;
+      end
    end
 endmodule
