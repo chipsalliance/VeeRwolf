@@ -23,19 +23,106 @@
 
 `default_nettype none
 module swervolf_core
-  #(parameter bootrom_file  = "",
-    parameter ram_init_file = "")
+  #(parameter bootrom_file  = "")
    (input wire 	clk,
     input wire 	rstn,
+    output wire  [3:0] o_ram_awid,
+    output wire [31:0] o_ram_awaddr,
+    output wire  [7:0] o_ram_awlen,
+    output wire  [2:0] o_ram_awsize,
+    output wire  [1:0] o_ram_awburst,
+    output wire        o_ram_awlock,
+    output wire  [3:0] o_ram_awcache,
+    output wire  [2:0] o_ram_awprot,
+    output wire  [3:0] o_ram_awregion,
+    output wire  [0:0] o_ram_awuser,
+    output wire  [3:0] o_ram_awqos,
+    output wire        o_ram_awvalid,
+    input  wire        i_ram_awready,
+    output wire  [3:0] o_ram_arid,
+    output wire [31:0] o_ram_araddr,
+    output wire  [7:0] o_ram_arlen,
+    output wire  [2:0] o_ram_arsize,
+    output wire  [1:0] o_ram_arburst,
+    output wire        o_ram_arlock,
+    output wire  [3:0] o_ram_arcache,
+    output wire  [2:0] o_ram_arprot,
+    output wire  [3:0] o_ram_arregion,
+    output wire  [0:0] o_ram_aruser,
+    output wire  [3:0] o_ram_arqos,
+    output wire        o_ram_arvalid,
+    input  wire        i_ram_arready,
+    output wire [63:0] o_ram_wdata,
+    output wire  [7:0] o_ram_wstrb,
+    output wire        o_ram_wlast,
+    output wire  [0:0] o_ram_wuser,
+    output wire        o_ram_wvalid,
+    input  wire        i_ram_wready,
+    input  wire  [3:0] i_ram_bid,
+    input  wire  [1:0] i_ram_bresp,
+    input  wire        i_ram_bvalid,
+    input  wire  [0:0] i_ram_buser,
+    output wire        o_ram_bready,
+    input  wire  [3:0] i_ram_rid,
+    input  wire [63:0] i_ram_rdata,
+    input  wire  [1:0] i_ram_rresp,
+    input  wire        i_ram_rlast,
+    input  wire  [0:0] i_ram_ruser,
+    input  wire        i_ram_rvalid,
+    output wire        o_ram_rready,
     output wire o_gpio);
 
    localparam BOOTROM_SIZE = 32'h1000;
-   localparam RAM_SIZE     = 32'h10000;
 
    wire        rst_n = rstn;
    wire        timer_irq;
 
 `include "axi_intercon.vh"
+
+   assign o_ram_awid     = ram_awid;
+   assign o_ram_awaddr   = ram_awaddr;
+   assign o_ram_awlen    = ram_awlen;
+   assign o_ram_awsize   = ram_awsize;
+   assign o_ram_awburst  = ram_awburst;
+   assign o_ram_awlock   = ram_awlock;
+   assign o_ram_awcache  = ram_awcache;
+   assign o_ram_awprot   = ram_awprot;
+   assign o_ram_awregion = ram_awregion;
+   assign o_ram_awuser   = ram_awuser;
+   assign o_ram_awqos    = ram_awqos;
+   assign o_ram_awvalid  = ram_awvalid;
+   assign ram_awready    = i_ram_awready;
+   assign o_ram_arid     = ram_arid;
+   assign o_ram_araddr   = ram_araddr;
+   assign o_ram_arlen    = ram_arlen;
+   assign o_ram_arsize   = ram_arsize;
+   assign o_ram_arburst  = ram_arburst;
+   assign o_ram_arlock   = ram_arlock;
+   assign o_ram_arcache  = ram_arcache;
+   assign o_ram_arprot   = ram_arprot;
+   assign o_ram_arregion = ram_arregion;
+   assign o_ram_aruser   = ram_aruser;
+   assign o_ram_arqos    = ram_arqos;
+   assign o_ram_arvalid  = ram_arvalid;
+   assign ram_arready    = i_ram_arready;
+   assign o_ram_wdata    = ram_wdata;
+   assign o_ram_wstrb    = ram_wstrb;
+   assign o_ram_wlast    = ram_wlast;
+   assign o_ram_wuser    = ram_wuser;
+   assign o_ram_wvalid   = ram_wvalid;
+   assign ram_wready     = i_ram_wready;
+   assign ram_bid        = i_ram_bid;
+   assign ram_bresp      = i_ram_bresp;
+   assign ram_bvalid     = i_ram_bvalid;
+   assign ram_buser      = i_ram_buser;
+   assign o_ram_bready   = ram_bready;
+   assign ram_rid        = i_ram_rid;
+   assign ram_rdata      = i_ram_rdata;
+   assign ram_rresp      = i_ram_rresp;
+   assign ram_rlast      = i_ram_rlast;
+   assign ram_ruser      = i_ram_ruser;
+   assign ram_rvalid     = i_ram_rvalid;
+   assign o_ram_rready   = ram_rready;
 
    axi_mem_wrapper
      #(.ID_WIDTH  (`RV_IFU_BUS_TAG+1),
@@ -77,47 +164,6 @@ module swervolf_core
       .o_rlast  (rom_rlast),
       .o_rvalid (rom_rvalid),
       .i_rready (rom_rready));
-
-   axi_mem_wrapper
-     #(.ID_WIDTH  (`RV_IFU_BUS_TAG+1),
-       .MEM_SIZE  (RAM_SIZE),
-       .INIT_FILE (ram_init_file))
-   ram
-     (.clk      (clk),
-      .rst_n    (rst_n),
-      .i_awid    (ram_awid),
-      .i_awaddr  (ram_awaddr),
-      .i_awlen   (ram_awlen),
-      .i_awsize  (ram_awsize),
-      .i_awburst (ram_awburst),
-      .i_awvalid (ram_awvalid),
-      .o_awready (ram_awready),
-
-      .i_arid    (ram_arid),
-      .i_araddr  (ram_araddr),
-      .i_arlen   (ram_arlen),
-      .i_arsize  (ram_arsize),
-      .i_arburst (ram_arburst),
-      .i_arvalid (ram_arvalid),
-      .o_arready (ram_arready),
-
-      .i_wdata  (ram_wdata),
-      .i_wstrb  (ram_wstrb),
-      .i_wlast  (ram_wlast),
-      .i_wvalid (ram_wvalid),
-      .o_wready (ram_wready),
-
-      .o_bid    (ram_bid),
-      .o_bresp  (ram_bresp),
-      .o_bvalid (ram_bvalid),
-      .i_bready (ram_bready),
-
-      .o_rid    (ram_rid),
-      .o_rdata  (ram_rdata),
-      .o_rresp  (ram_rresp),
-      .o_rlast  (ram_rlast),
-      .o_rvalid (ram_rvalid),
-      .i_rready (ram_rready));
 
    axi_multicon
      #(.ID_WIDTH  (`RV_IFU_BUS_TAG+1))
@@ -197,7 +243,7 @@ module swervolf_core
       .lsu_axi_bvalid   (lsu_bvalid),
       .lsu_axi_bready   (lsu_bready),
       .lsu_axi_bresp    (lsu_bresp),
-      .lsu_axi_bid      (lsu_bid),
+      .lsu_axi_bid      ({1'b0,lsu_bid}),
 
       .lsu_axi_arvalid  (lsu_arvalid ),
       .lsu_axi_arready  (lsu_arready ),
@@ -214,7 +260,7 @@ module swervolf_core
 
       .lsu_axi_rvalid   (lsu_rvalid),
       .lsu_axi_rready   (lsu_rready),
-      .lsu_axi_rid      (lsu_rid   ),
+      .lsu_axi_rid      ({1'b0,lsu_rid}   ),
       .lsu_axi_rdata    (lsu_rdata ),
       .lsu_axi_rresp    (lsu_rresp ),
       .lsu_axi_rlast    (lsu_rlast ),
@@ -242,7 +288,7 @@ module swervolf_core
       .ifu_axi_bvalid   (1'b0),
       .ifu_axi_bready   (),
       .ifu_axi_bresp    (2'b00),
-      .ifu_axi_bid      (),
+      .ifu_axi_bid      (3'd0),
 
       .ifu_axi_arvalid  (ifu_arvalid ),
       .ifu_axi_arready  (ifu_arready ),
