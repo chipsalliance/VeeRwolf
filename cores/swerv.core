@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:swerv:1.1
+name : chipsalliance.org:cores:swerv:1.1-r1
 
 filesets:
   rtl:
@@ -136,6 +136,6 @@ generators:
 
 provider:
   name : github
-  user : chipsalliance
+  user : olofk
   repo : Cores-SweRV
-  version : fusesoc
+  version : 60ff2407b4a86138c7e9ca03f4d14692e83992ef

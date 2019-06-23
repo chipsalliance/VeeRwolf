@@ -13,7 +13,7 @@ filesets:
     depend :
       - "pulp-platform.org::axi_mem_if"
       - "pulp-platform.org::axi_node"
-      - chipsalliance.org:cores:swerv:1.1
+      - ">=chipsalliance.org:cores:swerv:1.1-r1"
 
   tb          : {files: [tb/swervolf_core_tb.v   : {file_type : systemVerilogSource}]}
   verilator_tb: {files: [tb/tb.cpp : {file_type : cppSource}]}
