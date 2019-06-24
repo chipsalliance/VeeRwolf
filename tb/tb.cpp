@@ -46,6 +46,47 @@ void INThandler(int signal)
 	done = true;
 }
 
+typedef struct {
+  uint8_t state;
+  char ch;
+  uint32_t baud_t;
+  vluint64_t last_update;
+} uart_context_t;
+
+void uart_init(uart_context_t *context, uint32_t clk_freq, uint32_t baud_rate) {
+  context->baud_t = clk_freq/baud_rate;
+}
+
+void do_uart(uart_context_t *context, bool rx) {
+  if (context->state == 0) {
+    if (!rx) {
+      context->last_update = main_time + context->baud_t/2;
+      context->state++;
+    }
+  }
+  else if(context->state == 1) {
+    if (main_time > context->last_update) {
+      context->last_update += context->baud_t;
+      context->ch = 0;
+      context->state++;
+    }
+  }
+  else if (context->state < 10) {
+    if (main_time > context->last_update) {
+      context->last_update += context->baud_t;
+      context->ch |= rx << (context->state-2);
+      context->state++;
+    }
+  }
+  else {
+    if (main_time > context->last_update) {
+      context->last_update += context->baud_t;
+      putchar(context->ch);
+      context->state=0;
+    }
+  }
+}
+
 int main(int argc, char **argv, char **env)
 {
   Verilated::commandArgs(argc, argv);
@@ -61,6 +102,9 @@ int main(int argc, char **argv, char **env)
     tfp->open ("trace.vcd");
   }
 
+  uart_context_t uart_context;
+  int baud_rate = 115200;
+  uart_init(&uart_context, 1000*1000*1000, baud_rate);
   vluint64_t timeout = 0;
   const char *arg_timeout = Verilated::commandArgsPlusMatch("timeout=");
   if (arg_timeout[0])
@@ -78,6 +122,7 @@ int main(int argc, char **argv, char **env)
     top->eval();
     if (tfp)
       tfp->dump(main_time);
+    if (baud_rate) do_uart(&uart_context, top->o_uart_tx);
     if (gpio0 != top->o_gpio) {
       printf("%lu: gpio0 is %s\n", main_time, top->o_gpio ? "on" : "off");
       gpio0 = top->o_gpio;
@@ -87,7 +132,7 @@ int main(int argc, char **argv, char **env)
       done = true;
     }
     top->clk = !top->clk;
-    main_time+=5;
+    main_time+=20;
   }
   if (tfp)
     tfp->close();

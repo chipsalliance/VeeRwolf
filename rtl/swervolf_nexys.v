@@ -26,8 +26,10 @@ module swervolf_nexys_a7
   #(parameter bootrom_file = "jumptoram.vh",
     parameter ram_init_file = "zephyr_blinky.vh")
    (input wire 	       clk,
-    input wire 	       rstn,
-    output wire        led0);
+    input wire 	rstn,
+    input wire 	i_uart_rx,
+    output wire o_uart_tx,
+    output wire led0);
 
    localparam RAM_SIZE     = 32'h10000;
 
@@ -131,6 +133,8 @@ module swervolf_nexys_a7
    swervolf
      (.clk  (clk25),
       .rstn (~rst25),
+      .i_uart_rx      (i_uart_rx),
+      .o_uart_tx      (o_uart_tx),
       .o_ram_awid     (ram_awid),
       .o_ram_awaddr   (ram_awaddr),
       .o_ram_awlen    (ram_awlen),

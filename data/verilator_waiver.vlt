@@ -19,6 +19,7 @@ lint_off -msg WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/rrarbite
 lint_off -msg WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/rrarbiter.sv" -lines 121-122
 lint_off -msg WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/lzc.sv" -lines 46
 lint_off -msg WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/lzc.sv" -lines 55
+lint_off -msg CMPCONST -file "*/pulp-platform.org__common_cells_1.11.0/src/fifo_v2.sv" -lines 48
 
 //pulp-platform.org::axi_mem_if:0.2.0
 lint_off -msg CASEINCOMPLETE -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 119
@@ -35,5 +36,5 @@ lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/ax
 
 //AXI interconnect generator warnings
 lint_off -msg PINMISSING -file "*/swervolf-intercon_0/axi_intercon.v"
-lint_off -msg WIDTH -file "*/swervolf_0/rtl/swervolf_core.v" -lines 226
-lint_off -msg WIDTH -file "*/swervolf_0/rtl/swervolf_core.v" -lines 250
+lint_off -msg WIDTH -file "*/swervolf_0/rtl/swervolf_core.v" -lines 267
+lint_off -msg WIDTH -file "*/swervolf_0/rtl/swervolf_core.v" -lines 291

@@ -3,7 +3,7 @@ SweRVolf
 
 is a FuseSoC-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
 
-This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), Zephyr OS or other software in simulators or on FPGA boards. The SoC consists of the SweRV CPU with a boot ROM, DDR2 controller, on-chip RAM and GPIO.
+This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), Zephyr OS or other software in simulators or on FPGA boards. The SoC consists of the SweRV CPU with a boot ROM, DDR2 controller, on-chip RAM, UART and GPIO.
 
 # Memory map
 
@@ -12,6 +12,7 @@ This can be used to run the [RISC-V compliance tests](https://github.com/riscv/r
 | RAM      | 0x00000000-0x0000FFFF |
 | Boot ROM | 0x80000000-0x80000FFF |
 | GPIO     | 0x80001000-0x8000000F |
+| UART     | 0x80002000-0x80002FFF |
 
 For simulation targets there are also two extra registers defined. Writing to 0x80001008 will print a character to stdout. Writing to 0x80001009 will end the simulation.
 
@@ -95,10 +96,8 @@ If the memory test is successful, one LED should light up on the board
 
 ### Build Zephyr applications
 
-*Note: At this point only the Zephyr blinky application can be built with upstream Zephyr due to the lack of a real UART*
-
 1. Download and install Zephyr according to the official guidelines at https://www.zephyrproject.org/
-2. Enter the directory of the Zephyr blinky example
+2. Enter the directory of the application to build in the samples directory (e.g. `basic/blinky` for the Zephyr blinky example). From now on, the program to build and run will be called `$APP`
 3. Build the code with
     mkdir build
     cd build
@@ -106,13 +105,11 @@ If the memory test is successful, one LED should light up on the board
     ninja
 4. There will now be a binary file in `zephyr/zephyr.bin`
 5. Enter the FuseSoC workspace directory and convert the binary file into a suitable verilog hex file with
-    python $CORES_ROOT/swervolf/sw/makehex.py $ZEPHYR_BASE/samples/basic/blinky/build/zephyr/zephyr.bin > blinky2.hex
+    python $CORES_ROOT/swervolf/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex
 6. The new hex file can now be embedded for a new FPGA build with
 
-    fusesoc run --target=nexys_a7 swervolf --ram_init_file=blinky2.hex
+    fusesoc run --target=nexys_a7 swervolf --ram_init_file=$APP.hex
 
 or in a simulation with
 
-    fusesoc run --target=sim swervolf --ram_init_file=blinky2.hex
-
-Note that simulation will take a very long time unless the blink speed is changed by setting `SLEEP_TIME` to a lower value in `$ZEPHYR_BASE/samples/basic/blinky/src/main.c`
+    fusesoc run --target=sim swervolf --ram_init_file=$APP.hex

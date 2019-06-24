@@ -9,6 +9,10 @@
 
 #include <soc_common.h>
 
+#define DT_UART_NS16550_PORT_0_NAME      "uart0"
+#define DT_UART_NS16550_PORT_0_BASE_ADDR 0x80002000
+#define DT_UART_NS16550_PORT_0_BAUD_RATE (115200/16)
+#define DT_UART_NS16550_PORT_0_CLK_FREQ 25000000
 /* Following defines are needed for LED support until there is
    devices trees are in place. LED controller is defined in soc.c */
 #define LED0_GPIO_CONTROLLER "LED0"

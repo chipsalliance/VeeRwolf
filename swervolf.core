@@ -7,13 +7,21 @@ filesets:
     files:
       - rtl/dpram64.v
       - rtl/axi_mem_wrapper.v
+      - rtl/axi_uart_wrapper.v
       - rtl/axi_multicon.v
       - rtl/swervolf_core.v
     file_type : systemVerilogSource
     depend :
+      - "pulp-platform.org::apb_uart_sv"
+      - "pulp-platform.org::axi2apb"
       - "pulp-platform.org::axi_mem_if"
       - "pulp-platform.org::axi_node"
       - ">=chipsalliance.org:cores:swerv:1.1-r1"
+
+  bfm:
+    files:
+      - tb/uart_decoder.v
+    file_type : verilogSource
 
   tb          : {files: [tb/swervolf_core_tb.v   : {file_type : systemVerilogSource}]}
   verilator_tb: {files: [tb/tb.cpp : {file_type : cppSource}]}
@@ -44,6 +52,7 @@ targets:
     default_tool : verilator
     filesets :
       - core
+      - "!tool_verilator? (bfm)"
       - tb
       - bootrom
       - "tool_verilator? (verilator_tb)"
@@ -57,6 +66,7 @@ targets:
           - -mfcu
           - -cuautoname=du
           - config/common_defines.vh
+          - -timescale 1ns/1ns
       verilator:
         verilator_options : [--trace, -Wno-fatal]
     toplevel : swervolf_core_tb
@@ -100,6 +110,9 @@ generate:
           size   : 0x00001000
         multicon:
           offset : 0x80001000
+          size   : 0x00001000
+        uart:
+          offset : 0x80002000
           size   : 0x00001000
         ram:
           offset : 0x00000000

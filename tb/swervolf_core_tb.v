@@ -25,9 +25,10 @@
 module swervolf_core_tb
   #(parameter bootrom_file  = "jumptoram.vh")
 `ifdef VERILATOR
-  (input clk,
-   input  rst,
-   output o_gpio)
+  (input wire clk,
+   input wire  rst,
+   output wire o_uart_tx,
+   output wire o_gpio)
 `endif
   ;
 
@@ -36,9 +37,13 @@ module swervolf_core_tb
 `ifndef VERILATOR
    reg 	 clk = 1'b0;
    reg 	 rst = 1'b1;
-   always #5 clk <= !clk;
+   always #20 clk <= !clk;
    initial #100 rst <= 1'b0;
    wire  o_gpio;
+   wire  o_uart_tx;
+
+   uart_decoder #(115200) uart_decoder (o_uart_tx);
+
 `endif
 
    reg [1023:0] ram_init_file;
@@ -150,6 +155,8 @@ module swervolf_core_tb
    swervolf
      (.clk  (clk),
       .rstn (!rst),
+      .i_uart_rx           (1'b1),
+      .o_uart_tx           (o_uart_tx),
       .o_ram_awid          (ram_awid),
       .o_ram_awaddr        (ram_awaddr),
       .o_ram_awlen         (ram_awlen),
