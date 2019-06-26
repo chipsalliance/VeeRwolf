@@ -26,6 +26,12 @@ module swervolf_core
   #(parameter bootrom_file  = "")
    (input wire 	clk,
     input wire 	       rstn,
+    input wire 	       dmi_reg_en,
+    input wire [6:0]   dmi_reg_addr,
+    input wire 	       dmi_reg_wr_en,
+    input wire [31:0]  dmi_reg_wdata,
+    output wire [31:0] dmi_reg_rdata,
+    input wire 	       dmi_hard_reset,
     input wire 	       i_uart_rx,
     output wire        o_uart_tx,
     output wire [5:0]  o_ram_awid,
@@ -233,14 +239,13 @@ module swervolf_core
       .o_rvalid   (uart_rvalid),
       .i_rready   (uart_rready));
 
-   swerv_wrapper rvtop
+   swerv_wrapper_dmi rvtop
      (
       .clk     (clk),
       .rst_l   (rstn),
       .rst_vec (31'h40000000),
       .nmi_int (1'b0),
       .nmi_vec (31'h8880000),
-      .jtag_id (31'd0),
 
       .trace_rv_i_insn_ip      (),
       .trace_rv_i_address_ip   (),
@@ -433,11 +438,12 @@ module swervolf_core
       .dec_tlu_perfcnt2 (),
       .dec_tlu_perfcnt3 (),
 
-      .jtag_tck    (1'b0),
-      .jtag_tms    (1'b0),
-      .jtag_tdi    (1'b0),
-      .jtag_trst_n (1'b0),
-      .jtag_tdo    (),
+      .dmi_reg_rdata    (dmi_reg_rdata),
+      .dmi_reg_wdata    (dmi_reg_wdata),
+      .dmi_reg_addr     (dmi_reg_addr),
+      .dmi_reg_en       (dmi_reg_en),
+      .dmi_reg_wr_en    (dmi_reg_wr_en),
+      .dmi_hard_reset   (dmi_hard_reset),
 
       .mpc_debug_halt_req (1'b0),
       .mpc_debug_run_req  (1'b0),

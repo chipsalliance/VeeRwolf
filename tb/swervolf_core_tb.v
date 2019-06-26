@@ -27,6 +27,11 @@ module swervolf_core_tb
 `ifdef VERILATOR
   (input wire clk,
    input wire  rst,
+   input wire  i_jtag_tck,
+   input wire  i_jtag_tms,
+   input wire  i_jtag_tdi,
+   input wire  i_jtag_trst_n,
+   output wire o_jtag_tdo,
    output wire o_uart_tx,
    output wire o_gpio)
 `endif
@@ -40,6 +45,11 @@ module swervolf_core_tb
    always #20 clk <= !clk;
    initial #100 rst <= 1'b0;
    wire  o_gpio;
+   wire i_jtag_tck = 1'b0;
+   wire i_jtag_tms = 1'b0;
+   wire i_jtag_tdi = 1'b0;
+   wire i_jtag_trst_n = 1'b0;
+   wire o_jtag_tdo;
    wire  o_uart_tx;
 
    uart_decoder #(115200) uart_decoder (o_uart_tx);
@@ -104,6 +114,13 @@ module swervolf_core_tb
    wire        ram_rvalid;
    wire        ram_rready;
 
+   wire        dmi_reg_en;
+   wire [6:0]  dmi_reg_addr;
+   wire        dmi_reg_wr_en;
+   wire [31:0] dmi_reg_wdata;
+   wire [31:0] dmi_reg_rdata;
+   wire        dmi_hard_reset;
+   
    axi_mem_wrapper
      #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2),
        .MEM_SIZE  (RAM_SIZE),
@@ -145,11 +162,36 @@ module swervolf_core_tb
       .o_rvalid (ram_rvalid),
       .i_rready (ram_rready));
 
+   dmi_wrapper dmi_wrapper
+     (.trst_n    (i_jtag_trst_n),
+      .tck       (i_jtag_tck),
+      .tms       (i_jtag_tms),
+      .tdi       (i_jtag_tdi),
+      .tdo       (o_jtag_tdo),
+      .tdoEnable (),
+      // Processor Signals
+      .scan_mode      (1'b0),
+      .core_rst_n     (!rst),
+      .core_clk       (clk),
+      .jtag_id        (31'd0),
+      .rd_data        (dmi_reg_rdata),
+      .reg_wr_data    (dmi_reg_wdata),
+      .reg_wr_addr    (dmi_reg_addr),
+      .reg_en         (dmi_reg_en),
+      .reg_wr_en      (dmi_reg_wr_en),
+      .dmi_hard_reset (dmi_hard_reset)); 
+
    swervolf_core
      #(.bootrom_file (bootrom_file))
    swervolf
      (.clk  (clk),
       .rstn (!rst),
+      .dmi_reg_rdata       (dmi_reg_rdata),
+      .dmi_reg_wdata       (dmi_reg_wdata),
+      .dmi_reg_addr        (dmi_reg_addr),
+      .dmi_reg_en          (dmi_reg_en),
+      .dmi_reg_wr_en       (dmi_reg_wr_en),
+      .dmi_hard_reset      (dmi_hard_reset),
       .i_uart_rx           (1'b1),
       .o_uart_tx           (o_uart_tx),
       .o_ram_awid          (ram_awid),

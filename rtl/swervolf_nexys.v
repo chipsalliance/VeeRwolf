@@ -128,6 +128,12 @@ module swervolf_nexys_a7
    swervolf
      (.clk  (clk25),
       .rstn (~rst25),
+      .dmi_reg_rdata  (),
+      .dmi_reg_wdata  (32'd0),
+      .dmi_reg_addr   (7'd0),
+      .dmi_reg_en     (1'd0),
+      .dmi_reg_wr_en  (1'd0),
+      .dmi_hard_reset (1'd0),
       .i_uart_rx      (i_uart_rx),
       .o_uart_tx      (o_uart_tx),
       .o_ram_awid     (ram_awid),
