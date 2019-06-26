@@ -15,7 +15,7 @@ filesets:
       - "pulp-platform.org::apb_uart_sv"
       - "pulp-platform.org::axi2apb"
       - "pulp-platform.org::axi_mem_if"
-      - "pulp-platform.org::axi_node"
+      - ">=pulp-platform.org::axi_node:1.1.1-r2"
       - ">=chipsalliance.org:cores:swerv:1.1-r1"
 
   bfm:
@@ -103,7 +103,9 @@ generate:
     parameters:
       masters:
         ifu:
+          id_width : 3
         lsu:
+          id_width : 4
       slaves:
         rom:
           offset : 0x80000000

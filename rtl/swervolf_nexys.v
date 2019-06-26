@@ -42,7 +42,7 @@ module swervolf_nexys_a7
       .o_clk25 (clk25),
       .o_rst25 (rst25));
 
-   wire [3:0]  ram_awid;
+   wire [4:0]  ram_awid;
    wire [31:0] ram_awaddr;
    wire [7:0]  ram_awlen;
    wire [2:0]  ram_awsize;
@@ -51,11 +51,10 @@ module swervolf_nexys_a7
    wire [3:0]  ram_awcache;
    wire [2:0]  ram_awprot;
    wire [3:0]  ram_awregion;
-   wire [0:0]  ram_awuser;
    wire [3:0]  ram_awqos;
    wire        ram_awvalid;
    wire        ram_awready;
-   wire [3:0]  ram_arid;
+   wire [4:0]  ram_arid;
    wire [31:0] ram_araddr;
    wire [7:0]  ram_arlen;
    wire [2:0]  ram_arsize;
@@ -64,31 +63,27 @@ module swervolf_nexys_a7
    wire [3:0]  ram_arcache;
    wire [2:0]  ram_arprot;
    wire [3:0]  ram_arregion;
-   wire [0:0]  ram_aruser;
    wire [3:0]  ram_arqos;
    wire        ram_arvalid;
    wire        ram_arready;
    wire [63:0] ram_wdata;
    wire [7:0]  ram_wstrb;
    wire        ram_wlast;
-   wire [0:0]  ram_wuser;
    wire        ram_wvalid;
    wire        ram_wready;
-   wire [3:0]  ram_bid;
+   wire [4:0]  ram_bid;
    wire [1:0]  ram_bresp;
    wire        ram_bvalid;
-   wire [0:0]  ram_buser;
    wire        ram_bready;
-   wire [3:0]  ram_rid;
+   wire [4:0]  ram_rid;
    wire [63:0] ram_rdata;
    wire [1:0]  ram_rresp;
    wire        ram_rlast;
-   wire [0:0]  ram_ruser;
    wire        ram_rvalid;
    wire        ram_rready;
 
    axi_mem_wrapper
-     #(.ID_WIDTH  (`RV_IFU_BUS_TAG+1),
+     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+1),
        .MEM_SIZE  (RAM_SIZE),
        .INIT_FILE (ram_init_file))
    ram
@@ -144,7 +139,6 @@ module swervolf_nexys_a7
       .o_ram_awcache  (ram_awcache),
       .o_ram_awprot   (ram_awprot),
       .o_ram_awregion (ram_awregion),
-      .o_ram_awuser   (ram_awuser),
       .o_ram_awqos    (ram_awqos),
       .o_ram_awvalid  (ram_awvalid),
       .i_ram_awready  (ram_awready),
@@ -157,26 +151,22 @@ module swervolf_nexys_a7
       .o_ram_arcache  (ram_arcache),
       .o_ram_arprot   (ram_arprot),
       .o_ram_arregion (ram_arregion),
-      .o_ram_aruser   (ram_aruser),
       .o_ram_arqos    (ram_arqos),
       .o_ram_arvalid  (ram_arvalid),
       .i_ram_arready  (ram_arready),
       .o_ram_wdata    (ram_wdata),
       .o_ram_wstrb    (ram_wstrb),
       .o_ram_wlast    (ram_wlast),
-      .o_ram_wuser    (ram_wuser),
       .o_ram_wvalid   (ram_wvalid),
       .i_ram_wready   (ram_wready),
       .i_ram_bid      (ram_bid),
       .i_ram_bresp    (ram_bresp),
       .i_ram_bvalid   (ram_bvalid),
-      .i_ram_buser    (ram_buser),
       .o_ram_bready   (ram_bready),
       .i_ram_rid      (ram_rid),
       .i_ram_rdata    (ram_rdata),
       .i_ram_rresp    (ram_rresp),
       .i_ram_rlast    (ram_rlast),
-      .i_ram_ruser    (ram_ruser),
       .i_ram_rvalid   (ram_rvalid),
       .o_ram_rready   (ram_rready),
       .o_gpio (led0));

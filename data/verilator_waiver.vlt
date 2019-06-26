@@ -2,12 +2,12 @@
 
 //These non-critical warnings must be fixed upstream. In the meantime they are waived to easier spot other warnings
 
-//pulp-platform.org::axi_node:1.1.1-r1
-lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node_1.1.1-r1/src/axi_request_block.sv" -lines 101
-lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node_1.1.1-r1/src/axi_response_block.sv" -lines 68
-lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node_1.1.1-r1/src/axi_response_block.sv" -lines 75
-lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node_1.1.1-r1/src/axi_address_decoder_AR.sv" -lines 75
-lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node_1.1.1-r1/src/axi_address_decoder_AW.sv" -lines 84
+//pulp-platform.org::axi_node
+lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_request_block.sv" -lines 101
+lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_response_block.sv" -lines 68
+lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_response_block.sv" -lines 75
+lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_address_decoder_AR.sv" -lines 75
+lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_address_decoder_AW.sv" -lines 84
 
 //pulp-platform.org::axi:0.6
 lint_off -msg UNOPTFLAT -file "*/pulp-platform.org__axi_0.6/src/axi_intf.sv" -lines 57
@@ -33,8 +33,3 @@ lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/ax
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 115-116
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 196
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 239
-
-//AXI interconnect generator warnings
-lint_off -msg PINMISSING -file "*/swervolf-intercon_0/axi_intercon.v"
-lint_off -msg WIDTH -file "*/swervolf_0/rtl/swervolf_core.v" -lines 267
-lint_off -msg WIDTH -file "*/swervolf_0/rtl/swervolf_core.v" -lines 291

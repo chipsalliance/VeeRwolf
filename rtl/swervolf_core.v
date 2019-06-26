@@ -28,7 +28,7 @@ module swervolf_core
     input wire 	       rstn,
     input wire 	       i_uart_rx,
     output wire        o_uart_tx,
-    output wire [3:0]  o_ram_awid,
+    output wire [4:0]  o_ram_awid,
     output wire [31:0] o_ram_awaddr,
     output wire [7:0]  o_ram_awlen,
     output wire [2:0]  o_ram_awsize,
@@ -37,11 +37,10 @@ module swervolf_core
     output wire [3:0]  o_ram_awcache,
     output wire [2:0]  o_ram_awprot,
     output wire [3:0]  o_ram_awregion,
-    output wire [0:0]  o_ram_awuser,
     output wire [3:0]  o_ram_awqos,
     output wire        o_ram_awvalid,
     input wire 	       i_ram_awready,
-    output wire [3:0]  o_ram_arid,
+    output wire [4:0]  o_ram_arid,
     output wire [31:0] o_ram_araddr,
     output wire [7:0]  o_ram_arlen,
     output wire [2:0]  o_ram_arsize,
@@ -50,26 +49,22 @@ module swervolf_core
     output wire [3:0]  o_ram_arcache,
     output wire [2:0]  o_ram_arprot,
     output wire [3:0]  o_ram_arregion,
-    output wire [0:0]  o_ram_aruser,
     output wire [3:0]  o_ram_arqos,
     output wire        o_ram_arvalid,
     input wire 	       i_ram_arready,
     output wire [63:0] o_ram_wdata,
     output wire [7:0]  o_ram_wstrb,
     output wire        o_ram_wlast,
-    output wire [0:0]  o_ram_wuser,
     output wire        o_ram_wvalid,
     input wire 	       i_ram_wready,
-    input wire [3:0]   i_ram_bid,
+    input wire [4:0]   i_ram_bid,
     input wire [1:0]   i_ram_bresp,
     input wire 	       i_ram_bvalid,
-    input wire [0:0]   i_ram_buser,
     output wire        o_ram_bready,
-    input wire [3:0]   i_ram_rid,
+    input wire [4:0]   i_ram_rid,
     input wire [63:0]  i_ram_rdata,
     input wire [1:0]   i_ram_rresp,
     input wire 	       i_ram_rlast,
-    input wire [0:0]   i_ram_ruser,
     input wire 	       i_ram_rvalid,
     output wire        o_ram_rready,
     output wire        o_gpio);
@@ -91,7 +86,6 @@ module swervolf_core
    assign o_ram_awcache  = ram_awcache;
    assign o_ram_awprot   = ram_awprot;
    assign o_ram_awregion = ram_awregion;
-   assign o_ram_awuser   = ram_awuser;
    assign o_ram_awqos    = ram_awqos;
    assign o_ram_awvalid  = ram_awvalid;
    assign ram_awready    = i_ram_awready;
@@ -104,31 +98,27 @@ module swervolf_core
    assign o_ram_arcache  = ram_arcache;
    assign o_ram_arprot   = ram_arprot;
    assign o_ram_arregion = ram_arregion;
-   assign o_ram_aruser   = ram_aruser;
    assign o_ram_arqos    = ram_arqos;
    assign o_ram_arvalid  = ram_arvalid;
    assign ram_arready    = i_ram_arready;
    assign o_ram_wdata    = ram_wdata;
    assign o_ram_wstrb    = ram_wstrb;
    assign o_ram_wlast    = ram_wlast;
-   assign o_ram_wuser    = ram_wuser;
    assign o_ram_wvalid   = ram_wvalid;
    assign ram_wready     = i_ram_wready;
    assign ram_bid        = i_ram_bid;
    assign ram_bresp      = i_ram_bresp;
    assign ram_bvalid     = i_ram_bvalid;
-   assign ram_buser      = i_ram_buser;
    assign o_ram_bready   = ram_bready;
    assign ram_rid        = i_ram_rid;
    assign ram_rdata      = i_ram_rdata;
    assign ram_rresp      = i_ram_rresp;
    assign ram_rlast      = i_ram_rlast;
-   assign ram_ruser      = i_ram_ruser;
    assign ram_rvalid     = i_ram_rvalid;
    assign o_ram_rready   = ram_rready;
 
    axi_mem_wrapper
-     #(.ID_WIDTH  (`RV_IFU_BUS_TAG+1),
+     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+1),
        .MEM_SIZE  (BOOTROM_SIZE),
        .INIT_FILE (bootrom_file))
    bootrom
@@ -169,7 +159,7 @@ module swervolf_core
       .i_rready (rom_rready));
 
    axi_multicon
-     #(.ID_WIDTH  (`RV_IFU_BUS_TAG+1))
+     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+1))
    multicon
      (.clk       (clk),
       .rst_n     (rst_n),
@@ -206,7 +196,7 @@ module swervolf_core
       .i_rready  (multicon_rready));
 
    axi_uart_wrapper
-     #(.ID_WIDTH  (`RV_IFU_BUS_TAG+1))
+     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+1))
    uart
      (.clk        (clk),
       .rst_n      (rst_n),
@@ -283,8 +273,8 @@ module swervolf_core
 
       .lsu_axi_bvalid   (lsu_bvalid),
       .lsu_axi_bready   (lsu_bready),
-      .lsu_axi_bresp    (lsu_bresp),
-      .lsu_axi_bid      ({1'b0,lsu_bid}),
+      .lsu_axi_bresp    (lsu_bresp ),
+      .lsu_axi_bid      (lsu_bid   ),
 
       .lsu_axi_arvalid  (lsu_arvalid ),
       .lsu_axi_arready  (lsu_arready ),
@@ -301,7 +291,7 @@ module swervolf_core
 
       .lsu_axi_rvalid   (lsu_rvalid),
       .lsu_axi_rready   (lsu_rready),
-      .lsu_axi_rid      ({1'b0,lsu_rid}   ),
+      .lsu_axi_rid      (lsu_rid   ),
       .lsu_axi_rdata    (lsu_rdata ),
       .lsu_axi_rresp    (lsu_rresp ),
       .lsu_axi_rlast    (lsu_rlast ),
