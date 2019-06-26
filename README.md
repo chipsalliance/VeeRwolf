@@ -113,3 +113,57 @@ If the memory test is successful, one LED should light up on the board
 or in a simulation with
 
     fusesoc run --target=sim swervolf --ram_init_file=$APP.hex
+
+## Debugging
+
+SweRVolf supports debugging both on hardware and in simulation. There are different procedures on how to connect the debugger, but once connected, the same commands can be used (although it's a lot slower in simulations).
+
+### Prerequisites
+
+Install the RISC-V-specific version of OpenOCD
+
+    git clone https://github.com/riscv/riscv-openocd
+    cd riscv-openocd
+    ./bootstrap
+    ./configure --enable-jtag_vpi --enable-ftdi
+    make
+    sudo make install
+
+### Connecting debugger to simulation
+
+When a SweRVolf simulation is launched with the `--jtag_vpi_enable`, it will start a JTAG server waiting for a client to connect and send JTAG commands.
+
+    fusesoc run --target=sim swervolf --jtag_vpi_enable
+
+After compilation, the simulation should now say
+
+    Listening on port 5555
+
+This means that it's ready to accept a JTAG client.
+
+Open a new terminal, navigate to the workspace directory and run `openocd -f $CORES_ROOT/Cores-SweRVolf/data/swervolf_sim.cfg` to connect OpenOCD to the simulation instance. If successful, OpenOCD should output
+
+    Info : only one transport option; autoselect 'jtag'
+    Info : Set server port to 5555
+    Info : Set server address to 127.0.0.1
+    Info : Connection to 127.0.0.1 : 5555 succeed
+    Info : This adapter doesn't support configurable speed
+    Info : JTAG tap: riscv.cpu tap/device found: 0x00000001 (mfg: 0x000 (<invalid>), part: 0x0000, ver: 0x0)
+    Info : datacount=2 progbufsize=0
+    Warn : We won't be able to execute fence instructions on this target. Memory may not always appear consistent. (progbufsize=0, impebreak=0)
+    Info : Examined RISC-V core; found 1 harts
+    Info :  hart 0: XLEN=32, misa=0x40001104
+    Info : Listening on port 3333 for gdb connections
+    Info : Listening on port 6666 for tcl connections
+    Info : Listening on port 4444 for telnet connections
+
+and the simulation should report
+
+    Waiting for client connection...ok
+    Preloading TOP.swervolf_core_tb.swervolf.bootrom.ram from jumptoram.vh
+    Releasing reset
+
+Open a third terminal and connect to the debug session through OpenOCD with `telnet localhost 4444`. From this terminal, it is now possible to view and control the state of of the CPU and memory. Try this by running `mwb 0x80001010 1`. This will write to the GPIO register. To verify that it worked, there should now be a message from the simulation instance saying `gpio0 is on`. By writing 0 to the same register (`mwb 0x80001010 0`), the gpio will be turned off.
+
+OpenOCD also support loading ELF program files by running `load_image /path/to/file.elf`, setting the program counter to address zero with `reg pc 0` and finally running `resume`.
+

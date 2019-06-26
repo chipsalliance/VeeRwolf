@@ -24,6 +24,8 @@
 #include <stdint.h>
 #include <signal.h>
 
+#include <jtagServer.h>
+
 #include "verilated_vcd_c.h"
 #include "Vswervolf_core_tb.h"
 
@@ -102,6 +104,13 @@ int main(int argc, char **argv, char **env)
     tfp->open ("trace.vcd");
   }
 
+  const char *arg_jtag = Verilated::commandArgsPlusMatch("jtag_vpi_enable=");
+  VerilatorJtagServer* jtag = NULL;
+  if (arg_jtag[0]) {
+    jtag = new VerilatorJtagServer(10); /* Jtag clock is 10 period */
+    jtag->init_jtag_server(5555);
+  }
+
   uart_context_t uart_context;
   int baud_rate = 115200;
   uart_init(&uart_context, 1000*1000*1000, baud_rate);
@@ -119,10 +128,20 @@ int main(int argc, char **argv, char **env)
       printf("Releasing reset\n");
       top->rst = 0;
     }
+    if (main_time == 200)
+      top->i_jtag_trst_n = true;
+
     top->eval();
     if (tfp)
       tfp->dump(main_time);
     if (baud_rate) do_uart(&uart_context, top->o_uart_tx);
+    if (jtag && (main_time > 300))
+      jtag->doJTAG(main_time/20, //doJtag requires t to only increment by one
+		   &top->i_jtag_tms,
+		   &top->i_jtag_tdi,
+		   &top->i_jtag_tck,
+		   top->o_jtag_tdo);
+
     if (gpio0 != top->o_gpio) {
       printf("%lu: gpio0 is %s\n", main_time, top->o_gpio ? "on" : "off");
       gpio0 = top->o_gpio;
