@@ -128,7 +128,7 @@ module axi_mem_wrapper
      (.clk   (clk),
       .we    ({8{mem_we}} & mem_be),
       .din   (mem_wdata),
-      .waddr (mem_addr),
+      .waddr ({mem_addr[$clog2(MEM_SIZE)-1:3],3'b000}),
       .raddr ({mem_addr[$clog2(MEM_SIZE)-1:3],3'b000}),
       .dout  (mem_rdata));
 
