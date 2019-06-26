@@ -28,7 +28,7 @@ module swervolf_core
     input wire 	       rstn,
     input wire 	       i_uart_rx,
     output wire        o_uart_tx,
-    output wire [4:0]  o_ram_awid,
+    output wire [5:0]  o_ram_awid,
     output wire [31:0] o_ram_awaddr,
     output wire [7:0]  o_ram_awlen,
     output wire [2:0]  o_ram_awsize,
@@ -40,7 +40,7 @@ module swervolf_core
     output wire [3:0]  o_ram_awqos,
     output wire        o_ram_awvalid,
     input wire 	       i_ram_awready,
-    output wire [4:0]  o_ram_arid,
+    output wire [5:0]  o_ram_arid,
     output wire [31:0] o_ram_araddr,
     output wire [7:0]  o_ram_arlen,
     output wire [2:0]  o_ram_arsize,
@@ -57,11 +57,11 @@ module swervolf_core
     output wire        o_ram_wlast,
     output wire        o_ram_wvalid,
     input wire 	       i_ram_wready,
-    input wire [4:0]   i_ram_bid,
+    input wire [5:0]   i_ram_bid,
     input wire [1:0]   i_ram_bresp,
     input wire 	       i_ram_bvalid,
     output wire        o_ram_bready,
-    input wire [4:0]   i_ram_rid,
+    input wire [5:0]   i_ram_rid,
     input wire [63:0]  i_ram_rdata,
     input wire [1:0]   i_ram_rresp,
     input wire 	       i_ram_rlast,
@@ -118,7 +118,7 @@ module swervolf_core
    assign o_ram_rready   = ram_rready;
 
    axi_mem_wrapper
-     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+1),
+     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2),
        .MEM_SIZE  (BOOTROM_SIZE),
        .INIT_FILE (bootrom_file))
    bootrom
@@ -159,7 +159,7 @@ module swervolf_core
       .i_rready (rom_rready));
 
    axi_multicon
-     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+1))
+     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2))
    multicon
      (.clk       (clk),
       .rst_n     (rst_n),
@@ -196,7 +196,7 @@ module swervolf_core
       .i_rready  (multicon_rready));
 
    axi_uart_wrapper
-     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+1))
+     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2))
    uart
      (.clk        (clk),
       .rst_n      (rst_n),
@@ -342,49 +342,45 @@ module swervolf_core
       .ifu_axi_rlast    (ifu_rlast ),
 
       //-------------------------- SB AXI signals-------------------------
-      .sb_axi_awvalid  (),
-      .sb_axi_awready  (1'b0),
-      .sb_axi_awid     (),
-      .sb_axi_awaddr   (),
-      .sb_axi_awregion (),
-      .sb_axi_awlen    (),
-      .sb_axi_awsize   (),
-      .sb_axi_awburst  (),
-      .sb_axi_awlock   (),
-      .sb_axi_awcache  (),
-      .sb_axi_awprot   (),
-      .sb_axi_awqos    (),
-
-      .sb_axi_wvalid   (),
-      .sb_axi_wready   (1'b0),
-      .sb_axi_wdata    (),
-      .sb_axi_wstrb    (),
-      .sb_axi_wlast    (),
-
-      .sb_axi_bvalid   (1'b0),
-      .sb_axi_bready   (),
-      .sb_axi_bresp    (2'b00),
-      .sb_axi_bid      (`RV_SB_BUS_TAG'd0),
-
-      .sb_axi_arvalid  (),
-      .sb_axi_arready  (1'b0),
-      .sb_axi_arid     (),
-      .sb_axi_araddr   (),
-      .sb_axi_arregion (),
-      .sb_axi_arlen    (),
-      .sb_axi_arsize   (),
-      .sb_axi_arburst  (),
-      .sb_axi_arlock   (),
-      .sb_axi_arcache  (),
-      .sb_axi_arprot   (),
-      .sb_axi_arqos    (),
-
-      .sb_axi_rvalid   (1'b0),
-      .sb_axi_rready   (),
-      .sb_axi_rid      (`RV_SB_BUS_TAG'd0),
-      .sb_axi_rdata    (64'd0),
-      .sb_axi_rresp    (2'b00),
-      .sb_axi_rlast    (1'b0),
+      .sb_axi_awvalid  (sb_awvalid ),
+      .sb_axi_awready  (sb_awready ),
+      .sb_axi_awid     (sb_awid    ),
+      .sb_axi_awaddr   (sb_awaddr  ),
+      .sb_axi_awregion (sb_awregion),
+      .sb_axi_awlen    (sb_awlen   ),
+      .sb_axi_awsize   (sb_awsize  ),
+      .sb_axi_awburst  (sb_awburst ),
+      .sb_axi_awlock   (sb_awlock  ),
+      .sb_axi_awcache  (sb_awcache ),
+      .sb_axi_awprot   (sb_awprot  ),
+      .sb_axi_awqos    (sb_awqos   ),
+      .sb_axi_wvalid   (sb_wvalid  ),
+      .sb_axi_wready   (sb_wready  ),
+      .sb_axi_wdata    (sb_wdata   ),
+      .sb_axi_wstrb    (sb_wstrb   ),
+      .sb_axi_wlast    (sb_wlast   ),
+      .sb_axi_bvalid   (sb_bvalid  ),
+      .sb_axi_bready   (sb_bready  ),
+      .sb_axi_bresp    (sb_bresp   ),
+      .sb_axi_bid      (sb_bid     ),
+      .sb_axi_arvalid  (sb_arvalid ),
+      .sb_axi_arready  (sb_arready ),
+      .sb_axi_arid     (sb_arid    ),
+      .sb_axi_araddr   (sb_araddr  ),
+      .sb_axi_arregion (sb_arregion),
+      .sb_axi_arlen    (sb_arlen   ),
+      .sb_axi_arsize   (sb_arsize  ),
+      .sb_axi_arburst  (sb_arburst ),
+      .sb_axi_arlock   (sb_arlock  ),
+      .sb_axi_arcache  (sb_arcache ),
+      .sb_axi_arprot   (sb_arprot  ),
+      .sb_axi_arqos    (sb_arqos   ),
+      .sb_axi_rvalid   (sb_rvalid  ),
+      .sb_axi_rready   (sb_rready  ),
+      .sb_axi_rid      (sb_rid     ),
+      .sb_axi_rdata    (sb_rdata   ),
+      .sb_axi_rresp    (sb_rresp   ),
+      .sb_axi_rlast    (sb_rlast   ),
 
       //-------------------------- DMA AXI signals--------------------------
       .dma_axi_awvalid  (1'b0),

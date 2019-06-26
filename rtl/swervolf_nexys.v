@@ -42,7 +42,7 @@ module swervolf_nexys_a7
       .o_clk25 (clk25),
       .o_rst25 (rst25));
 
-   wire [4:0]  ram_awid;
+   wire [5:0]  ram_awid;
    wire [31:0] ram_awaddr;
    wire [7:0]  ram_awlen;
    wire [2:0]  ram_awsize;
@@ -54,7 +54,7 @@ module swervolf_nexys_a7
    wire [3:0]  ram_awqos;
    wire        ram_awvalid;
    wire        ram_awready;
-   wire [4:0]  ram_arid;
+   wire [5:0]  ram_arid;
    wire [31:0] ram_araddr;
    wire [7:0]  ram_arlen;
    wire [2:0]  ram_arsize;
@@ -71,11 +71,11 @@ module swervolf_nexys_a7
    wire        ram_wlast;
    wire        ram_wvalid;
    wire        ram_wready;
-   wire [4:0]  ram_bid;
+   wire [5:0]  ram_bid;
    wire [1:0]  ram_bresp;
    wire        ram_bvalid;
    wire        ram_bready;
-   wire [4:0]  ram_rid;
+   wire [5:0]  ram_rid;
    wire [63:0] ram_rdata;
    wire [1:0]  ram_rresp;
    wire        ram_rlast;
@@ -83,7 +83,7 @@ module swervolf_nexys_a7
    wire        ram_rready;
 
    axi_mem_wrapper
-     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+1),
+     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2),
        .MEM_SIZE  (RAM_SIZE),
        .INIT_FILE (ram_init_file))
    ram

@@ -107,6 +107,8 @@ generate:
           read_only : true
         lsu:
           id_width : 4
+        sb:
+          id_width : 1
       slaves:
         rom:
           offset : 0x80000000
