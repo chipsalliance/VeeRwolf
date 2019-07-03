@@ -82,6 +82,13 @@ module swervolf_nexys_a7
    wire        ram_rvalid;
    wire        ram_rready;
 
+   wire        dmi_reg_en;
+   wire [6:0]  dmi_reg_addr;
+   wire        dmi_reg_wr_en;
+   wire [31:0] dmi_reg_wdata;
+   wire [31:0] dmi_reg_rdata;
+   wire        dmi_hard_reset;
+
    axi_mem_wrapper
      #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2),
        .MEM_SIZE  (RAM_SIZE),
@@ -123,17 +130,32 @@ module swervolf_nexys_a7
       .o_rvalid (ram_rvalid),
       .i_rready (ram_rready));
 
+   bscan_tap tap
+     (.clk            (clk25),
+      .rst            (rst25),
+      .jtag_id        (31'd0),
+      .dmi_reg_wdata  (dmi_reg_wdata),
+      .dmi_reg_addr   (dmi_reg_addr),
+      .dmi_reg_wr_en  (dmi_reg_wr_en),
+      .dmi_reg_en     (dmi_reg_en),
+      .dmi_reg_rdata  (dmi_reg_rdata),
+      .dmi_hard_reset (dmi_hard_reset),
+      .rd_status      (2'd0),
+      .idle           (3'd0),
+      .dmi_stat       (2'd0),
+      .version        (4'd1));
+
    swervolf_core
      #(.bootrom_file (bootrom_file))
    swervolf
      (.clk  (clk25),
       .rstn (~rst25),
-      .dmi_reg_rdata  (),
-      .dmi_reg_wdata  (32'd0),
-      .dmi_reg_addr   (7'd0),
-      .dmi_reg_en     (1'd0),
-      .dmi_reg_wr_en  (1'd0),
-      .dmi_hard_reset (1'd0),
+      .dmi_reg_rdata  (dmi_reg_rdata),
+      .dmi_reg_wdata  (dmi_reg_wdata),
+      .dmi_reg_addr   (dmi_reg_addr ),
+      .dmi_reg_en     (dmi_reg_en   ),
+      .dmi_reg_wr_en  (dmi_reg_wr_en),
+      .dmi_hard_reset (dmi_hard_reset),
       .i_uart_rx      (i_uart_rx),
       .o_uart_tx      (o_uart_tx),
       .o_ram_awid     (ram_awid),

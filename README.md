@@ -165,5 +165,46 @@ and the simulation should report
 
 Open a third terminal and connect to the debug session through OpenOCD with `telnet localhost 4444`. From this terminal, it is now possible to view and control the state of of the CPU and memory. Try this by running `mwb 0x80001010 1`. This will write to the GPIO register. To verify that it worked, there should now be a message from the simulation instance saying `gpio0 is on`. By writing 0 to the same register (`mwb 0x80001010 0`), the gpio will be turned off.
 
-OpenOCD also support loading ELF program files by running `load_image /path/to/file.elf`, setting the program counter to address zero with `reg pc 0` and finally running `resume`.
+### Connecting debugger to Nexys A7
 
+SweRVolf can be debugged using the same USB cable that is used for programming the FPGA, communicating over UART and powering the board. There is however one restriction. If the Vivado programmer has been used, it will have exclusive access to the JTAG channel. For that reason it is recommended to avoid using the Vivado programming tool and instead use OpenOCD for programming the FPGA as well. Unplugging and plugging the USB cable back will make Vivado lose the grip on the JTAG port.
+
+Programming the board with OpenOCD can be performed by running (from $WORKSPACE)
+
+    openocd -f ../cores/Cores-SweRVolf/data/swervolf_nexys_program.cfg
+
+To change the default FPGA image to load, add `-c "set BITFILE /path/to/bitfile"` as the first argument to openocd.
+
+If everything goes as expected, this should output
+
+    Info : ftdi: if you experience problems at higher adapter clocks, try the command "ftdi_tdo_sample_edge falling"
+    Info : clock speed 10000 kHz
+    Info : JTAG tap: xc7.tap tap/device found: 0x13631093 (mfg: 0x049 (Xilinx), part: 0x3631, ver: 0x1)
+    Warn : gdb services need one or more targets defined
+    loaded file build/swervolf_0/nexys_a7-vivado/swervolf_0.bit to pld device 0 in 3s 201521us
+    shutdown command invoked
+
+OpenOCD can now be connected to SweRVolf by running
+
+    openocd -f ../cores/Cores-SweRVolf/data/swervolf_nexys_debug.cfg
+
+This should output
+
+    Info : ftdi: if you experience problems at higher adapter clocks, try the command "ftdi_tdo_sample_edge falling"
+    Info : clock speed 10000 kHz
+    Info : JTAG tap: riscv.cpu tap/device found: 0x13631093 (mfg: 0x049 (Xilinx), part: 0x3631, ver: 0x1)
+    Info : datacount=2 progbufsize=0
+    Warn : We won't be able to execute fence instructions on this target. Memory may not always appear consistent. (progbufsize=0, impebreak=0)
+    Info : Examined RISC-V core; found 1 harts
+    Info :  hart 0: XLEN=32, misa=0x40001104
+    Info : Listening on port 3333 for gdb connections
+    Info : Listening on port 6666 for tcl connections
+    Info : Listening on port 4444 for telnet connections
+
+Open a third terminal and connect to the debug session through OpenOCD with `telnet localhost 4444`. From this terminal, it is now possible to view and control the state of of the CPU and memory. Try this by running `mwb 0x80001010 1`. This will write to the GPIO register. To verify that it worked, LED0 should light up. By writing 0 to the same register (`mwb 0x80001010 0`), the LED will be turned off.
+
+### Loading programs with OpenOCD
+
+OpenOCD support loading ELF program files by running `load_image /path/to/file.elf`. Remember that the path is relative to the directory from where OpenOCD was launched.
+
+After the program has been loaded, set the program counter to address zero with `reg pc 0` and run `resume` to start the program.
