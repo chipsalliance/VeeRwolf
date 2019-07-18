@@ -25,7 +25,7 @@
 module litedram_top
   #(parameter ID_WIDTH = 0)
    (
-    output 		       serial_tx,
+    output reg 		       serial_tx,
     input 		       serial_rx,
     input 		       clk100,
     input 		       rst_n,
@@ -83,10 +83,14 @@ module litedram_top
     output wire 	       o_rvalid,
     input wire 		       i_rready);
 
+   wire 		       serial_tx_int;
+
+   always @(posedge user_clk)
+     serial_tx <= serial_tx_int;
 
 litedram_core ldc
   (
-   .serial_tx   (serial_tx),
+   .serial_tx   (serial_tx_int),
    .serial_rx   (serial_rx),
    .clk         (clk100),
    .rst         (!rst_n),
@@ -140,4 +144,4 @@ litedram_core ldc
    .user_port0_r_valid  (o_rvalid),
    .user_port0_r_ready  (i_rready));
 
-endmodule   
+endmodule

@@ -1,9 +1,3 @@
- ## serial:0.tx
-set_property LOC D4 [get_ports o_serial_tx]
-set_property IOSTANDARD LVCMOS33 [get_ports o_serial_tx]
- ## serial:0.rx
-set_property LOC C4 [get_ports i_serial_rx]
-set_property IOSTANDARD LVCMOS33 [get_ports i_serial_rx]
  ## ddram:0.a
 set_property LOC M4 [get_ports ddram_a[0]]
 set_property SLEW FAST [get_ports ddram_a[0]]

@@ -3,13 +3,13 @@ SweRVolf
 
 is a FuseSoC-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
 
-This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), Zephyr OS or other software in simulators or on FPGA boards. The SoC consists of the SweRV CPU with a boot ROM, DDR2 controller, on-chip RAM, UART and GPIO.
+This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), [Zephyr OS](https://www.zephyrproject.org) or other software in simulators or on FPGA boards. The SoC consists of the SweRV CPU with a boot ROM, DDR2 controller, UART and GPIO.
 
 # Memory map
 
 | Core     | Address               |
 | -------- | --------------------- |
-| RAM      | 0x00000000-0x0000FFFF |
+| RAM      | 0x00000000-0x07FFFFFF |
 | Boot ROM | 0x80000000-0x80000FFF |
 | GPIO     | 0x80001000-0x8000000F |
 | UART     | 0x80002000-0x80002FFF |
@@ -33,9 +33,29 @@ Create a directory structure consisting of a workspace directory (from now on ca
 4. Add the cores directory as a FuseSoC core library `fusesoc library add swervolf ../cores`
 5. Make sure you have verilator installed to run the simulation. **Note** This requires at least version 3.918. The version that is shipped with Ubuntu 18.04 will NOT work
 
+## Running the SoC
+
+The SweRVolf SoC can be run in simulation or on hardware (Digilent Nexys A7 currently supported). In either case FuseSoC is used to launch the simulation or build and run the FPGA build. To select what to run, use the `fusesoc run` command with the `--target` parameter. To run in simulation use
+
+    fusesoc run --target=sim swervolf
+
+To build (and optionally program) an image for a Nexys A7 board, run
+
+    fusesoc run --target=nexys_a7 swervolf
+
+All targets support different compile- and run-time options. To see all options for a target run
+
+    fusesoc run --target=$TARGET swervolf --help
+
+To list all available targets, run
+
+    fusesoc core show swervolf
+
 ### Run a precompiled example in simulation
 
-At this point we can now build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_hello.vh`.
+In simulation, SweRVolf supports preloading an application to memory with the `--ram_init_file` parameter. SweRVolf comes bundled with some example applications in the `sw` directory.
+
+To build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_hello.vh`.
 
 After running the above command, the simulation model should be built and run. At the end it will output
 
@@ -44,8 +64,6 @@ After running the above command, the simulation model should be built and run. A
     Hello World! swervolf_nexys
 
 At this point the simulation can be aborted with `Ctrl-C`.
-
-*Note: To see all available options for the simulation target, run `fusesoc run --target=sim swervolf --help`*
 
 Another example to run is the Zephyr philosophers demo.
 
@@ -61,54 +79,55 @@ Another example to run is the Zephyr philosophers demo.
 ├──riscv-compliance
 └──workspace
 
-3. Copy the compiled simulation model into the target directory `cp $WORKSPACE/build/swervolf_0/sim-verilator/Vswervolf_core_tb $CORES_ROOT/swervolf/riscv-target/swerv/`
-4. Enter the riscv-compliance directory and run `make TARGETDIR=$CORES_ROOT/swervolf/riscv-target/swerv riscv-target $RISCV_TARGET=swerv RISCV_DEVICE=rv32i RISCV_ISA=rv32imc`
+3. Copy the compiled simulation model into the target directory `cp $WORKSPACE/build/swervolf_0/sim-verilator/Vswervolf_core_tb $CORES_ROOT/Cores-SweRVolf/riscv-target/swerv/`
+4. Enter the riscv-compliance directory and run `make TARGETDIR=$CORES_ROOT/Cores-SweRVolf/riscv-target/swerv riscv-target $RISCV_TARGET=swerv RISCV_DEVICE=rv32i RISCV_ISA=rv32imc`
 
 *Note: Other test suites can be run by replacing RISCV_ISA=rv32imc with rv32im or rv32i*
 
 ### Run on hardware
 
-The SweRVolf SoC can be built for a Digilent Nexys A7 board. Programs can be preloaded to the on-chip RAM at compile time. In the example below we will embed the Zephyr blinky example program.
+The SweRVolf SoC can be built for a Digilent Nexys A7 board with
 
-    fusesoc run --target=nexys_a7 swervolf --ram_init_file=../cores/swervolf/sw/zephyr_blinky.vh
+    fusesoc run --target=nexys_a7 swervolf
 
-If the board is connected, it will automatically be programmed when the FPGA image has been built. It can also be programmed manually afterwards by running `fusesoc run --target=nexys_a7 --run swervolf`
+If the board is connected, it will automatically be programmed when the FPGA image has been built. It can also be programmed manually afterwards by running `fusesoc run --target=nexys_a7 --run swervolf` or running OpenOCD as described in the debugging chapter.
 
-In case you wonder why the LED blinks so fast, the reason is that we want to be able to run the same thing in a simulator without having to wait for a second of simulated time. To run the same system in verilator, change the target to simulation by running `fusesoc run --target=nexys_a7 swervolf --ram_init_file=../cores/swervolf/sw/zephyr_blinky.vh`. Eventually it will output notifications that the GPIO pin have changed which will result in an output looking like
+The default bootloader will just blink the LED and other programs are uploaded through the debug interface. The default bootloader can be replaced with the `--bootrom_file` parameter. Note that the boot ROM is not connected to the data port, so it can only execute instructions. Data can not be read or written to this segment. The below example will compile the memtest application and use that as boot ROM instead.
 
-    Loading RAM contents from /home/olof/projects/swerv/cores/swervolf/sw/zephyr_blinky.vh
-    Releasing reset
-    5074080: gpio0 is on
-    10090350: gpio0 is off
-    15106420: gpio0 is on
-    20122690: gpio0 is off
-    25138760: gpio0 is on
+    make -C ../cores/Cores-SweRVolf/sw memtest.vh
+    fusesoc run --target=nexys_a7 swervolf --bootrom_file=../cores/Cores-SweRVolf/sw/memtest.vh
 
-To find all available targets, you can run `fusesoc core show swervolf`
+#### I/O
 
-### Run on hardware (with DDR2 controller)
+The active on-board I/O consists of a LED, a switch and the microUSB connector for UART, JTAG and power.
 
-As there is yet no way to load an external program, the easiest way to run software is to preload it into the on-chip RAM. But there is also a DDR2 controller that can be enabled instead of the on-chip RAM by using the nexys_a7_ddr target. If the DDR2 controller is used, there is no RAM initialization file and programs have to be preloaded into the bootloader memory instead. Currently, the only supported program in this mode is the memory test application. This configuration can be built with
+##### LED 0
 
-    fusesoc run --target=nexys_a7_ddr swervolf --bootrom_file=../cores/Cores-SweRVolf/sw/memtest.vh
+LED 0 is controlled by memory-mapped GPIO at address 0x80001010
 
-If the memory test is successful, one LED should light up on the board
+##### Switch 0
 
-### Build Zephyr applications
+Switch 0 selects whether to output serial communication from the SoC or from the embedded self-test program in the DDR2 controller.
+
+##### micro USB
+
+UART and JTAG communication is tunneled through the microUSB port on the board and will appear as `/dev/ttyUSB0`, `/dev/ttyUSB1` or similar depending on OS configuration. A terminal emulator can be used to connect to the UART (e.g. by running `screen /dev/ttyUSB0 115200`) and OpenOCD can connect to the JTAG port.
+
+## Build Zephyr applications
 
 1. Download and install Zephyr according to the official guidelines at https://www.zephyrproject.org/
 2. Enter the directory of the application to build in the samples directory (e.g. `basic/blinky` for the Zephyr blinky example). From now on, the program to build and run will be called `$APP`
 3. Build the code with
     mkdir build
     cd build
-    cmake -GNinja -DBOARD=swervolf_nexys -DBOARD_ROOT=$CORES_ROOT/swervolf/zephyr -DSOC_ROOT=$CORES_ROOT/swervolf/zephyr ..
+    `cmake -GNinja -DBOARD=swervolf_nexys -DBOARD_ROOT=$CORES_ROOT/swervolf/zephyr -DSOC_ROOT=$CORES_ROOT/swervolf/zephyr ..`
     ninja
 4. There will now be a binary file in `zephyr/zephyr.bin`
 5. Enter the FuseSoC workspace directory and convert the binary file into a suitable verilog hex file with
-    python $CORES_ROOT/swervolf/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex
-6. The new hex file can now be embedded for a new FPGA build with
+    `python $CORES_ROOT/swervolf/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex`
+6. The new hex file can now be embedded as a bootloader for a new FPGA build with
 
-    fusesoc run --target=nexys_a7 swervolf --ram_init_file=$APP.hex
+    fusesoc run --target=nexys_a7 swervolf --bootrom_file=$APP.hex
 
 or in a simulation with
 

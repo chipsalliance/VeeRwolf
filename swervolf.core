@@ -35,21 +35,13 @@ filesets:
       - data/swervolf_nexys.xdc : {file_type : xdc}
       - rtl/clk_gen_nexys.v : {file_type : verilogSource}
       - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
-
-  nexys_a7_nodram:
-    files :
       - rtl/swervolf_nexys.v    : {file_type : systemVerilogSource}
-
-  nexys_a7_dram:
-    files :
-      - data/ips.tcl : {file_type : tclSource}
-      - rtl/swervolf_nexys_ddr.v : {file_type : systemVerilogSource}
-    depend : [":swervolf:litedram"]
+    depend : [":swervolf:litedram", pulp-platform.org::axi_slice_dc]
 
   bootrom:
     files :
-      - sw/zephyr_blinky.vh : {file_type : user, copyto : zephyr_blinky.vh}
-      - sw/jumptoram.vh     : {file_type : user, copyto : jumptoram.vh}
+      - sw/blinky.vh    : {file_type : user, copyto : blinky.vh}
+      - sw/jumptoram.vh : {file_type : user, copyto : jumptoram.vh}
 
 targets:
   sim:
@@ -81,20 +73,6 @@ targets:
       - bootrom
       - core
       - nexys_a7_files
-      - nexys_a7_nodram
-    generate : [intercon, swerv_default_config]
-    parameters : [bootrom_file, ram_init_file]
-    tools:
-      vivado: {part : xc7a100tcsg324-1}
-    toplevel : swervolf_nexys_a7
-
-  nexys_a7_ddr:
-    default_tool : vivado
-    filesets :
-      - bootrom
-      - core
-      - nexys_a7_files
-      - nexys_a7_dram
     generate : [intercon, swerv_default_config]
     parameters : [bootrom_file]
     tools:
