@@ -19,6 +19,8 @@ For simulation targets there are also two extra registers defined. Writing to 0x
 
 ### Prerequisites
 
+Install verilator
+
 Create a directory structure consisting of a workspace directory (from now on called `$WORKSPACE`) and a root directory for the SweRV SoC (from now on called `$CORES_ROOT`). All further commands will be run from `$WORKSPACE` unless otherwise stated. The structure will look like this
 
     ├──cores
@@ -28,7 +30,7 @@ Create a directory structure consisting of a workspace directory (from now on ca
 2. Initialize the FuseSoC base library with `fusesoc init`
 3. From `$CORES_ROOT`, clone the SweRVolf repository `git clone https://github.com/chipsalliance/Cores-SweRVolf`
 4. Add the cores directory as a FuseSoC core library `fusesoc library add swervolf ../cores`
-5. Make sure you have verilator installed to run the simulation
+5. Make sure you have verilator installed to run the simulation. **Note** This requires at least version 3.918. The version that is shipped with Ubuntu 18.04 will NOT work
 
 ### Run a precompiled example in simulation
 
