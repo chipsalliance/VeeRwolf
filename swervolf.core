@@ -17,6 +17,7 @@ filesets:
 
   tb          : {files: [tb/swervolf_core_tb.v   : {file_type : systemVerilogSource}]}
   verilator_tb: {files: [tb/tb.cpp : {file_type : cppSource}]}
+  verilator_waiver: {files: [data/verilator_waiver.vlt : {file_type : vlt}]}
 
   nexys_a7_files:
     files :
@@ -46,6 +47,7 @@ targets:
       - tb
       - bootrom
       - "tool_verilator? (verilator_tb)"
+      - "tool_verilator? (verilator_waiver)"
 
     generate : [intercon, swerv_default_config]
     parameters : [SIMPRINT=true, ram_init_file, rom_init_file, signature, timeout, vcd]
