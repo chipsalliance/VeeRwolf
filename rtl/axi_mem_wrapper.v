@@ -76,6 +76,13 @@ module axi_mem_wrapper
    assign slave.aw_len   = i_awlen  ;
    assign slave.aw_size  = i_awsize ;
    assign slave.aw_burst = i_awburst;
+   assign slave.aw_lock  = 1'd0;
+   assign slave.aw_cache = 4'd0;
+   assign slave.aw_prot  = 3'd0;
+   assign slave.aw_qos   = 4'd0;
+   assign slave.aw_region = 4'd0;
+   assign slave.aw_atop  = 6'd0;
+   assign slave.aw_user  = 1'd0;
    assign slave.aw_valid = i_awvalid;
    assign o_awready = slave.aw_ready;
 
@@ -84,12 +91,19 @@ module axi_mem_wrapper
    assign slave.ar_len   = i_arlen  ;
    assign slave.ar_size  = i_arsize ;
    assign slave.ar_burst = i_arburst;
+   assign slave.ar_lock  = 1'd0;
+   assign slave.ar_cache = 4'd0;
+   assign slave.ar_prot  = 3'd0;
+   assign slave.ar_qos   = 4'd0;
+   assign slave.ar_region = 4'd0;
+   assign slave.ar_user  = 1'd0;
    assign slave.ar_valid = i_arvalid;
    assign o_arready = slave.ar_ready;
 
    assign slave.w_data  = i_wdata ;
    assign slave.w_strb  = i_wstrb ;
    assign slave.w_last  = i_wlast ;
+   assign slave.w_user  = 1'd0;
    assign slave.w_valid = i_wvalid;
    assign o_wready = slave.w_ready;
 

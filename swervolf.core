@@ -104,6 +104,7 @@ generate:
       masters:
         ifu:
           id_width : 3
+          read_only : true
         lsu:
           id_width : 4
       slaves:
