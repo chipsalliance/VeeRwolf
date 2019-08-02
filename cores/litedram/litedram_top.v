@@ -58,7 +58,7 @@ module litedram_top
     output wire 	       o_awready,
 
     input wire [ID_WIDTH-1:0]  i_arid,
-    input wire [31:0] 	       i_araddr,
+    input wire [26:0] 	       i_araddr,
     input wire [7:0] 	       i_arlen,
     input wire [3:0] 	       i_arsize,
     input wire [1:0] 	       i_arburst,

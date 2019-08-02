@@ -4,12 +4,6 @@ set_property IOSTANDARD LVCMOS33 [get_ports o_serial_tx]
  ## serial:0.rx
 set_property LOC C4 [get_ports i_serial_rx]
 set_property IOSTANDARD LVCMOS33 [get_ports i_serial_rx]
- ## cpu_reset:0
-#set_property LOC C12 [get_ports cpu_reset]
-#set_property IOSTANDARD LVCMOS33 [get_ports cpu_reset]
- ## clk100:0
-#set_property LOC E3 [get_ports clk100]
-#set_property IOSTANDARD LVCMOS33 [get_ports clk100]
  ## ddram:0.a
 set_property LOC M4 [get_ports ddram_a[0]]
 set_property SLEW FAST [get_ports ddram_a[0]]
