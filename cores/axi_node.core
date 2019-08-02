@@ -96,4 +96,4 @@ provider:
   name : github
   user : olofk
   repo : axi_node
-  version : fusesoc
+  version : 2004f424b43798fff40b61a53d9bd2a71ee6637e
