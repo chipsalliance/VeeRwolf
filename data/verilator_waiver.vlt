@@ -32,3 +32,8 @@ lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/ax
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 115-116
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 196
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 239
+
+//AXI interconnect generator warnings
+lint_off -msg PINMISSING -file "*/swervolf-intercon_0/axi_intercon.v"
+lint_off -msg WIDTH -file "*/swervolf_0/rtl/swervolf_core.v" -lines 226
+lint_off -msg WIDTH -file "*/swervolf_0/rtl/swervolf_core.v" -lines 250
