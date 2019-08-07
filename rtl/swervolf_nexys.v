@@ -23,7 +23,7 @@
 
 `default_nettype none
 module swervolf_nexys_a7
-  #(parameter bootrom_file = "blinky.vh")
+  #(parameter bootrom_file = "spi_uimage_loader.vh")
    (input wire 	       clk,
     input wire 	       rstn,
     output wire [12:0] ddram_a,
@@ -41,6 +41,9 @@ module swervolf_nexys_a7
     output wire        ddram_cke,
     output wire        ddram_odt,
     input wire 	       sw0,
+    output wire        o_flash_cs_n,
+    output wire        o_flash_mosi,
+    input wire 	       i_flash_miso,
     input wire 	       i_uart_rx,
     output wire        o_uart_tx,
     output reg         led0);
@@ -156,6 +159,24 @@ module swervolf_nexys_a7
    wire [31:0] dmi_reg_rdata;
    wire        dmi_hard_reset;
 
+   wire        flash_sclk;
+
+   STARTUPE2 STARTUPE2
+     (
+      .CFGCLK    (),
+      .CFGMCLK   (),
+      .EOS       (),
+      .PREQ      (),
+      .CLK       (1'b0),
+      .GSR       (1'b0),
+      .GTS       (1'b0),
+      .KEYCLEARB (1'b1),
+      .PACK      (1'b0),
+      .USRCCLKO  (flash_sclk),
+      .USRCCLKTS (1'b0),
+      .USRDONEO  (1'b1),
+      .USRDONETS (1'b0));
+
    bscan_tap tap
      (.clk            (clk_core),
       .rst            (rst_core),
@@ -182,10 +203,10 @@ module swervolf_nexys_a7
       .dmi_reg_en     (dmi_reg_en   ),
       .dmi_reg_wr_en  (dmi_reg_wr_en),
       .dmi_hard_reset (dmi_hard_reset),
-      .o_flash_sclk   (),
-      .o_flash_cs_n   (),
-      .o_flash_mosi   (),
-      .i_flash_miso   (1'b0),
+      .o_flash_sclk   (flash_sclk),
+      .o_flash_cs_n   (o_flash_cs_n),
+      .o_flash_mosi   (o_flash_mosi),
+      .i_flash_miso   (i_flash_miso),
       .i_uart_rx      (i_uart_rx),
       .o_uart_tx      (cpu_tx),
       .o_ram_awid     (cpu.aw_id),
