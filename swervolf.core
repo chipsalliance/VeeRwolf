@@ -41,7 +41,6 @@ filesets:
   bootrom:
     files :
       - sw/blinky.vh    : {file_type : user, copyto : blinky.vh}
-      - sw/jumptoram.vh : {file_type : user, copyto : jumptoram.vh}
 
 targets:
   sim:

@@ -79,8 +79,7 @@ Another example to run is the Zephyr philosophers demo.
 ├──riscv-compliance
 └──workspace
 
-3. Copy the compiled simulation model into the target directory `cp $WORKSPACE/build/swervolf_0/sim-verilator/Vswervolf_core_tb $CORES_ROOT/Cores-SweRVolf/riscv-target/swerv/`
-4. Enter the riscv-compliance directory and run `make TARGETDIR=$CORES_ROOT/Cores-SweRVolf/riscv-target/swerv riscv-target $RISCV_TARGET=swerv RISCV_DEVICE=rv32i RISCV_ISA=rv32imc`
+3. Enter the riscv-compliance directory and run `make TARGETDIR=$CORES_ROOT/Cores-SweRVolf/riscv-target/swerv riscv-target $RISCV_TARGET=swerv RISCV_DEVICE=rv32i RISCV_ISA=rv32imc TARGET_SIM=$WORKSPACE/build/swervolf_0/sim-verilator/Vswervolf_core_tb`
 
 *Note: Other test suites can be run by replacing RISCV_ISA=rv32imc with rv32im or rv32i*
 

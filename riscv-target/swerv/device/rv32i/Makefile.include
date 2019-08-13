@@ -4,11 +4,10 @@ ifeq ($(shell command -v $(TARGET_SIM) 2> /dev/null),)
 endif
 
 RUN_TARGET=\
-    cp $(TARGETDIR)/$(RISCV_TARGET)/jumptoram.vh . && \
     $(TARGET_SIM) \
         +signature=$(work_dir_isa)/$(*).signature.output \
         +ram_init_file=$(work_dir_isa)/$<.hex \
-        +timeout=200000 \
+        +timeout=800000 \
 	2> $(work_dir_isa)/$@
 
 RISCV_PREFIX   ?= riscv32-unknown-elf-

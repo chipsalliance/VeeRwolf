@@ -23,7 +23,7 @@
 
 `default_nettype none
 module swervolf_core_tb
-  #(parameter bootrom_file  = "jumptoram.vh")
+  #(parameter bootrom_file  = "")
 `ifdef VERILATOR
   (input wire clk,
    input wire  rst,
@@ -71,7 +71,9 @@ module swervolf_core_tb
       if ($value$plusargs("rom_init_file=%s", rom_init_file)) begin
 	 $display("Loading ROM contents from %0s", rom_init_file);
 	 $readmemh(rom_init_file, swervolf.bootrom.ram.mem);
-      end
+      end else if (!(|bootrom_file))
+	//Jump to address 0 if no bootloader is selected
+	swervolf.bootrom.ram.mem[0] = 64'h0000000000000067;
    end
 
    wire [5:0]  ram_awid;
