@@ -46,7 +46,10 @@ module swervolf_nexys_a7
     output wire        led0);
 
    wire 	       cpu_tx,litedram_tx;
-   
+
+   wire 	       litedram_init_done;
+   wire 	       litedram_init_error;
+
    localparam RAM_SIZE     = 32'h10000;
 
    wire 	 clk25;
@@ -104,8 +107,8 @@ module swervolf_nexys_a7
       .ddram_clk_n (ddram_clk_n),
       .ddram_cke   (ddram_cke  ),
       .ddram_odt   (ddram_odt  ),
-      .init_done  (),
-      .init_error (),
+      .init_done  (litedram_init_done),
+      .init_error (litedram_init_error),
       .i_awid    (mem.aw_id   ),
       .i_awaddr  (mem.aw_addr[26:0] ),
       .i_awlen   (mem.aw_len  ),
@@ -210,6 +213,8 @@ module swervolf_nexys_a7
       .i_ram_rlast    (cpu.r_last),
       .i_ram_rvalid   (cpu.r_valid),
       .o_ram_rready   (cpu.r_ready),
+      .i_ram_init_done  (litedram_init_done),
+      .i_ram_init_error (litedram_init_error),
       .o_gpio (led0));
 
    assign o_uart_tx = sw0 ? litedram_tx : cpu_tx;

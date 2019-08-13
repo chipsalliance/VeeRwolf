@@ -28,6 +28,8 @@ module axi_multicon
     input wire 		       rst_n,
     output reg 		       o_gpio,
     output reg 		       o_timer_irq,
+    input wire 		       i_ram_init_done,
+    input wire 		       i_ram_init_error,
     input wire [ID_WIDTH-1:0]  i_awid,
     input wire [31:0] 	       i_awaddr,
     input wire [7:0] 	       i_awlen,
@@ -180,6 +182,7 @@ module axi_multicon
    //4 = sha
    //8 = simprint
    //9 = simexit
+   //A = RAM status
    //10 = gpio
    //18 = timer/timecmp
    always @(posedge clk) begin
@@ -212,6 +215,7 @@ module axi_multicon
 
       case (reg_addr[5:3])
 	0 : reg_rdata <= {`SWERVOLF_SHA, version};
+	1 : reg_rdata <= {46'd0, i_ram_init_error, i_ram_init_done, 16'd0};
 	4 : reg_rdata <= mtime;
       endcase
 

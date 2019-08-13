@@ -235,7 +235,8 @@ module swervolf_core_tb
       .i_ram_rlast         (ram_rlast),
       .i_ram_rvalid        (ram_rvalid),
       .o_ram_rready        (ram_rready),
-
+      .i_ram_init_done     (1'b1),
+      .i_ram_init_error    (1'b0),
       .o_gpio (o_gpio));
 
 endmodule
