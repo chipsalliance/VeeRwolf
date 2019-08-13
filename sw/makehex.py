@@ -1,19 +1,16 @@
 import sys
 
 with open(sys.argv[1], "rb") as f:
-    data = f.read(4)
-    while data:
-        w2 = "{:02X}{:02X}{:02X}{:02X}".format(data[3],
-                                               data[2],
-                                               data[1],
-                                               data[0])
-        try:
-            data = f.read(4)
-            w1 = "{:02X}{:02X}{:02X}{:02X}".format(data[3],
-                                                   data[2],
-                                                   data[1],
-                                                   data[0])
-        except:
-            w1 = "00000000"
-        print("{}{}".format(w1,w2))
-        data = f.read(4)
+    cnt = 7
+    s = ["00"]*8
+    while True:
+        data = f.read(1)
+        if not data:
+            print(''.join(s))
+            exit(0)
+        s[cnt] = "{:02X}".format(data[0])
+        if cnt == 0:
+            print(''.join(s))
+            s = ["00"]*8
+            cnt = 8
+        cnt -= 1
