@@ -12,6 +12,7 @@ filesets:
   core:
     files:
       - litedram_core.init : {file_type : user, copyto: litedram_core.init}
+      - mem_1.init         : {file_type : user, copyto: mem_1.init}
       - litedram_core.v
     file_type : verilogSource
 

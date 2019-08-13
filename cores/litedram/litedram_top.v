@@ -22,33 +22,35 @@
 //********************************************************************************
 
 `timescale 1ps / 1ps
+`default_nettype none
+
 module litedram_top
   #(parameter ID_WIDTH = 0)
    (
     output reg 		       serial_tx,
-    input 		       serial_rx,
-    input 		       clk100,
-    input 		       rst_n,
-    output 		       pll_locked,
-    output 		       user_clk,
-    output 		       user_rst,
-    output [12:0] 	       ddram_a,
-    output [2:0] 	       ddram_ba,
-    output 		       ddram_ras_n,
-    output 		       ddram_cas_n,
-    output 		       ddram_we_n,
-    output 		       ddram_cs_n,
-    output [1:0] 	       ddram_dm,
-    inout [15:0] 	       ddram_dq,
-    output [1:0] 	       ddram_dqs_p,
-    output [1:0] 	       ddram_dqs_n,
-    output 		       ddram_clk_p,
-    output 		       ddram_clk_n,
-    output 		       ddram_cke,
-    output 		       ddram_odt,
+    input wire 		       serial_rx,
+    input wire 		       clk100,
+    input wire 		       rst_n,
+    output wire 	       pll_locked,
+    output wire 	       user_clk,
+    output wire 	       user_rst,
+    output wire [12:0] 	       ddram_a,
+    output wire [2:0] 	       ddram_ba,
+    output wire 	       ddram_ras_n,
+    output wire 	       ddram_cas_n,
+    output wire 	       ddram_we_n,
+    output wire 	       ddram_cs_n,
+    output wire [1:0] 	       ddram_dm,
+    inout wire [15:0] 	       ddram_dq,
+    output wire [1:0] 	       ddram_dqs_p,
+    output wire [1:0] 	       ddram_dqs_n,
+    output wire 	       ddram_clk_p,
+    output wire 	       ddram_clk_n,
+    output wire 	       ddram_cke,
+    output wire 	       ddram_odt,
 
-    output 		       init_done,
-    output 		       init_error,
+    output reg 		       init_done,
+    output reg 		       init_error,
     input wire [ID_WIDTH-1:0]  i_awid,
     input wire [26:0] 	       i_awaddr,
     input wire [7:0] 	       i_awlen,
@@ -85,8 +87,18 @@ module litedram_top
 
    wire 		       serial_tx_int;
 
-   always @(posedge user_clk)
-     serial_tx <= serial_tx_int;
+   wire 		       init_done_int;
+   wire 		       init_error_int;
+   reg 			       init_done_int_r;
+   reg 			       init_error_int_r;
+
+   always @(posedge user_clk) begin
+      serial_tx <= serial_tx_int;
+      init_done_int_r <= init_done_int;
+      init_done <= init_done_int_r;
+      init_error_int_r <= init_error_int;
+      init_error <= init_error_int_r;
+   end
 
 litedram_core ldc
   (
@@ -110,8 +122,8 @@ litedram_core ldc
    .ddram_cke   (ddram_cke  ),
    .ddram_odt   (ddram_odt  ),
    .ddram_reset_n (),
-   .init_done  (init_done),
-   .init_error (init_error),
+   .init_done  (init_done_int),
+   .init_error (init_error_int),
    .user_clk   (user_clk),
    .user_rst   (user_rst),
    .user_port0_aw_addr  (i_awaddr),
@@ -145,3 +157,4 @@ litedram_core ldc
    .user_port0_r_ready  (i_rready));
 
 endmodule
+`default_nettype wire
