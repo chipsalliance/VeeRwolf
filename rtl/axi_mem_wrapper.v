@@ -25,6 +25,7 @@
 module axi_mem_wrapper
   #(parameter ID_WIDTH = 0,
     parameter MEM_SIZE = 0,
+    parameter mem_clear = 0,
     parameter INIT_FILE = "")
   (input wire 		      clk,
    input wire 		      rst_n,
@@ -137,6 +138,7 @@ module axi_mem_wrapper
 
    dpram64
      #(.SIZE (MEM_SIZE),
+       .mem_clear (mem_clear),
        .memfile (INIT_FILE))
    ram
      (.clk   (clk),

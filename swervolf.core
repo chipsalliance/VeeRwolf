@@ -126,6 +126,11 @@ parameters:
     description : Enable simulation character output
     paramtype   : vlogdefine
 
+  mem_clear:
+    datatype    : bool
+    description : Initialize on-chip RAM to zero on simulation start
+    paramtype   : vlogparam
+
   bootrom_file:
     datatype: file
     description : Verilog hex file to use as boot ROM

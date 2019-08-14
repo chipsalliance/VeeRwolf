@@ -23,6 +23,7 @@
 
 module dpram64
   #(parameter SIZE=0,
+    parameter mem_clear = 0,
     parameter memfile = "")
   (input wire clk,
    input wire [7:0] 		 we,
@@ -50,13 +51,16 @@ module dpram64
       dout <= mem[raddr[AW-1:3]];
    end
 
-   reg [7:0] 			 mem0 [0:SIZE-1] /* verilator public */;
    generate
-      initial
-	if(|memfile) begin
-	   $display("Preloading %m from %s", memfile);
-	   $readmemh(memfile, mem);
-	end
+      initial begin
+	 if (mem_clear)
+	   for (i=0;i<SIZE;i=i+1)
+	     mem[i] = 64'd0;
+	 if(|memfile) begin
+	    $display("Preloading %m from %s", memfile);
+	    $readmemh(memfile, mem);
+	 end
+      end
    endgenerate
 
 endmodule
