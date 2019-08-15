@@ -132,6 +132,8 @@ or in a simulation with
 
     fusesoc run --target=sim swervolf --ram_init_file=$APP.hex
 
+The SweRVolf demo application in `sw/swervolf_zephyr_demo` is also a Zephyr program and can be built in the same way
+
 ## Debugging
 
 SweRVolf supports debugging both on hardware and in simulation. There are different procedures on how to connect the debugger, but once connected, the same commands can be used (although it's a lot slower in simulations).
