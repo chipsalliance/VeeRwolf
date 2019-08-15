@@ -13,6 +13,7 @@ filesets:
       - rtl/swervolf_core.v
     file_type : systemVerilogSource
     depend :
+      - fusesoc:utils:generators
       - "pulp-platform.org::apb_uart_sv"
       - "pulp-platform.org::axi2apb"
       - "pulp-platform.org::axi_mem_if"
@@ -53,7 +54,7 @@ targets:
       - "tool_verilator? (verilator_tb)"
       - "tool_verilator? (verilator_waiver)"
 
-    generate : [intercon, swerv_default_config]
+    generate : [intercon, swerv_default_config, version]
     parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file, rom_init_file, signature, timeout, vcd]
     tools:
       modelsim:
@@ -72,7 +73,7 @@ targets:
       - bootrom
       - core
       - nexys_a7_files
-    generate : [intercon, swerv_default_config]
+    generate : [intercon, swerv_default_config, version]
     parameters : [bootrom_file]
     tools:
       vivado: {part : xc7a100tcsg324-1}
@@ -109,6 +110,9 @@ generate:
     position : first
     parameters:
       args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
+
+  version:
+    generator: gitversion
 
 parameters:
   SIMPRINT:

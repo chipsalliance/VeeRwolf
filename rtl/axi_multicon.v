@@ -149,29 +149,29 @@ module axi_multicon
    end
 `endif
 
-`ifndef SWERVOLF_FPGA_VERSION_DIRTY
- `define SWERVOLF_FPGA_VERSION_DIRTY 1
+`ifndef VERSION_DIRTY
+ `define VERSION_DIRTY 1
 `endif
-`ifndef SWERVOLF_FPGA_VERSION_MAJOR
- `define SWERVOLF_FPGA_VERSION_MAJOR 255
+`ifndef VERSION_MAJOR
+ `define VERSION_MAJOR 255
 `endif
-`ifndef SWERVOLF_FPGA_VERSION_MINOR
- `define SWERVOLF_FPGA_VERSION_MINOR 255
+`ifndef VERSION_MINOR
+ `define VERSION_MINOR 255
 `endif
-`ifndef SWERVOLF_FPGA_VERSION_REV
- `define SWERVOLF_FPGA_VERSION_REV 255
+`ifndef VERSION_REV
+ `define VERSION_REV 255
 `endif
-`ifndef SWERVOLF_SHA
- `define SWERVOLF_SHA 32'hdeadbeef
+`ifndef VERSION_SHA
+ `define VERSION_SHA deadbeef
 `endif
 
    wire [31:0] version;
 
-   assign version[31]    = `SWERVOLF_FPGA_VERSION_DIRTY;
+   assign version[31]    = `VERSION_DIRTY;
    assign version[30:24] = 7'd0;
-   assign version[23:16] = `SWERVOLF_FPGA_VERSION_MAJOR;
-   assign version[15: 8] = `SWERVOLF_FPGA_VERSION_MINOR;
-   assign version[ 7: 0] = `SWERVOLF_FPGA_VERSION_REV;
+   assign version[23:16] = `VERSION_MAJOR;
+   assign version[15: 8] = `VERSION_MINOR;
+   assign version[ 7: 0] = `VERSION_REV;
 
    localparam [2:0]
      REG_VERSION  = 3'd0,
@@ -195,7 +195,7 @@ module axi_multicon
 		$write("%c", reg_wdata[7:0]);
 	     end
 	     if (reg_be[1]) begin
-		$display("Finito");
+		$display("\nFinito");
 		$finish;
 	     end
 	  end
@@ -214,7 +214,7 @@ module axi_multicon
 	endcase
 
       case (reg_addr[5:3])
-	0 : reg_rdata <= {`SWERVOLF_SHA, version};
+	0 : reg_rdata <= {32'h`VERSION_SHA, version};
 	1 : reg_rdata <= {46'd0, i_ram_init_error, i_ram_init_done, 16'd0};
 	4 : reg_rdata <= mtime;
       endcase
