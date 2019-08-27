@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:SweRV_EH1:1.2
+name : chipsalliance.org:cores:SweRV_EH1:1.2-r1
 
 filesets:
   rtl:
@@ -138,4 +138,4 @@ provider:
   name : github
   user : olofk
   repo : Cores-SweRV
-  version : 6b32588a2689061d0ba5e9166e680907aafcf333
+  version : 0c8c73444210c4ec8360d7898e7d386d653d1f99
