@@ -66,6 +66,13 @@ module swervolf_nexys_a7
    AXI_BUS #(32, 64, 6, 1) mem();
    AXI_BUS #(32, 64, 6, 1) cpu();
 
+   assign cpu.aw_atop = 6'd0;
+   assign cpu.aw_user = 1'b0;
+   assign cpu.ar_user = 1'b0;
+   assign cpu.w_user = 1'b0;
+   assign cpu.b_user = 1'b0;
+   assign cpu.r_user = 1'b0;
+
    axi_cdc
      #(.AXI_USER_WIDTH (1),
        .AXI_ID_WIDTH   (6))
