@@ -23,7 +23,8 @@
 
 `default_nettype none
 module swervolf_core_tb
-  #(parameter bootrom_file  = "")
+  #(parameter bootrom_file  = "",
+    parameter sd_ram_memory_size = 65536)
 `ifdef VERILATOR
   (input wire clk,
    input wire  rst,
@@ -68,6 +69,7 @@ module swervolf_core_tb
    end
 
    reg [1023:0] rom_init_file;
+   reg [1023:0] sd_init_file;
 
    initial begin
       if ($value$plusargs("rom_init_file=%s", rom_init_file)) begin
@@ -76,6 +78,10 @@ module swervolf_core_tb
       end else if (!(|bootrom_file))
 	//Jump to address 0 if no bootloader is selected
 	swervolf.bootrom.ram.mem[0] = 64'h0000000000000067;
+      if ($value$plusargs("sd_init_file=%s", sd_init_file)) begin
+	 $display("Loading SD contents from %0s", sd_init_file);
+	 $readmemh(sd_init_file, sd_card.mem);
+      end
    end
 
    wire [5:0]  ram_awid;
@@ -185,6 +191,26 @@ module swervolf_core_tb
       .reg_wr_en      (dmi_reg_wr_en),
       .dmi_hard_reset (dmi_hard_reset)); 
 
+   wire        sd_cmd_out;
+   wire        sd_cmd_oe;
+   wire [3:0]  sd_dat_out;
+   wire        sd_dat_oe;
+
+   wire        sd_clk;
+   wire	       sd_cmd;
+   wire [3:0]  sd_dat;
+
+   assign sd_dat[2:1] = 2'bzz;
+
+   sd_card
+     #(.sd_card_size (sd_ram_memory_size))
+   sd_card
+     (.i_clk     (clk),
+      .i_rst     (rst),
+      .i_sd_clk  (sd_clk),
+      .io_sd_cmd (sd_cmd),
+      .io_sd_dat (sd_dat));
+
    swervolf_core
      #(.bootrom_file (bootrom_file))
    swervolf
@@ -200,10 +226,10 @@ module swervolf_core_tb
       .o_flash_cs_n        (),
       .o_flash_mosi        (),
       .i_flash_miso        (1'b0),
-      .o_sd_sclk           (),
-      .o_sd_cs_n           (),
-      .o_sd_mosi           (),
-      .i_sd_miso           (1'b0),
+      .o_sd_sclk           (sd_clk),
+      .o_sd_cs_n           (sd_dat[3]),
+      .o_sd_mosi           (sd_cmd),
+      .i_sd_miso           (sd_dat[0]),
       .i_uart_rx           (1'b1),
       .o_uart_tx           (o_uart_tx),
       .o_ram_awid          (ram_awid),

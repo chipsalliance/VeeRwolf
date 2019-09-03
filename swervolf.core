@@ -29,7 +29,9 @@ filesets:
   tb:
     files:
       - sw/hello.vh : {file_type : user, copyto : hello.vh}
+      - tb/sd_card.v       : {file_type : verilogSource}
       - tb/swervolf_core_tb.v : {file_type : systemVerilogSource}
+    depend: [sd_device]
 
   verilator_tb:
     files: [tb/tb.cpp : {file_type : cppSource}]
@@ -69,7 +71,7 @@ targets:
       - "tool_verilator? (verilator_waiver)"
 
     generate : [intercon, swerv_default_config, version]
-    parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file=hello.vh, rom_init_file, signature, timeout, vcd]
+    parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file=hello.vh, rom_init_file, sd_init_file, sd_ram_memory_size, signature, timeout, vcd]
     tools:
       modelsim:
         vlog_options :
@@ -177,6 +179,16 @@ parameters:
     datatype: file
     description : Verilog hex file to use as initial bootrom RAM contents
     paramtype : plusarg
+
+  sd_init_file:
+    datatype: file
+    description : Verilog hex file to use as initial SD card contents
+    paramtype : plusarg
+
+  sd_ram_memory_size:
+    datatype: int
+    description : Size of simulated SD card
+    paramtype : vlogparam
 
   flash_init_file:
     datatype: file
