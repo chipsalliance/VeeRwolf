@@ -1,28 +1,25 @@
-if SOC_SERIES_RISCV32_SWERV
+if SOC_RISCV32_SWERVOLF
 
-config SOC_SERIES
-	string
-	default "swerv"
+config SOC
+	def_string "swervolf"
 
 config SYS_CLOCK_HW_CYCLES_PER_SEC
-	int
-	default 50000000
+	def_int 50000000
 
 config RISCV_SOC_INTERRUPT_INIT
-	bool
-	default y
+	def_bool y
 
 config RISCV_HAS_CPU_IDLE
-	bool
-	default n
+	def_bool n
 
 config RISCV_HAS_PLIC
-	bool
-	default n
+	def_bool n
+
+config SWERV_PIC
+	def_bool y
 
 config NUM_IRQS
-	int
-	default 8
+	def_int 64
 
 if SERIAL
 
@@ -31,6 +28,7 @@ config UART_NS16550
 
 config UART_NS16550_PORT_0
 	def_bool y
+
 endif # SERIAL
 
 if GPIO
@@ -41,20 +39,15 @@ config GPIO_MMIO32
 endif # GPIO
 
 config XIP
-	bool
-	default n
-
+	def_bool n
 
 config RISCV_MACHINE_TIMER
-	bool
-	default y
+	def_bool y
 
 config RISCV_ROM_BASE_ADDR
-	hex
-	default 0x00000000
+	def_hex 0x00000000
 
 config RISCV_ROM_SIZE
-	hex
-	default 0x0
+	def_hex 0x0
 
-endif # SOC_SERIES_RISCV32_SWERV
+endif # SOC_RISCV32_SWERVOLF
