@@ -25,7 +25,11 @@ filesets:
       - tb/uart_decoder.v
     file_type : verilogSource
 
-  tb          : {files: [tb/swervolf_core_tb.v   : {file_type : systemVerilogSource}]}
+  tb:
+    files:
+      - sw/hello.vh : {file_type : user, copyto : hello.vh}
+      - tb/swervolf_core_tb.v : {file_type : systemVerilogSource}
+
   verilator_tb:
     files: [tb/tb.cpp : {file_type : cppSource}]
     depend : [jtag_vpi]
@@ -56,7 +60,7 @@ targets:
       - "tool_verilator? (verilator_waiver)"
 
     generate : [intercon, swerv_default_config, version]
-    parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file, rom_init_file, signature, timeout, vcd]
+    parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file=hello.vh, rom_init_file, signature, timeout, vcd]
     tools:
       modelsim:
         vlog_options :

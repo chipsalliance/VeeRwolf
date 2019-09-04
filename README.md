@@ -39,6 +39,10 @@ The SweRVolf SoC can be run in simulation or on hardware (Digilent Nexys A7 curr
 
     fusesoc run --target=sim swervolf
 
+This will load a small example program that prints a string and exits. If you want to rerun the program without rebuilding the simulation model, you can add the --run parameter
+
+    fusesoc run --target=sim --run swervolf
+
 To build (and optionally program) an image for a Nexys A7 board, run
 
     fusesoc run --target=nexys_a7 swervolf
