@@ -32,6 +32,10 @@ module swervolf_core
     input wire [31:0]  dmi_reg_wdata,
     output wire [31:0] dmi_reg_rdata,
     input wire 	       dmi_hard_reset,
+    output wire        o_flash_sclk,
+    output wire        o_flash_cs_n,
+    output wire        o_flash_mosi,
+    input wire 	       i_flash_miso,
     input wire 	       i_uart_rx,
     output wire        o_uart_tx,
     output wire [5:0]  o_ram_awid,
@@ -82,6 +86,7 @@ module swervolf_core
    wire        rst_n = rstn;
    wire        timer_irq;
    wire        uart_irq;
+   wire        spi0_irq;
 
 `include "axi_intercon.vh"
 
@@ -172,6 +177,11 @@ module swervolf_core
      (.clk       (clk),
       .rst_n     (rst_n),
       .o_gpio    (o_gpio),
+      .o_sclk    (o_flash_sclk),
+      .o_cs_n    (o_flash_cs_n),
+      .o_mosi    (o_flash_mosi),
+      .i_miso    (i_flash_miso),
+      .o_spi0_irq  (spi0_irq),
       .o_timer_irq (timer_irq),
       .i_ram_init_done  (i_ram_init_done),
       .i_ram_init_error (i_ram_init_error),
@@ -435,7 +445,7 @@ module swervolf_core
       .dma_bus_clk_en (1'b1),
 
       .timer_int (timer_irq),
-      .extintsrc_req ({7'd0, uart_irq}),
+      .extintsrc_req ({6'd0, spi0_irq, uart_irq}),
 
       .dec_tlu_perfcnt0 (),
       .dec_tlu_perfcnt1 (),

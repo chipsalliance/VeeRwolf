@@ -27,6 +27,11 @@ module axi_multicon
    (input wire		  clk,
     input wire 		       rst_n,
     output reg 		       o_gpio,
+    output wire 	       o_sclk,
+    output wire 	       o_cs_n,
+    output wire 	       o_mosi,
+    input wire 		       i_miso,
+    output wire 	       o_spi0_irq,
     output reg 		       o_timer_irq,
     input wire 		       i_ram_init_done,
     input wire 		       i_ram_init_error,
@@ -66,9 +71,22 @@ module axi_multicon
 
    wire 	 reg_we;
    wire [31:0] 	 reg_addr;
+   wire 	 reg_req;
    wire [7:0] 	 reg_be;
    wire [63:0] 	 reg_wdata;
    reg [63:0] 	 reg_rdata;
+   wire [63:0] 	 rdata;
+   wire [7:0] 	 spi_rdt;
+
+   wire [2:0] 	 wb_spi_adr;
+   wire [7:0] 	 wb_spi_dat;
+   wire 	 wb_spi_cyc;
+
+   wire [2:0] 	 spi_adr;
+   reg [2:0] 	 spi_adr_r;
+   reg [7:0] 	 wb_spi_dat_r;
+   reg 		 reg_we_r;
+   reg 		 wb_spi_cyc_r;
 
    AXI_BUS #(32, 64, ID_WIDTH, 1) slave();
 
@@ -129,12 +147,12 @@ module axi_multicon
      (.clk_i  (clk),
       .rst_ni (rst_n),
       .slave  (slave),
-      .req_o  (),
+      .req_o  (reg_req),
       .we_o   (reg_we),
       .addr_o (reg_addr),
       .be_o   (reg_be),
       .data_o (reg_wdata),
-      .data_i (reg_rdata));
+      .data_i (rdata));
 
    reg [63:0] 	 mtime;
    reg [63:0] 	 mtimecmp;
@@ -178,15 +196,16 @@ module axi_multicon
      REG_SHA      = 3'd1,
      REG_SIMPRINT = 3'd4,
      REG_SIMEXIT  = 3'd5;
-//0 = ver
-   //4 = sha
-   //8 = simprint
-   //9 = simexit
-   //A = RAM status
+   //00 = ver
+   //04 = sha
+   //08 = simprint
+   //09 = simexit
+   //0A = RAM status
    //10 = gpio
-   //18 = timer/timecmp
+   //20 = timer/timecmp
+   //40 = SPI
    always @(posedge clk) begin
-      if (reg_we)
+      if (reg_we & !reg_addr[6])
 	case (reg_addr[5:3])
 `ifdef SIMPRINT
 	  1: begin
@@ -221,9 +240,44 @@ module axi_multicon
 
       mtime <= mtime + 64'd1;
       o_timer_irq <= (mtime >= mtimecmp);
+      spi_adr_r <= spi_adr;
+      wb_spi_dat_r <= wb_spi_dat;
+      reg_we_r <= reg_we;
+      wb_spi_cyc_r <= wb_spi_cyc;
+
       if (!rst_n) begin
 	 mtime <= 64'd0;
 	 mtimecmp <= 64'd0;
       end
    end
+
+   wire [7:0] wb_spi_rdt;
+
+   assign rdata = reg_addr[6] ? {8{wb_spi_rdt}} : reg_rdata;
+
+   assign spi_adr = reg_addr[5:3];
+
+   assign wb_spi_adr = reg_req ? spi_adr : spi_adr_r;
+   assign wb_spi_dat = !reg_req ? wb_spi_dat_r : reg_wdata[7:0];
+
+   assign wb_spi_cyc = reg_req & reg_addr[6];
+
+   simple_spi spi
+     (// Wishbone slave interface
+      .clk_i  (clk),
+      .rst_i  (~rst_n),
+      .adr_i  (wb_spi_adr),
+      .dat_i  (wb_spi_dat),
+      .we_i   (reg_we | reg_we_r),
+      .cyc_i  (wb_spi_cyc | wb_spi_cyc_r),
+      .stb_i  (wb_spi_cyc | wb_spi_cyc_r),
+      .dat_o  (wb_spi_rdt),
+      .ack_o  (),
+      .inta_o (o_spi0_irq),
+      // SPI interface
+      .sck_o  (o_sclk),
+      .ss_o   (o_cs_n),
+      .mosi_o (o_mosi),
+      .miso_i (i_miso));
+
 endmodule

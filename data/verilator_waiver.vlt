@@ -33,3 +33,6 @@ lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/ax
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 115-116
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 196
 lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 239
+
+//::simple_spi:1.6-r1
+lint_off -msg CASEINCOMPLETE -file "*/simple_spi_1.6/rtl/verilog/simple_spi_top.v" -lines 244
