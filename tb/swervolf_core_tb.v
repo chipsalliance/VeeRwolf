@@ -59,7 +59,9 @@ module swervolf_core_tb
    reg [1023:0] ram_init_file;
 
    initial begin
-      if ($value$plusargs("ram_init_file=%s", ram_init_file)) begin
+      if (|$test$plusargs("jtag_vpi_enable"))
+	$display("JTAG VPI enabled. Not loading RAM");
+      else if ($value$plusargs("ram_init_file=%s", ram_init_file)) begin
 	 $display("Loading RAM contents from %0s", ram_init_file);
 	 $readmemh(ram_init_file, ram.ram.mem);
       end
