@@ -36,6 +36,13 @@ filesets:
     depend : [jtag_vpi]
   verilator_waiver: {files: [data/verilator_waiver.vlt : {file_type : vlt}]}
 
+  spi_tb:
+    files:
+      - tb/s25fl128s.v
+      - tb/swervolf_spi_tb.v
+      - sw/hello.ubvh : {file_type : user, copyto : hello.ubvh}
+    file_type : verilogSource
+
   nexys_a7_files:
     files :
       - data/vivado_waiver.tcl : {file_type : tclSource}
@@ -48,6 +55,7 @@ filesets:
   bootrom:
     files :
       - sw/blinky.vh    : {file_type : user, copyto : blinky.vh}
+      - sw/spi_uimage_loader.vh : {file_type : user, copyto : spi_uimage_loader.vh}
 
 targets:
   sim:
@@ -73,6 +81,25 @@ targets:
         verilator_options : [--trace, -Wno-fatal]
     toplevel : swervolf_core_tb
 
+  spi_tb:
+    default_tool : modelsim
+    filesets :
+      - bootrom
+      - core
+      - bfm
+      - spi_tb
+
+    generate : [intercon, swerv_default_config]
+    parameters : [SIMPRINT=true, ram_init_file, rom_init_file, flash_init_file, mem_clear=true, timeout, vcd]
+    tools:
+      modelsim:
+        vlog_options :
+          - -mfcu
+          - -cuautoname=du
+          - config/common_defines.vh
+          - -timescale 1ns/1ns
+    toplevel : swervolf_spi_tb
+    
   nexys_a7:
     default_tool : vivado
     filesets :
@@ -150,6 +177,11 @@ parameters:
     datatype: file
     description : Verilog hex file to use as initial bootrom RAM contents
     paramtype : plusarg
+
+  flash_init_file:
+    datatype: file
+    description : Verilog hex file to use as initial SPI Flash contents
+    paramtype : vlogparam
 
   signature:
     datatype : file
