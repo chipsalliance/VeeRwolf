@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:SweRV_EH1:1.2-r1
+name : chipsalliance.org:cores:SweRV_EH1:1.3
 
 filesets:
   rtl:
@@ -135,7 +135,7 @@ generators:
     description : Create a SweRV configuration. Note! Only supports the default config
 
 provider:
-  name : github
-  user : olofk
-  repo : Cores-SweRV
-  version : 0c8c73444210c4ec8360d7898e7d386d653d1f99
+  name    : github
+  user    : olofk
+  repo    : Cores-SweRV
+  version : 4a287a070497f602feadf63f1b6a130b64cffdb4
