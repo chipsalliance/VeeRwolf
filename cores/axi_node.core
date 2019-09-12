@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : pulp-platform.org::axi_node:1.1.1-r3
+name : pulp-platform.org::axi_node:1.1.1-r4
 
 filesets:
   core:
@@ -100,4 +100,4 @@ provider:
   name : github
   user : olofk
   repo : axi_node
-  version : 8ef3aba04dbb7d1a189f982469233ad0c0a8c212
+  version : 9fb32e909edabcbdc6ebdc3d5170ca301ae44ea8
