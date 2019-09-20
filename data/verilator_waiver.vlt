@@ -36,3 +36,28 @@ lint_off -msg WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/ax
 
 //::simple_spi:1.6-r1
 lint_off -msg CASEINCOMPLETE -file "*/simple_spi_1.6/rtl/verilog/simple_spi_top.v" -lines 244
+
+//::sd_device:0
+lint_off -msg WIDTH          -file "*/sd_device_0-r1/rtl/verilog/sd_params.vh"   -lines 40
+lint_off -msg WIDTH          -file "*/sd_device_0-r1/rtl/verilog/common.v"       -lines 50
+lint_off -msg WIDTH          -file "*/sd_device_0-r1/rtl/verilog/sd_phy.v"       -lines 597
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_wishbone.v"  -lines 105
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_mgr.v"       -lines 91
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 326
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 336
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 385
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 405
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 418
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 429
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 443
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 455
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 565
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 676
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 730
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 207
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_link.v"      -lines 785
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_phy.v"       -lines 296
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_phy.v"       -lines 446
+lint_off -msg CASEINCOMPLETE -file "*/sd_device_0-r1/rtl/verilog/sd_phy.v"       -lines 463
+
+lint_off -msg UNOPTFLAT -file "*/swervolf_0/rtl/axi_multicon.v" -lines 76

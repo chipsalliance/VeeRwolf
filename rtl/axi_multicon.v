@@ -27,11 +27,16 @@ module axi_multicon
    (input wire		  clk,
     input wire 		       rst_n,
     output reg 		       o_gpio,
-    output wire 	       o_sclk,
-    output wire 	       o_cs_n,
-    output wire 	       o_mosi,
-    input wire 		       i_miso,
+    output wire 	       o_sclk0,
+    output wire 	       o_cs_n0,
+    output wire 	       o_mosi0,
+    input wire 		       i_miso0,
+    output wire 	       o_sclk1,
+    output wire 	       o_cs_n1,
+    output wire 	       o_mosi1,
+    input wire 		       i_miso1,
     output wire 	       o_spi0_irq,
+    output wire 	       o_spi1_irq,
     output reg 		       o_timer_irq,
     input wire 		       i_ram_init_done,
     input wire 		       i_ram_init_error,
@@ -80,13 +85,15 @@ module axi_multicon
 
    wire [2:0] 	 wb_spi_adr;
    wire [7:0] 	 wb_spi_dat;
-   wire 	 wb_spi_cyc;
+   wire 	 wb_spi_cyc0;
+   wire 	 wb_spi_cyc1;
 
    wire [2:0] 	 spi_adr;
    reg [2:0] 	 spi_adr_r;
    reg [7:0] 	 wb_spi_dat_r;
    reg 		 reg_we_r;
-   reg 		 wb_spi_cyc_r;
+   reg 		 wb_spi_cyc0_r;
+   reg 		 wb_spi_cyc1_r;
 
    AXI_BUS #(32, 64, ID_WIDTH, 1) slave();
 
@@ -205,7 +212,7 @@ module axi_multicon
    //20 = timer/timecmp
    //40 = SPI
    always @(posedge clk) begin
-      if (reg_we & !reg_addr[6])
+      if (reg_we & (reg_addr[7:6]==2'b00))
 	case (reg_addr[5:3])
 `ifdef SIMPRINT
 	  1: begin
@@ -243,7 +250,8 @@ module axi_multicon
       spi_adr_r <= spi_adr;
       wb_spi_dat_r <= wb_spi_dat;
       reg_we_r <= reg_we;
-      wb_spi_cyc_r <= wb_spi_cyc;
+      wb_spi_cyc0_r <= wb_spi_cyc0;
+      wb_spi_cyc1_r <= wb_spi_cyc1;
 
       if (!rst_n) begin
 	 mtime <= 64'd0;
@@ -252,6 +260,8 @@ module axi_multicon
    end
 
    wire [7:0] wb_spi_rdt;
+   wire [7:0] wb_spi_rdt0;
+   wire [7:0] wb_spi_rdt1;
 
    assign rdata = reg_addr[6] ? {8{wb_spi_rdt}} : reg_rdata;
 
@@ -260,24 +270,44 @@ module axi_multicon
    assign wb_spi_adr = reg_req ? spi_adr : spi_adr_r;
    assign wb_spi_dat = !reg_req ? wb_spi_dat_r : reg_wdata[7:0];
 
-   assign wb_spi_cyc = reg_req & reg_addr[6];
+   assign wb_spi_cyc0 = reg_req & reg_addr[6] & !reg_addr[7];
+   assign wb_spi_cyc1 = reg_req & reg_addr[6] &  reg_addr[7];
 
-   simple_spi spi
+   assign wb_spi_rdt = reg_addr[7] ? wb_spi_rdt1 : wb_spi_rdt0;
+
+   simple_spi spi0
      (// Wishbone slave interface
       .clk_i  (clk),
       .rst_i  (~rst_n),
       .adr_i  (wb_spi_adr),
       .dat_i  (wb_spi_dat),
       .we_i   (reg_we | reg_we_r),
-      .cyc_i  (wb_spi_cyc | wb_spi_cyc_r),
-      .stb_i  (wb_spi_cyc | wb_spi_cyc_r),
-      .dat_o  (wb_spi_rdt),
+      .cyc_i  (wb_spi_cyc0 | wb_spi_cyc0_r),
+      .stb_i  (wb_spi_cyc0 | wb_spi_cyc0_r),
+      .dat_o  (wb_spi_rdt0),
       .ack_o  (),
       .inta_o (o_spi0_irq),
       // SPI interface
-      .sck_o  (o_sclk),
-      .ss_o   (o_cs_n),
-      .mosi_o (o_mosi),
-      .miso_i (i_miso));
+      .sck_o  (o_sclk0),
+      .ss_o   (o_cs_n0),
+      .mosi_o (o_mosi0),
+      .miso_i (i_miso0));
 
+   simple_spi spi1
+     (// Wishbone slave interface
+      .clk_i  (clk),
+      .rst_i  (~rst_n),
+      .adr_i  (wb_spi_adr),
+      .dat_i  (wb_spi_dat),
+      .we_i   (reg_we | reg_we_r),
+      .cyc_i  (wb_spi_cyc1 | wb_spi_cyc1_r),
+      .stb_i  (wb_spi_cyc1 | wb_spi_cyc1_r),
+      .dat_o  (wb_spi_rdt1),
+      .ack_o  (),
+      .inta_o (o_spi1_irq),
+      // SPI interface
+      .sck_o  (o_sclk1),
+      .ss_o   (o_cs_n1),
+      .mosi_o (o_mosi1),
+      .miso_i (i_miso1));
 endmodule

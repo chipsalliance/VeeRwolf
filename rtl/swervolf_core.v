@@ -36,6 +36,10 @@ module swervolf_core
     output wire        o_flash_cs_n,
     output wire        o_flash_mosi,
     input wire 	       i_flash_miso,
+    output wire        o_sd_sclk,
+    output wire        o_sd_cs_n,
+    output wire        o_sd_mosi,
+    input wire 	       i_sd_miso,
     input wire 	       i_uart_rx,
     output wire        o_uart_tx,
     output wire [5:0]  o_ram_awid,
@@ -87,6 +91,7 @@ module swervolf_core
    wire        timer_irq;
    wire        uart_irq;
    wire        spi0_irq;
+   wire        spi1_irq;
 
 `include "axi_intercon.vh"
 
@@ -177,11 +182,16 @@ module swervolf_core
      (.clk       (clk),
       .rst_n     (rst_n),
       .o_gpio    (o_gpio),
-      .o_sclk    (o_flash_sclk),
-      .o_cs_n    (o_flash_cs_n),
-      .o_mosi    (o_flash_mosi),
-      .i_miso    (i_flash_miso),
+      .o_sclk0   (o_flash_sclk),
+      .o_cs_n0   (o_flash_cs_n),
+      .o_mosi0   (o_flash_mosi),
+      .i_miso0   (i_flash_miso),
+      .o_sclk1   (o_sd_sclk),
+      .o_cs_n1   (o_sd_cs_n),
+      .o_mosi1   (o_sd_mosi),
+      .i_miso1   (i_sd_miso),
       .o_spi0_irq  (spi0_irq),
+      .o_spi1_irq  (spi1_irq),
       .o_timer_irq (timer_irq),
       .i_ram_init_done  (i_ram_init_done),
       .i_ram_init_error (i_ram_init_error),
@@ -445,7 +455,7 @@ module swervolf_core
       .dma_bus_clk_en (1'b1),
 
       .timer_int (timer_irq),
-      .extintsrc_req ({6'd0, spi0_irq, uart_irq}),
+      .extintsrc_req ({5'd0, spi1_irq, spi0_irq, uart_irq}),
 
       .dec_tlu_perfcnt0 (),
       .dec_tlu_perfcnt1 (),
