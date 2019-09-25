@@ -5,6 +5,18 @@ set_msg_config -id "Synth 8-350" -string "litedram_core.v IDELAYCTRL" -suppress
 set_msg_config -id "Synth 8-350" -string "litedram_core.v IDELAYE2" -suppress
 set_msg_config -id "Synth 8-350" -string "litedram_core.v PLLE2_ADV" -suppress
 set_msg_config -id "Synth 8-6014" -string "litedram_core.v" -suppress
+set_msg_config -id "Synth 8-3936"  -string "memdat_2_reg" -suppress
+set_msg_config -id "Synth 8-3936"  -string "memdat_4_reg" -suppress
+set_msg_config -id "Synth 8-3936"  -string "memdat_18_reg" -suppress
+set_msg_config -id "DRC REQP-1839" -string "ddr2/ldc/storage" -suppress
+set_msg_config -id "DRC REQP-1840" -string "ddr2/ldc/storage" -suppress
 
 #VexRiscv warnings
 set_msg_config -id "Synth 8-6014" -string "VexRiscv.v" -suppress
+set_msg_config -id "Synth 8-3936" -string "memory_to_writeBack_MUL_HH_reg" -suppress
+
+#SweRV warnings
+set_msg_config -id "DRC REQP-1840" -string "rvtop/mem/Gen_dccm_enable.dccm/mem_bank" -suppress
+
+#AXI CDC
+set_msg_config -id "Synth 8-3332" -string "dc_awchan/buffer/data_reg" -suppress
