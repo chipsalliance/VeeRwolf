@@ -26,6 +26,7 @@ The core of SweRVolf consists of the SweRV CPU with a boot ROM, AXI4 interconnec
 | Boot ROM | 0x80000000-0x80000FFF |
 | syscon   | 0x80001000-0x80001FFF |
 | UART     | 0x80002000-0x80002FFF |
+| ETH      | 0x80003000-0x80003FFF |
 
 #### RAM
 

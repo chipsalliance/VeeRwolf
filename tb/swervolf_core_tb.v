@@ -130,7 +130,7 @@ module swervolf_core_tb
    wire [31:0] dmi_reg_wdata;
    wire [31:0] dmi_reg_rdata;
    wire        dmi_hard_reset;
-   
+
    axi_mem_wrapper
      #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2),
        .MEM_SIZE  (RAM_SIZE),
@@ -189,7 +189,7 @@ module swervolf_core_tb
       .reg_wr_addr    (dmi_reg_addr),
       .reg_en         (dmi_reg_en),
       .reg_wr_en      (dmi_reg_wr_en),
-      .dmi_hard_reset (dmi_hard_reset)); 
+      .dmi_hard_reset (dmi_hard_reset));
 
    wire        sd_cmd_out;
    wire        sd_cmd_oe;
@@ -232,6 +232,20 @@ module swervolf_core_tb
       .i_sd_miso           (sd_dat[0]),
       .i_uart_rx           (1'b1),
       .o_uart_tx           (o_uart_tx),
+      .i_ethmac_mtx_clk    (clk),
+      .o_ethmac_mtxd       (),
+      .o_ethmac_mtxen      (),
+      .o_ethmac_mtxerr     (),
+      .i_ethmac_mrx_clk    (clk),
+      .i_ethmac_mrxd       (4'd0),
+      .i_ethmac_mrxdv      (1'b0),
+      .i_ethmac_mrxerr     (1'b0),
+      .i_ethmac_mcoll      (1'b0),
+      .i_ethmac_mcrs       (1'b0),
+      .o_ethmac_mdc        (),
+      .i_ethmac_md         (1'b0),
+      .o_ethmac_md         (),
+      .o_ethmac_mdoe       (),
       .o_ram_awid          (ram_awid),
       .o_ram_awaddr        (ram_awaddr),
       .o_ram_awlen         (ram_awlen),

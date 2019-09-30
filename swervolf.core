@@ -8,6 +8,9 @@ filesets:
       - rtl/dpram64.v
       - rtl/axi_mem_wrapper.v
       - rtl/axi_uart_wrapper.v
+      - rtl/wb2axi.v
+      - rtl/axi2wb.v
+      - rtl/axi_ethmac_wrapper.v
       - rtl/axi_multicon.v
       - rtl/swerv_wrapper.sv
       - rtl/swervolf_core.v
@@ -20,6 +23,7 @@ filesets:
       - ">=pulp-platform.org::axi_node:1.1.1-r2"
       - ">=chipsalliance.org:cores:SweRV_EH1:1.4"
       - simple_spi
+      - ethmac
 
   bfm:
     files:
@@ -126,6 +130,8 @@ generate:
           id_width : 4
         sb:
           id_width : 1
+        ethmac_dma:
+          id_width : 1
       slaves:
         rom:
           offset : 0x80000000
@@ -135,6 +141,9 @@ generate:
           size   : 0x00001000
         uart:
           offset : 0x80002000
+          size   : 0x00001000
+        ethmac:
+          offset : 0x80003000
           size   : 0x00001000
         ram:
           offset : 0x00000000
