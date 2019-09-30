@@ -2,6 +2,11 @@ TOOLCHAIN_PREFIX ?= riscv64-unknown-elf-
 RESET_VECTOR ?= 0
 FLASH_ADDR ?= 0x0
 
+ethmac.elf:
+	$(TOOLCHAIN_PREFIX)gcc -c stack.S
+	$(TOOLCHAIN_PREFIX)gcc -c ethmac.c
+	$(TOOLCHAIN_PREFIX)gcc -nostartfiles -march=rv32i -mabi=ilp32 -Ttext=0 -o ethmac.elf stack.o ethmac.o
+
 %.elf: %.S
 	$(TOOLCHAIN_PREFIX)gcc -nostartfiles -march=rv32i -mabi=ilp32 -Tlink.ld -o$@ $<
 %.vh: %.bin
