@@ -30,3 +30,30 @@ set_property -dict { PACKAGE_PIN B1    IOSTANDARD LVCMOS33 } [get_ports o_sd_scl
 set_property -dict { PACKAGE_PIN C1    IOSTANDARD LVCMOS33 } [get_ports o_sd_mosi];
 set_property -dict { PACKAGE_PIN C2    IOSTANDARD LVCMOS33 } [get_ports i_sd_miso];
 set_property -dict { PACKAGE_PIN D2    IOSTANDARD LVCMOS33 } [get_ports o_sd_cs_n];
+
+set_property -dict {PACKAGE_PIN A9 IOSTANDARD LVCMOS33} [get_ports io_ethmac_md]
+set_property -dict {PACKAGE_PIN C9 IOSTANDARD LVCMOS33} [get_ports o_ethmac_mdc]
+set_property -dict {PACKAGE_PIN B3 IOSTANDARD LVCMOS33} [get_ports o_phy_rstn]
+set_property -dict {PACKAGE_PIN D10 IOSTANDARD LVCMOS33} [get_ports {i_rmii_rxd[1]}]
+set_property -dict {PACKAGE_PIN C11 IOSTANDARD LVCMOS33} [get_ports {i_rmii_rxd[0]}]
+set_property -dict {PACKAGE_PIN C10 IOSTANDARD LVCMOS33} [get_ports i_rmii_rxerr]
+set_property -dict {PACKAGE_PIN A10 IOSTANDARD LVCMOS33} [get_ports {o_rmii_txd[0]}]
+set_property -dict {PACKAGE_PIN A8 IOSTANDARD LVCMOS33} [get_ports {o_rmii_txd[1]}]
+set_property -dict {PACKAGE_PIN B9 IOSTANDARD LVCMOS33} [get_ports o_rmii_txen]
+set_property -dict {PACKAGE_PIN D9 IOSTANDARD LVCMOS33} [get_ports i_rmii_crsdv]
+set_property -dict {PACKAGE_PIN D5 IOSTANDARD LVCMOS33} [get_ports o_phy_clk]
+
+set_input_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports {i_rmii_rxd[*]}]
+set_input_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -max -add_delay 15.000 [get_ports {i_rmii_rxd[*]}]
+set_input_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports i_rmii_crsdv]
+set_input_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -max -add_delay 15.000 [get_ports i_rmii_crsdv]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -min -add_delay -1.500 [get_ports {o_rmii_txd[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports {o_rmii_txd[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -min -add_delay -1.500 [get_ports o_phy_rstn]
+set_output_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports o_phy_rstn]
+set_output_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -min -add_delay -1.500 [get_ports o_rmii_txen]
+set_output_delay -clock [get_clocks -of_objects [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports o_rmii_txen]
+
+create_generated_clock -name mii_to_rmii_0_inst/U0/rmii2mac_rx_clk -source [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1] -divide_by 2 [get_pins mii_to_rmii_0_inst/U0/rmii2mac_rx_clk_bi_reg/Q]
+create_generated_clock -name mii_to_rmii_0_inst/U0/rmii2mac_tx_clk -source [get_pins clk_gen/PLLE2_BASE_inst/CLKOUT1] -divide_by 2 [get_pins mii_to_rmii_0_inst/U0/rmii2mac_tx_clk_bi_reg/Q]

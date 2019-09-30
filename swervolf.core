@@ -52,6 +52,7 @@ filesets:
   nexys_a7_files:
     files :
       - data/vivado_waiver.tcl : {file_type : tclSource}
+      - data/vivado_ip.tcl : {file_type : tclSource}
       - data/swervolf_nexys.xdc : {file_type : xdc}
       - rtl/clk_gen_nexys.v : {file_type : verilogSource}
       - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}

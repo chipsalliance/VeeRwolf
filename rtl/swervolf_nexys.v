@@ -50,10 +50,35 @@ module swervolf_nexys_a7
     input wire 	       i_sd_miso,
     input wire 	       i_uart_rx,
     output wire        o_uart_tx,
-    output reg         led0);
+    output wire        o_phy_clk,
+    output wire	       o_phy_rstn, 
+    inout wire 	       io_ethmac_md,
+    output wire        o_ethmac_mdc,
+    input wire [1:0]   i_rmii_rxd,
+    input wire 	       i_rmii_rxerr,
+    output wire [1:0]  o_rmii_txd,
+    output wire        o_rmii_txen,
+    input wire 	       i_rmii_crsdv,
+    output wire        led0);
 
-   wire 	       led0_int;
-   reg 		       led0_int_r;
+   wire [3:0]	       ethmac_mtxd;
+   wire 	       ethmac_mtxen;
+   wire 	       ethmac_mtxerr;
+   wire 	       ethmac_mrx_clk;
+   wire 	       ethmac_mtx_clk;
+   wire [3:0]	       ethmac_mrxd;
+   wire 	       ethmac_mrxdv;
+   wire 	       ethmac_mrxerr;
+   wire 	       ethmac_mcoll;
+   wire 	       ethmac_mcrs;
+
+   wire                ethmac_mdi;
+   wire                ethmac_mdo;
+   wire                ethmac_mdoe;
+
+   assign io_ethmac_md = ethmac_mdoe ? ethmac_mdo : 1'bz;
+   assign ethmac_mdi = io_ethmac_md;
+
 
    wire 	       cpu_tx,litedram_tx;
 
@@ -64,14 +89,21 @@ module swervolf_nexys_a7
 
    wire 	 clk_core;
    wire 	 rst_core;
+   wire 	 clk50;
+   wire 	 rst50;
    wire 	 user_clk;
    wire 	 user_rst;
 
+   assign o_phy_clk = clk50;
+   assign o_phy_rstn = ~rst50;   
+   
    clk_gen_nexys clk_gen
      (.i_clk (user_clk),
       .i_rst (user_rst),
       .o_clk_core (clk_core),
-      .o_rst_core (rst_core));
+      .o_rst_core (rst_core),
+      .o_clk50 (clk50),
+      .o_rst50 (rst50));
 
    AXI_BUS #(32, 64, 6, 1) mem();
    AXI_BUS #(32, 64, 6, 1) cpu();
@@ -196,6 +228,30 @@ module swervolf_nexys_a7
       .dmi_stat       (2'd0),
       .version        (4'd1));
 
+
+   mii_to_rmii_0
+     mii_to_rmii_0_inst
+       (	
+        .rst_n (~rst50),
+	.ref_clk (clk50), 
+	.mac2rmii_tx_en (ethmac_mtxen),   
+	.mac2rmii_txd   (ethmac_mtxd),  
+	.mac2rmii_tx_er  (ethmac_mtxerr),
+	.rmii2mac_tx_clk (ethmac_mtx_clk),		
+	.rmii2mac_rx_clk (ethmac_mrx_clk),   
+	.rmii2mac_col  (ethmac_mcoll),  
+	.rmii2mac_crs (ethmac_mcrs),       
+	.rmii2mac_rx_dv (ethmac_mrxdv), 
+	.rmii2mac_rx_er (ethmac_mrxerr),  
+	.rmii2mac_rxd (ethmac_mrxd),
+        .phy2rmii_crs_dv (i_rmii_crsdv), 
+	.phy2rmii_rx_er (i_rmii_rxerr), 
+	.phy2rmii_rxd (i_rmii_rxd),     
+	.rmii2phy_txd (o_rmii_txd),     
+	.rmii2phy_tx_en (o_rmii_txen)    
+	);
+
+      
    swervolf_core
      #(.bootrom_file (bootrom_file))
    swervolf
@@ -217,20 +273,20 @@ module swervolf_nexys_a7
       .i_sd_miso      (i_sd_miso),
       .i_uart_rx      (i_uart_rx),
       .o_uart_tx      (cpu_tx),
-      .i_ethmac_mtx_clk    (clk),
-      .o_ethmac_mtxd       (),
-      .o_ethmac_mtxen      (),
-      .o_ethmac_mtxerr     (),
-      .i_ethmac_mrx_clk    (clk),
-      .i_ethmac_mrxd       (4'd0),
-      .i_ethmac_mrxdv      (1'b0),
-      .i_ethmac_mrxerr     (1'b0),
-      .i_ethmac_mcoll      (1'b0),
-      .i_ethmac_mcrs       (1'b0),
-      .o_ethmac_mdc        (),
-      .i_ethmac_md         (1'b0),
-      .o_ethmac_md         (),
-      .o_ethmac_mdoe       (),
+      .i_ethmac_mtx_clk (ethmac_mtx_clk),
+      .o_ethmac_mtxd    (ethmac_mtxd),
+      .o_ethmac_mtxen   (ethmac_mtxen),
+      .o_ethmac_mtxerr  (ethmac_mtxerr),
+      .i_ethmac_mrx_clk (ethmac_mrx_clk),
+      .i_ethmac_mrxd    (ethmac_mrxd),
+      .i_ethmac_mrxdv   (ethmac_mrxdv),
+      .i_ethmac_mrxerr  (ethmac_mrxerr),
+      .i_ethmac_mcoll   (ethmac_mcoll),
+      .i_ethmac_mcrs    (ethmac_mcrs),
+      .o_ethmac_mdc     (o_ethmac_mdc),
+      .i_ethmac_md      (ethmac_mdi), 
+      .o_ethmac_md      (ethmac_mdo), 
+      .o_ethmac_mdoe    (ethmac_mdoe),
       .o_ram_awid     (cpu.aw_id),
       .o_ram_awaddr   (cpu.aw_addr),
       .o_ram_awlen    (cpu.aw_len),
