@@ -6,5 +6,7 @@ TOOLCHAIN_PREFIX ?= riscv64-unknown-elf-
 	python3 makehex.py $< > $@
 %.bin: %.elf
 	$(TOOLCHAIN_PREFIX)objcopy -O binary $< $@
+%.ihex: %.elf
+	$(TOOLCHAIN_PREFIX)objcopy -O ihex $< $@
 clean:
 	rm -f *.elf *.bin *.vh
