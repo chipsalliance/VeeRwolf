@@ -1,26 +1,119 @@
 SweRVolf
 ========
 
-is a FuseSoC-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
+SweRVolf is a [FuseSoC](https://github.com/olofk/fusesoc)-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
 
-This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), [Zephyr OS](https://www.zephyrproject.org) or other software in simulators or on FPGA boards. The SoC consists of the SweRV CPU with a boot ROM, DDR2 controller, UART and GPIO.
+This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), [Zephyr OS](https://www.zephyrproject.org) or other software in simulators or on FPGA boards. Focus is on portability, extendability and ease of use; to allow SweRV users to quickly get software running, modify the SoC to their needs or port it to new target devices.
 
-# Memory map
+# Structure
+
+To ease portability, the SoC consists of a portable technology-agnostic core with target-specific wrappers. This chapter describes the functionality of the core and the technology-specific targets.
+
+## SweRVolf Core
+
+The core of SweRVolf consists of the SweRV CPU with a boot ROM, AXI4 interconnect, UART, SPI, RISC-V timer and GPIO. The core doesn't include any RAM but instead exposes a memory bus that the target-specific wrapper will connect to an appropriate memory controller. Other external connections are clock, reset, UART, GPIO, SPI and DMI (Debug Module Interface).
+
+![](swervolf_core.png)
+
+*SwerVolf Core*
+
+
+### Memory map
 
 | Core     | Address               |
 | -------- | --------------------- |
 | RAM      | 0x00000000-0x07FFFFFF |
 | Boot ROM | 0x80000000-0x80000FFF |
-| GPIO     | 0x80001000-0x8000000F |
+| syscon   | 0x80001000-0x80001FFF |
 | UART     | 0x80002000-0x80002FFF |
 
-For simulation targets there are also two extra registers defined. Writing to 0x80001008 will print a character to stdout. Writing to 0x80001009 will end the simulation.
+#### RAM
 
-## How to use
+The SweRVolf core does not contain a memory controller but allocates the first 128MiB of the address for RAM that can be used by a target application and exposes an AXI bus to the wrapper.
 
-### Prerequisites
+#### Boot ROM
 
-Install verilator
+The boot ROM contains a first-stage bootloader. After system reset, SweRV will start fetching its first instructions from this area.
+
+To select a bootloader, set the `bootrom_file` parameter. See the [Booting](#booting) chapter for more information about available bootloaders.
+
+#### System controller
+
+The system controller contains common system functionality such as keeping register with the SoC version information, RAM initialization status and the RISC-V machine timer. Below is the memory map of the system controller
+
+
+| Address  | Register              | Description |
+| -------- | --------------------- | -----------
+| 0x00     | version_rev  | SweRVolf revision |
+| 0x01     | version_minor | SweRVolf minor version |
+| 0x02     | version_major |SweRVolf major version |
+| 0x03     | version_misc | Bit 7 is set when SweRVolf was built from modified sources |
+| 0x04-0x07     | version_sha | SHA hash of the build
+| 0x08     | sim_print | Outputs a character in simulation. No effect on hardware
+| 0x09     | sim_exit | Exits a simulation. No effect on hardware
+| 0x0A     | init_status | Bit 0 = RAM initialization complete. Bit 1 = RAM initialization reported errors
+| 0x10     | gpio | Writing to bit 0 clears or sets GPIO bit |
+| 0x20-0x27 | mtime | mtime from RISC-V privilege spec |
+| 0x28-0x2f | mtimecmp |mtimecmp from RISC-V privilege spec |
+| 0x40     | SPI_SPCR | Simple SPI Control register |
+| 0x48     | SPI_SPSR | Simple SPI status register |
+| 0x50     | SPI_SPDR | Simple SPI data register |
+| 0x58     | SPI_SPER | Simple SPI extended register |
+| 0x60     | SPI_SPSS | Simple SPI slave select register |
+
+#### UART
+
+SweRVolf contains a ns16550-compatible UART
+
+## SweRVolf sim
+
+SweRVolf sim is a simulation target that wraps the SweRVolf core in a testbench to be used by verilator or event-driven simulators such as QuestaSim. It can be used for full-system simulations that executes programs running on SweRV. It also supports connecting a debugger through OpenOCD and JTAG VPI. The [Debugging](#debugging) chapter contains more information on how to connect a debugger.
+
+![](swervolf_sim.png)
+
+*SwerVolf Simulation target*
+
+The simulation target exposes a number of parameters for compile-time and run-time configuration. These parameters are all exposed as FuseSoC parameters. The most relevant parameters are:
+
+* `--jtag_vpi_enable` : Enables the JTAG server which OpenOCD can connect to
+* `--ram_init_file` : Loads a Verilog hex file to use as initial on-chip RAM contents
+* `--vcd` : Enable VCD dumping
+
+Memory files suitable for loading with `--ram_init_file` can be created from binary files with the `sw/makehex.py` script
+
+## SweRVolf Nexys
+
+SweRVolf Nexys is a version of the SweRVolf SoC created for the Digilent Nexys A7 board. It uses the on-board 128MB DDR2 for RAM, has GPIO connected to LED, supports booting from SPI Flash and uses the microUSB port for UART and JTAG communication. The default bootloader for the SweRVolf Nexys target will attempt to load a program stored in SPI Flash by default.
+
+![](swervolf_nexys.png)
+
+*SwerVolf Nexys A7 target*
+
+### I/O
+
+The active on-board I/O consists of a LED, a switch and the microUSB connector for UART, JTAG and power.
+
+#### LED 0
+
+LED 0 is controlled by the memory-mapped GPIO at address 0x80001010
+
+#### Switch 0
+
+Switch 0 selects whether to output serial communication from the SoC or from the embedded self-test program in the DDR2 controller.
+
+#### micro USB
+
+UART and JTAG communication is tunneled through the microUSB port on the board and will appear as `/dev/ttyUSB0`, `/dev/ttyUSB1` or similar depending on OS configuration. A terminal emulator can be used to connect to the UART (e.g. by running `screen /dev/ttyUSB0 115200`) and OpenOCD can connect to the JTAG port to program the FPGA or connect the debug proxy. The [debugging](#debugging) chapter goes into more detail on how to connect a debugger.
+
+#### SPI Flash
+
+An SPI controller is connected to the on-board SPI Flash. This can be used for storing data such as program to be loaded into memory during boot. The [SPI uImage loader](#spi-uimage-loader) chapter goes into more detail on how to prepare, write and boot a program stored in SPI Flash
+
+# How to use
+
+## Prerequisites
+
+Install [verilator](https://www.veripool.org/wiki/verilator)
 
 Create a directory structure consisting of a workspace directory (from now on called `$WORKSPACE`) and a root directory for the SweRV SoC (from now on called `$CORES_ROOT`). All further commands will be run from `$WORKSPACE` unless otherwise stated. The structure will look like this
 
@@ -99,22 +192,6 @@ The default bootloader will just blink the LED and other programs are uploaded t
 
     make -C ../cores/Cores-SweRVolf/sw memtest.vh
     fusesoc run --target=nexys_a7 swervolf --bootrom_file=../cores/Cores-SweRVolf/sw/memtest.vh
-
-#### I/O
-
-The active on-board I/O consists of a LED, a switch and the microUSB connector for UART, JTAG and power.
-
-##### LED 0
-
-LED 0 is controlled by memory-mapped GPIO at address 0x80001010
-
-##### Switch 0
-
-Switch 0 selects whether to output serial communication from the SoC or from the embedded self-test program in the DDR2 controller.
-
-##### micro USB
-
-UART and JTAG communication is tunneled through the microUSB port on the board and will appear as `/dev/ttyUSB0`, `/dev/ttyUSB1` or similar depending on OS configuration. A terminal emulator can be used to connect to the UART (e.g. by running `screen /dev/ttyUSB0 115200`) and OpenOCD can connect to the JTAG port.
 
 ## Build Zephyr applications
 
@@ -232,3 +309,46 @@ Open a third terminal and connect to the debug session through OpenOCD with `tel
 OpenOCD support loading ELF program files by running `load_image /path/to/file.elf`. Remember that the path is relative to the directory from where OpenOCD was launched.
 
 After the program has been loaded, set the program counter to address zero with `reg pc 0` and run `resume` to start the program.
+
+## Booting
+
+SweRVolf is set up by default to read its initial instructions from address 0x80000000 which point to the on-chip boot ROM. Several first-stage bootloaders are provided for different applications
+
+### Jump to RAM
+
+For simulations, the most common option is to load a program into the on-chip RAM and start executing from there. The default bootloader in such cases is a single instruction that jumps to address 0x0 and continues execution from there.
+
+### SPI uImage loader
+
+For most applications on real hardware it is preferred to store them in an on-board SPI Flash memory. The SPI uImage loader can read an image in the u-boot uImage format, copy it to RAM and start executing. This process requires creating a suitable image, writing it to Flash and set up the SPI uImage loader to read from the correct address in Flash.
+
+#### Create a flash image
+
+The `mkimage` tool available from u-boot is used to prepare an image to be written to Flash. `mkimage` expects a `.bin` file, which has been created with `iscv64-unknown-elf-objcopy -O binary`. Given a `$IMAGE.bin` we can now create `$IMAGE.ub` with the following command:
+
+    mkimage -A riscv -C none -T standalone -a 0x0 -e 0x0 -n '' -d $IMAGE.bin $IMAGE.ub
+
+Refer to the uimage manual for a description of each parameter. There arae also Makefile targets in `sw/Makefile` that can be used as reference.
+
+### Writing SPI Flash
+
+#### Simulation
+
+In order to test the SPI image loading mechanism in simulation, a specific FuseSoC target, `spi_tb` is available. If no run-time parameters are supplied it will load a prebuilt image containing the `hello` program (source available in `sw/hello.S`) from Flash, execute it and exit. This testbench will not work in Verilator as it uses a non synthesizable model of the SPI Flash. The default simulator is instead ModelSim. Other simulators can be used by adding the `--tool=$TOOL` argument to the command-line.
+
+    fusesoc run --target=spi_tb swervolf
+
+The simulated Flash contents can be changed at compile-time with the `--flash_init_file` parameter. The model expects a uImage in verilog hex format. Such files can be created by running
+
+    objcopy -I binary -O verilog $IMAGE.ub $IMAGE.hex
+
+#### Nexys A7
+
+For Nexys A7, OpenOCD is used to write to Flash. As the connection to the SPI Flash goes through the FPGA, this consists of a two-stage process where a proxy FPGA image is first written, which will handle communication between OpenOCD and the SPI Flash
+
+1. Obtain the proxy FPGA image from [here](https://github.com/quartiq/bscan_spi_bitstreams/blob/master/bscan_spi_xc7a100t.bit) and place it in `$WORKSPACE`
+2. Run `openocd -c "set BINFILE $IMAGE" -f ../cores/Cores-SweRVolf/data/swervolf_nexys_write_flash.cfg`, where `$IMAGE` is the path to the uImage file that should be written to Flash
+
+### Set up SPI uImage loader
+
+The final step is to prepare the bootloader for SweRVolf which will be responsible for reading the image from Flash, copy it to RAM and execute it. This process is the same for both simulation and hardware targets. Note that both the `spi_tb` target and `nexys_a7` target will have this as the default boot loader so in most cases nothing else needs to be done. There are however a couple of defines in `sw/spi_uimage_loader.S` that might need to be adjusted if the SPI controller is mapped to another base address or if the image is not stored at address 0 in the Flash.
