@@ -14,7 +14,7 @@ filesets:
     file_type : systemVerilogSource
     depend :
       - fusesoc:utils:generators
-      - "pulp-platform.org::apb_uart_sv"
+      - uart16550
       - "pulp-platform.org::axi2apb"
       - "pulp-platform.org::axi_mem_if"
       - ">=pulp-platform.org::axi_node:1.1.1-r2"

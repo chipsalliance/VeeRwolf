@@ -435,7 +435,7 @@ module swervolf_core
       .dma_bus_clk_en (1'b1),
 
       .timer_int (timer_irq),
-      .extintsrc_req ('0),
+      .extintsrc_req ({7'd0, uart_irq}),
 
       .dec_tlu_perfcnt0 (),
       .dec_tlu_perfcnt1 (),

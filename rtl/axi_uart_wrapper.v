@@ -70,9 +70,10 @@ module axi_uart_wrapper
    wire 		      pwrite;
    wire 		      psel;
    wire 		      penable;
-   wire [31:0] 		      prdata;
    wire 		      pready;
    wire 		      pslverr;
+
+   wire [7:0] 		      wb_rdt;
 
    axi2apb_64_32
      #(
@@ -140,27 +141,38 @@ module axi_uart_wrapper
       .PADDR      (paddr       ),
       .PSEL       (psel        ),
       .PWDATA     (pwdata      ),
-      .PRDATA     (prdata      ),
+      .PRDATA     ({24'd0,wb_rdt}),
       .PREADY     (pready      ),
       .PSLVERR    (pslverr     ));
 
-   apb_uart_sv
-     #(.APB_ADDR_WIDTH (3))
-   uart
-     (
-      .CLK     (clk),
-      .RSTN    (rst_n),
-      .PADDR   (paddr[4:2]),
-      .PWDATA  (pwdata),
-      .PWRITE  (pwrite),
-      .PSEL    (psel),
-      .PENABLE (penable),
-      .PRDATA  (prdata),
-      .PREADY  (pready),
-      .PSLVERR (pslverr),
+   wire 		      wb_ack;
+   assign pready = !penable | wb_ack;
 
-      .rx_i    (i_uart_rx),
-      .tx_o    (o_uart_tx),
-      .event_o (o_uart_irq));
+   uart_top uart16550_0
+     (
+      // Wishbone slave interface
+      .wb_clk_i	(clk),
+      .wb_rst_i	(~rst_n),
+      .wb_adr_i	(paddr[4:2]),
+      .wb_dat_i	(pwdata[7:0]),
+      .wb_we_i	(pwrite),
+      .wb_cyc_i	(psel),
+      .wb_stb_i	(penable),
+      .wb_sel_i	(4'b0), // Not used in 8-bit mode
+      .wb_dat_o	(wb_rdt),
+      .wb_ack_o	(wb_ack),
+
+      // Outputs
+      .int_o     (o_uart_irq),
+      .stx_pad_o (o_uart_tx),
+      .rts_pad_o (),
+      .dtr_pad_o (),
+
+      // Inputs
+      .srx_pad_i (i_uart_rx),
+      .cts_pad_i (1'b0),
+      .dsr_pad_i (1'b0),
+      .ri_pad_i  (1'b0),
+      .dcd_pad_i (1'b0));
 
 endmodule
