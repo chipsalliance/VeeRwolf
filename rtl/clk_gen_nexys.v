@@ -24,8 +24,8 @@
 module clk_gen_nexys
   (input  i_clk,
    input      i_rst,
-   output     o_clk25,
-   output reg o_rst25);
+   output     o_clk_core,
+   output reg o_rst_core);
 
    wire   clkfb;
    wire   locked;
@@ -35,11 +35,11 @@ module clk_gen_nexys
      #(.BANDWIDTH("OPTIMIZED"),
        .CLKFBOUT_MULT(16),
        .CLKIN1_PERIOD(10.0), //100MHz
-       .CLKOUT0_DIVIDE(64),
+       .CLKOUT0_DIVIDE(32),
        .DIVCLK_DIVIDE(1),
        .STARTUP_WAIT("FALSE"))
    PLLE2_BASE_inst
-     (.CLKOUT0(o_clk25),
+     (.CLKOUT0(o_clk_core),
       .CLKOUT1(),
       .CLKOUT2(),
       .CLKOUT3(),
@@ -52,9 +52,9 @@ module clk_gen_nexys
       .RST(i_rst),
       .CLKFBIN(clkfb));
 
-   always @(posedge o_clk25) begin
+   always @(posedge o_clk_core) begin
       locked_r <= locked;
-      o_rst25  <= !locked_r;
+      o_rst_core <= !locked_r;
    end
 
 endmodule

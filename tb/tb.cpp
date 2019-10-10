@@ -151,7 +151,7 @@ int main(int argc, char **argv, char **env)
       done = true;
     }
     top->clk = !top->clk;
-    main_time+=20;
+    main_time+=10;
   }
   if (tfp)
     tfp->close();

@@ -10,8 +10,8 @@ set_false_path -from  [get_cells -regexp {tap/dtmcs_r_reg\[([2-9]|[1-9][0-9])\]}
 set_false_path -from  [get_cells ddr2/serial_tx_reg]
 
 set_input_delay 10 [get_ports i_uart_rx]
-set_output_delay -clock clk25 10 [get_ports led0]
-set_output_delay -clock clk25 10 [get_ports o_uart_tx]
+set_output_delay -clock clk_core 10 [get_ports led0]
+set_output_delay -clock clk_core 10 [get_ports o_uart_tx]
 
 set_property -dict { PACKAGE_PIN E3    IOSTANDARD LVCMOS33 } [get_ports { clk }];
 

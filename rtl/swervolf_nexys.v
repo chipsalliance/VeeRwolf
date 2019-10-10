@@ -52,16 +52,16 @@ module swervolf_nexys_a7
 
    localparam RAM_SIZE     = 32'h10000;
 
-   wire 	 clk25;
-   wire 	 rst25;
+   wire 	 clk_core;
+   wire 	 rst_core;
    wire 	 user_clk;
    wire 	 user_rst;
 
    clk_gen_nexys clk_gen
      (.i_clk (user_clk),
       .i_rst (user_rst),
-      .o_clk25 (clk25),
-      .o_rst25 (rst25));
+      .o_clk_core (clk_core),
+      .o_rst_core (rst_core));
 
    AXI_BUS #(32, 64, 6, 1) mem();
    AXI_BUS #(32, 64, 6, 1) cpu();
@@ -71,8 +71,8 @@ module swervolf_nexys_a7
        .AXI_ID_WIDTH   (6))
    cdc
      (
-      .clk_slave_i   (clk25),
-      .rst_slave_ni  (~rst25),
+      .clk_slave_i   (clk_core),
+      .rst_slave_ni  (~rst_core),
       .axi_slave     (cpu),
       .isolate_slave_i    (1'b0),
       .test_cgbypass_i    (1'b0),
@@ -147,8 +147,8 @@ module swervolf_nexys_a7
    wire        dmi_hard_reset;
 
    bscan_tap tap
-     (.clk            (clk25),
-      .rst            (rst25),
+     (.clk            (clk_core),
+      .rst            (rst_core),
       .jtag_id        (31'd0),
       .dmi_reg_wdata  (dmi_reg_wdata),
       .dmi_reg_addr   (dmi_reg_addr),
@@ -164,8 +164,8 @@ module swervolf_nexys_a7
    swervolf_core
      #(.bootrom_file (bootrom_file))
    swervolf
-     (.clk  (clk25),
-      .rstn (~rst25),
+     (.clk  (clk_core),
+      .rstn (~rst_core),
       .dmi_reg_rdata  (dmi_reg_rdata),
       .dmi_reg_wdata  (dmi_reg_wdata),
       .dmi_reg_addr   (dmi_reg_addr ),
