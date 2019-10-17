@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:SweRV_EH1:1.3
+name : chipsalliance.org:cores:SweRV_EH1:1.4
 
 filesets:
   rtl:
@@ -96,7 +96,6 @@ targets:
       - "tool_verilator? (verilator_tb)"
 
     generate : [swerv_ahb_config]
-    parameters : [ifu_mem_file, lsu_mem_file]
     tools:
       modelsim:
         vlog_options :
@@ -110,10 +109,11 @@ targets:
   synth:
     default_tool : vivado
     filesets : [includes, rtl, vivado_tcl]
-    generate : [swerv_default_config]
+    generate : [swerv_fpga_config]
     tools:
       vivado:
         part : xc7a100tcsg324-1
+        pnr  : none
     toplevel : swerv_wrapper
 
 generate:
@@ -121,13 +121,20 @@ generate:
     generator: swerv_config
     position : first
     parameters:
-      args : ['-ahb_lite']
+      args : ['-ahb_lite', -unset=assert_on]
 
   swerv_default_config:
     generator: swerv_config
     position : first
     parameters:
       args : [-unset=assert_on]
+
+  swerv_fpga_config:
+    generator: swerv_config
+    position : first
+    parameters:
+      args : [-unset=assert_on, -set=fpga_optimize=1]
+
 generators:
   swerv_config:
     interpreter: python
@@ -138,4 +145,4 @@ provider:
   name    : github
   user    : olofk
   repo    : Cores-SweRV
-  version : 4a287a070497f602feadf63f1b6a130b64cffdb4
+  version : 5bca0373295e6ba4c8bbb0c0390322a101650de6
