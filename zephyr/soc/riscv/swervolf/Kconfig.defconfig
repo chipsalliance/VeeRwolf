@@ -38,6 +38,16 @@ config GPIO_MMIO32
 
 endif # GPIO
 
+if SPI
+
+config SPI_OC_SIMPLE
+	def_bool y
+
+config SPI_OC_SIMPLE_BUS_WIDTH
+	def_int 64
+
+endif # SPI
+
 config XIP
 	def_bool n
 

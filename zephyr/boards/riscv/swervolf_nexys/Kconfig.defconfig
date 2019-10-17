@@ -3,4 +3,11 @@ if BOARD_SWERVOLF_NEXYS
 config BOARD
 	default "swervolf_nexys"
 
+if FLASH
+
+config SPI_NOR
+	def_bool y
+
+endif
+
 endif

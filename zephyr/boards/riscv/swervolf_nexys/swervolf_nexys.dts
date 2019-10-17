@@ -29,3 +29,15 @@
 	clock-frequency = <50000000>;
 };
 
+&spi0 {
+	status = "okay";
+
+	flash0: flash@0 {
+		compatible = "jedec,spi-nor";
+		label = "FLASH0";
+		jedec-id = [01 20 18];
+		size = <0x1000000>;
+		reg = <0>;
+		spi-max-frequency = <2000000>;
+	};
+};

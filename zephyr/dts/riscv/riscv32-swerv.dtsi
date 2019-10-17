@@ -45,5 +45,15 @@
 			interrupts = <12 15>;
 			status = "disabled";
 		};
+
+		spi0: spi@80001040 {
+			compatible = "opencores,spi-simple";
+			reg = <0x80001040 0x40>;
+			reg-names = "control";
+			label = "SPI0";
+			status = "disabled";
+			#address-cells = <1>;
+			#size-cells = <0>;
+		};
 	};
 };
