@@ -18,21 +18,21 @@ module bscan_tap
     parameter AWIDTH = 7
     )
    (
-    input 		clk,
-    input 		rst,
-    output [31:0] 	dmi_reg_wdata,
-    output [AWIDTH-1:0] dmi_reg_addr,
-    output 		dmi_reg_wr_en,
-    output 		dmi_reg_en,
+    input wire 		     clk,
+    input wire 		     rst,
+    output wire [31:0] 	     dmi_reg_wdata,
+    output wire [AWIDTH-1:0] dmi_reg_addr,
+    output wire 	     dmi_reg_wr_en,
+    output wire 	     dmi_reg_en,
 
-    input [31:0] 	dmi_reg_rdata,
-    input [1:0] 	rd_status,
+    input wire [31:0] 	     dmi_reg_rdata,
+    input wire [1:0] 	     rd_status,
 
-    output reg 		dmi_hard_reset,
-    input [2:0] 	idle,
-    input [1:0] 	dmi_stat,
-    input [31:1] 	jtag_id,
-    input [3:0] 	version);
+    output reg 		     dmi_hard_reset,
+    input wire [2:0] 	     idle,
+    input wire [1:0] 	     dmi_stat,
+    input wire [31:1] 	     jtag_id,
+    input wire [3:0] 	     version);
 
    wire 		idcode_capture;
    wire 		idcode_tck;

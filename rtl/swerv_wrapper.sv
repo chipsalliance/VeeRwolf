@@ -20,6 +20,7 @@
 // Comments: 
 //
 //********************************************************************************
+`default_nettype wire
 `include "build.h"
 //`include "def.sv"
 module swerv_wrapper_dmi
@@ -345,3 +346,4 @@ module swerv_wrapper_dmi
 		 
 endmodule
    
+`default_nettype none
