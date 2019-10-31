@@ -42,7 +42,7 @@ filesets:
       - rtl/clk_gen_nexys.v : {file_type : verilogSource}
       - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
       - rtl/swervolf_nexys.v    : {file_type : systemVerilogSource}
-    depend : [":swervolf:litedram", pulp-platform.org::axi_slice_dc]
+    depend : [":swervolf:litedram", "pulp-platform.org::axi_slice_dc"]
 
   bootrom:
     files :
