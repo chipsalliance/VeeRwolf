@@ -55,28 +55,33 @@ typedef struct {
   vluint64_t last_update;
 } uart_context_t;
 
-void uart_init(uart_context_t *context, uint32_t clk_freq, uint32_t baud_rate) {
-  context->baud_t = clk_freq/baud_rate;
+void uart_init(uart_context_t *context, uint32_t baud_rate) {
+  context->baud_t = 1000*1000*1000/baud_rate;
+  context->state = 0;
 }
 
 void do_uart(uart_context_t *context, bool rx) {
   if (context->state == 0) {
+    if (rx)
+      context->state++;
+  }
+  else if (context->state == 1) {
     if (!rx) {
       context->last_update = main_time + context->baud_t/2;
       context->state++;
     }
   }
-  else if(context->state == 1) {
+  else if(context->state == 2) {
     if (main_time > context->last_update) {
       context->last_update += context->baud_t;
       context->ch = 0;
       context->state++;
     }
   }
-  else if (context->state < 10) {
+  else if (context->state < 11) {
     if (main_time > context->last_update) {
       context->last_update += context->baud_t;
-      context->ch |= rx << (context->state-2);
+      context->ch |= rx << (context->state-3);
       context->state++;
     }
   }
@@ -84,7 +89,7 @@ void do_uart(uart_context_t *context, bool rx) {
     if (main_time > context->last_update) {
       context->last_update += context->baud_t;
       putchar(context->ch);
-      context->state=0;
+      context->state=1;
     }
   }
 }
@@ -113,7 +118,7 @@ int main(int argc, char **argv, char **env)
 
   uart_context_t uart_context;
   int baud_rate = 115200;
-  uart_init(&uart_context, 1000*1000*1000, baud_rate);
+  uart_init(&uart_context, baud_rate);
   vluint64_t timeout = 0;
   const char *arg_timeout = Verilated::commandArgsPlusMatch("timeout=");
   if (arg_timeout[0])
