@@ -191,7 +191,8 @@ module axi_multicon
 `ifdef SIMPRINT
 	  1: begin
 	     if (reg_be[0]) begin
-		$fwrite(f, "%c", reg_wdata[7:0]);
+		if (f)
+		  $fwrite(f, "%c", reg_wdata[7:0]);
 		$write("%c", reg_wdata[7:0]);
 	     end
 	     if (reg_be[1]) begin
