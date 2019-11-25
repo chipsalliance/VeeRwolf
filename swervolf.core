@@ -68,6 +68,8 @@ targets:
           - -cuautoname=du
           - config/common_defines.vh
           - -timescale 1ns/1ns
+          - -svinputport=compat
+          - -suppress vlog-2583
       verilator:
         verilator_options : [--trace, -Wno-fatal]
     toplevel : swervolf_core_tb
