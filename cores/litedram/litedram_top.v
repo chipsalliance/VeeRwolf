@@ -85,6 +85,7 @@ module litedram_top
     output wire 	       o_rvalid,
     input wire 		       i_rready);
 
+   reg 			       serial_rx_int;
    wire 		       serial_tx_int;
 
    wire 		       init_done_int;
@@ -93,6 +94,7 @@ module litedram_top
    reg 			       init_error_int_r;
 
    always @(posedge user_clk) begin
+      serial_rx_int <= serial_rx;
       serial_tx <= serial_tx_int;
       init_done_int_r <= init_done_int;
       init_done <= init_done_int_r;
@@ -103,7 +105,7 @@ module litedram_top
 litedram_core ldc
   (
    .serial_tx   (serial_tx_int),
-   .serial_rx   (serial_rx),
+   .serial_rx   (serial_rx_int),
    .clk         (clk100),
    .rst         (!rst_n),
    .pll_locked  (pll_locked),
