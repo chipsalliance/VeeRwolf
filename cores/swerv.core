@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:SweRV_EH1:1.4
+name : chipsalliance.org:cores:SweRV_EH1:1.5
 
 filesets:
   rtl:
@@ -103,7 +103,7 @@ targets:
           - -cuautoname=du
           - config/common_defines.vh
       verilator:
-        verilator_options : [--trace]
+        verilator_options : [--trace, -Wno-fatal]
     toplevel : tb_top
 
   synth:
@@ -143,6 +143,6 @@ generators:
 
 provider:
   name    : github
-  user    : olofk
+  user    : chipsalliance
   repo    : Cores-SweRV
-  version : 5bca0373295e6ba4c8bbb0c0390322a101650de6
+  version : 70b6f74b119da3810cbe1aa40337cfc416b95b5b

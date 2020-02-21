@@ -259,6 +259,7 @@ module swervolf_core
      (
       .clk     (clk),
       .rst_l   (rstn),
+      .dbg_rst_l   (rstn),
       .rst_vec (31'h40000000),
       .nmi_int (1'b0),
       .nmi_vec (31'h8880000),
