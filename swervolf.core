@@ -142,7 +142,7 @@ generate:
     generator: swerv_config
     position : first
     parameters:
-      args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
+      args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1, -icache_enable=0]
 
   version:
     generator: gitversion
