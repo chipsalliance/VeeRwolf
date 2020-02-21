@@ -78,6 +78,9 @@ module swervolf_core_tb
 	swervolf.bootrom.ram.mem[0] = 64'h0000000000000067;
    end
 
+   wire [63:0] gpio_out;
+   assign o_gpio = gpio_out[0];
+
    wire [5:0]  ram_awid;
    wire [31:0] ram_awaddr;
    wire [7:0]  ram_awlen;
@@ -243,6 +246,7 @@ module swervolf_core_tb
       .o_ram_rready        (ram_rready),
       .i_ram_init_done     (1'b1),
       .i_ram_init_error    (1'b0),
-      .o_gpio (o_gpio));
+      .i_gpio              (64'd0),
+      .o_gpio              (gpio_out));
 
 endmodule

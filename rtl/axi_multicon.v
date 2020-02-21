@@ -26,7 +26,8 @@ module axi_multicon
   #(parameter ID_WIDTH = 0)
    (input wire		  clk,
     input wire 		       rst_n,
-    output reg 		       o_gpio,
+    input wire [63:0] 	       i_gpio,
+    output reg [63:0] 	       o_gpio,
     output wire 	       o_sclk,
     output wire 	       o_cs_n,
     output wire 	       o_mosi,
@@ -219,7 +220,16 @@ module axi_multicon
 	     end
 	  end
 `endif
-	  2 : o_gpio <= reg_wdata[0];
+	  2 : begin
+	     if (reg_be[0]) o_gpio[7:0]   <= reg_wdata[7:0]  ;
+	     if (reg_be[1]) o_gpio[15:8]  <= reg_wdata[15:8] ;
+	     if (reg_be[2]) o_gpio[23:16] <= reg_wdata[23:16];
+	     if (reg_be[3]) o_gpio[31:24] <= reg_wdata[31:24];
+	     if (reg_be[4]) o_gpio[39:32] <= reg_wdata[39:32];
+	     if (reg_be[5]) o_gpio[47:40] <= reg_wdata[47:40];
+	     if (reg_be[6]) o_gpio[55:48] <= reg_wdata[55:48];
+	     if (reg_be[7]) o_gpio[63:56] <= reg_wdata[63:56];
+	  end
 	  5 : begin
 	     if (reg_be[0]) mtimecmp[7:0]   <= reg_wdata[7:0]  ;
 	     if (reg_be[1]) mtimecmp[15:8]  <= reg_wdata[15:8] ;
@@ -235,6 +245,7 @@ module axi_multicon
       case (reg_addr[5:3])
 	0 : reg_rdata <= {32'h`VERSION_SHA, version};
 	1 : reg_rdata <= {46'd0, i_ram_init_error, i_ram_init_done, 16'd0};
+	2 : reg_rdata <= i_gpio;
 	4 : reg_rdata <= mtime;
       endcase
 

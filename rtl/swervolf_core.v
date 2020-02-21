@@ -79,7 +79,8 @@ module swervolf_core
     output wire        o_ram_rready,
     input wire 	       i_ram_init_done,
     input wire 	       i_ram_init_error,
-    output wire        o_gpio);
+    input wire [63:0]  i_gpio,
+    output wire [63:0] o_gpio);
 
    localparam BOOTROM_SIZE = 32'h1000;
 
@@ -176,6 +177,7 @@ module swervolf_core
    multicon
      (.clk       (clk),
       .rst_n     (rst_n),
+      .i_gpio    (i_gpio),
       .o_gpio    (o_gpio),
       .o_sclk    (o_flash_sclk),
       .o_cs_n    (o_flash_cs_n),

@@ -52,7 +52,7 @@ The system controller contains common system functionality such as keeping regis
 | 0x08     | sim_print | Outputs a character in simulation. No effect on hardware
 | 0x09     | sim_exit | Exits a simulation. No effect on hardware
 | 0x0A     | init_status | Bit 0 = RAM initialization complete. Bit 1 = RAM initialization reported errors
-| 0x10     | gpio | Writing to bit 0 clears or sets GPIO bit |
+| 0x10-0x17 | gpio | 64 readable and writable GPIO bits |
 | 0x20-0x27 | mtime | mtime from RISC-V privilege spec |
 | 0x28-0x2f | mtimecmp |mtimecmp from RISC-V privilege spec |
 | 0x40     | SPI_SPCR | Simple SPI Control register |
@@ -93,13 +93,15 @@ SweRVolf Nexys is a version of the SweRVolf SoC created for the Digilent Nexys A
 
 The active on-board I/O consists of a LED, a switch and the microUSB connector for UART, JTAG and power.
 
-#### LED 0
+#### LEDs
 
-LED 0 is controlled by the memory-mapped GPIO at address 0x80001010
+16 LEDs are controlled by memory-mapped GPIO at address 0x80001010-0x80001011
 
-#### Switch 0
+#### Switches
 
-Switch 0 selects whether to output serial communication from the SoC or from the embedded self-test program in the DDR2 controller.
+16 Switches are mapped GPIO addresses at 0x80001012-0x80001013
+
+*Note: Switch 0 has a dual purpose and selects whether to output serial communication from the SoC (0=off) or from the embedded self-test program in the DDR2 controller (1=on).*
 
 #### micro USB
 
