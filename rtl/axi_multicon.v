@@ -247,6 +247,7 @@ module axi_multicon
 	1 : reg_rdata <= {46'd0, i_ram_init_error, i_ram_init_done, 16'd0};
 	2 : reg_rdata <= i_gpio;
 	4 : reg_rdata <= mtime;
+	5 : reg_rdata <= mtimecmp;
       endcase
 
       mtime <= mtime + 64'd1;
