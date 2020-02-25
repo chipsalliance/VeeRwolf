@@ -23,7 +23,7 @@
 
 `default_nettype none
 module swervolf_nexys_a7
-  #(parameter bootrom_file = "spi_uimage_loader.vh")
+  #(parameter bootrom_file = "bootloader.vh")
    (input wire 	       clk,
     input wire 	       rstn,
     output wire [12:0] ddram_a,

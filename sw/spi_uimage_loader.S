@@ -15,7 +15,7 @@
 #define SPI_BASE 0x80001040
 #endif
 
-/* Base address of the SPI controller used to blink LED */
+/* Base address of the GPIO controller used to blink LED */
 #ifndef GPIO_BASE
 #define GPIO_BASE 0x80001010
 #endif
@@ -32,8 +32,6 @@
 #define INIT_DELAY 700
 #endif
 
-#define RAM_INIT_DONE 0x8000100A
-
 #define RETRIES     3
 
 #define SPI_SPCR 0x00
@@ -45,8 +43,6 @@
 #define SPI_SPSS_INIT 0x1
 #define SPI_SPSR_RX_CHECK 0x01 /* Check bit 0 is cleared, fifo !empty*/
 
-.globl _start
-_start:
 	/* Registers used
 	ra link register
 	t1 temp register
@@ -60,7 +56,8 @@ _start:
 	t3 temp register
 	*/
 
-boot_init:
+.globl spi_boot
+spi_boot:
 
 #if INIT_DELAY
 	li t1, INIT_DELAY
@@ -68,11 +65,6 @@ boot_init:
 1:	addi t2,t2,1
 	bne t1, t2, 1b
 #endif
-
-	/* Wait until RAM initialization is done */
-	li t1, RAM_INIT_DONE
-1:	lbu t2, 0(t1)
-	beqz t2, 1b
 
 	/* Load SPI base address to gp */
 	li gp, SPI_BASE
@@ -163,9 +155,6 @@ copy_to_ram:
 	/* Jump to entry point */
 goto_reset:
 	jr	s2
-
-	/* Spin here on boot failures */
-boot_fail:	j boot_fail
 
 	/* Reads ddccbbaa from a1, stores aabbccdd to a2 */
 endian_swap:

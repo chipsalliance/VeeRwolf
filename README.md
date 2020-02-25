@@ -101,6 +101,15 @@ The active on-board I/O consists of a LED, a switch and the microUSB connector f
 
 16 Switches are mapped GPIO addresses at 0x80001012-0x80001013
 
+During boot up, the two topmost switches (sw14, sw15) control the boot mode.
+
+| sw15 | sw14 | Boot mode                  |
+| ---- | ---- | -------------------------- |
+|  off |  off | Boot from SPI Flash        |
+|  off |   on | Boot from address 0 in RAM |
+|   on |  off | Boot from serial           |
+|   on |   on | Undefined                  |
+
 *Note: Switch 0 has a dual purpose and selects whether to output serial communication from the SoC (0=off) or from the embedded self-test program in the DDR2 controller (1=on).*
 
 #### micro USB
@@ -191,7 +200,7 @@ The SweRVolf SoC can be built for a Digilent Nexys A7 board with
 
 If the board is connected, it will automatically be programmed when the FPGA image has been built. It can also be programmed manually afterwards by running `fusesoc run --target=nexys_a7 --run swervolf` or running OpenOCD as described in the debugging chapter.
 
-The default bootloader will just blink the LED and other programs are uploaded through the debug interface. The default bootloader can be replaced with the `--bootrom_file` parameter. Note that the boot ROM is not connected to the data port, so it can only execute instructions. Data can not be read or written to this segment. The below example will compile the memtest application and use that as boot ROM instead.
+The default bootloader will boot from SPI Flash, RAM or serial depending on the boot mode set by the switches. The default bootloader can be replaced with the `--bootrom_file` parameter. Note that the boot ROM is not connected to the data port, so it can only execute instructions. Data can not be read or written to this segment. The below example will compile the memtest application and use that as boot ROM instead.
 
     make -C ../cores/Cores-SweRVolf/sw memtest.vh
     fusesoc run --target=nexys_a7 swervolf --bootrom_file=../cores/Cores-SweRVolf/sw/memtest.vh
@@ -315,7 +324,14 @@ After the program has been loaded, set the program counter to address zero with 
 
 ## Booting
 
-SweRVolf is set up by default to read its initial instructions from address 0x80000000 which point to the on-chip boot ROM. Several first-stage bootloaders are provided for different applications
+SweRVolf is set up by default to read its initial instructions from address 0x80000000 which point to the on-chip boot ROM. A default bootloader is provided which has the capability to boot from SPI Flash, RAM or serial depending on the GPIO pins connected to bits 7:6 in register 0x80001013. The table below summarizes the boot modes
+
+| bit7 | bit6 | Boot mode         |
+| ---- | ---- | ----------------- |
+|    0 |    0 | SPI uImage loader |
+|    0 |    1 | Jump to RAM       |
+|    1 |    0 | Serial boot       |
+|    1 |    1 | Undefined         |
 
 ### Jump to RAM
 
@@ -355,3 +371,7 @@ For Nexys A7, OpenOCD is used to write to Flash. As the connection to the SPI Fl
 ### Set up SPI uImage loader
 
 The final step is to prepare the bootloader for SweRVolf which will be responsible for reading the image from Flash, copy it to RAM and execute it. This process is the same for both simulation and hardware targets. Note that both the `spi_tb` target and `nexys_a7` target will have this as the default boot loader so in most cases nothing else needs to be done. There are however a couple of defines in `sw/spi_uimage_loader.S` that might need to be adjusted if the SPI controller is mapped to another base address or if the image is not stored at address 0 in the Flash.
+
+### Serial boot
+
+In serial boot mode, the UART waits for a program in Intel Hex format to be sent to the UART. Upon completion, the program will be launched.

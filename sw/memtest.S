@@ -2,7 +2,7 @@
 #define DELAY 0x1000 /*0000*/ /* Loop 100000 times before inverting the LED */
 #define MEM_START 0
 #define MEM_END 0x1FF
-	
+
 .globl _start
 _start:
 	li x1, 0x03020100 //Word 1
@@ -33,16 +33,16 @@ byteloop:
 	sw x0,  4(x3)
 	sw x0,  8(x3)
 	sw x0, 12(x3)
-	
+
 	addi x3, x3, 16
 	blt x3, x7, wordloop
 
-	
+
 	li a0, GPIO_BASE
 	addi t0, x0, 1
 	sb t0, 0(a0)
-	
-done:	
+
+done:
 	j done
 
 error:
@@ -57,4 +57,3 @@ time1:
 	addi t2, t2, 1
 	bne t1, t2, time1
 	j bl1
-	

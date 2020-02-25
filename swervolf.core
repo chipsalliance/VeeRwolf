@@ -54,8 +54,7 @@ filesets:
 
   bootrom:
     files :
-      - sw/blinky.vh    : {file_type : user, copyto : blinky.vh}
-      - sw/spi_uimage_loader.vh : {file_type : user, copyto : spi_uimage_loader.vh}
+      - sw/bootloader.vh : {file_type : user, copyto : bootloader.vh}
 
 targets:
   sim:
@@ -171,7 +170,7 @@ parameters:
   ram_init_file:
     datatype: file
     description : Verilog hex file to use as initial on-chip RAM contents
-    paramtype : "tool_vivado? (vlogparam) !tool_vivado? (plusarg)"
+    paramtype : plusarg
 
   rom_init_file:
     datatype: file

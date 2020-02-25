@@ -1,8 +1,8 @@
 /*
 * Hello world for SweRVolf
-* 
+*
 * Prints a fancy string using the UART and exits afterwards
-* 
+*
 */
 #define CONSOLE_ADDR 0x80001008
 #define HALT_ADDR    0x80001009
@@ -50,7 +50,7 @@ _start:
 
 	li	t3, FCR_FIFO | FCR_MODE0 | FCR_FIFO_8 | FCR_RCVRCLR | FCR_XMITCLR
 	sb	t3, REG_FCR(a0)
-	
+
 	/* disable interrupts  */
 	sb	zero, REG_IER(a0)
 
@@ -82,4 +82,3 @@ put_byte:
 str:
 	.section .data
 	.string "SweRV+FuseSoC rocks\n"
-

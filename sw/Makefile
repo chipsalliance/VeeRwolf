@@ -2,6 +2,8 @@ TOOLCHAIN_PREFIX ?= riscv64-unknown-elf-
 RESET_VECTOR ?= 0
 FLASH_ADDR ?= 0x0
 
+bootloader.elf: boot_main.S spi_uimage_loader.S hexloader.S
+	$(TOOLCHAIN_PREFIX)gcc -nostartfiles -march=rv32i -mabi=ilp32 -Tlink.ld -o$@ $^
 %.elf: %.S
 	$(TOOLCHAIN_PREFIX)gcc -nostartfiles -march=rv32i -mabi=ilp32 -Tlink.ld -o$@ $<
 %.vh: %.bin

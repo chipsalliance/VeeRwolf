@@ -1,6 +1,4 @@
-#define UART_BASE 0x80002000
-
-.globl _start
+#define UART_BASE     0x80002000
 	/*
 	x1  : ra = return address for other calls
 	x2  : sp = start address
@@ -43,49 +41,16 @@
 #define FCR_MODE1 0x08 /* set receiver in mode 1 */
 #define FCR_FIFO_8 0x80  /* 8 bytes in RCVR FIFO */
 
-_start:
+.globl serial_boot
+serial_boot:
 	addi t5, zero, 0
 	addi t6, zero, 0
 	addi a2, zero, 0
 	addi gp, zero, 0
 	li a1, UART_BASE
 
-	//Set baud rate
-	/* Set DLAB bit in LCR */
-	lbu	t3, REG_LCR(a1)
-	ori	t3, t3, 0x80
-	sb	t3, REG_LCR(a1)
-
-	/* Set divisor regs */
-	li	t4, 435
-	sb	t4, REG_BRDL(a1)
-	srli	t4, t4, 8
-	sb	t4, REG_BRDH(a1)
-
-	/* Clear DLAB bit */
-	andi	t3, t3, 0x7f
-	sb	t3,REG_LCR(a1)
-
-	/* 8 data bits, 1 stop bit, no parity, clear DLAB */
-	li	t3, LCR_CS8 | LCR_1_STB | LCR_PDIS
-	sb	t3, REG_LCR(a1)
-
-	li	t3, MCR_OUT2 | MCR_RTS | MCR_DTR
-	sb	t3, REG_MDC(a1)
-
-	/*
-	 * Program FIFO: enabled, mode 0 (set for compatibility with quark),
-	 * generate the interrupt at 8th byte
-	 * Clear TX and RX FIFO
-	*/
-	li	t3, FCR_FIFO | FCR_MODE0 | FCR_FIFO_8 | FCR_RCVRCLR | FCR_XMITCLR
-	sb	t3, REG_FCR(a1)
-
 	/* clear the port */
 	lb	t3, REG_RDR(a1)
-
-	/* disable interrupts  */
-	sb	zero, REG_IER(a1)
 
 	li	t1, ':'
 
