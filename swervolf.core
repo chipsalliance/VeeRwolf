@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : ::swervolf:0
+name : ::swervolf:0.6
 
 filesets:
   core:
@@ -98,7 +98,7 @@ targets:
           - config/common_defines.vh
           - -timescale 1ns/1ns
     toplevel : swervolf_spi_tb
-    
+
   nexys_a7:
     default_tool : vivado
     filesets :
