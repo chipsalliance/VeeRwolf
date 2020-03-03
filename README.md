@@ -117,7 +117,7 @@ An SPI controller is connected to the on-board SPI Flash. This can be used for s
 
 Install [verilator](https://www.veripool.org/wiki/verilator)
 
-Create a directory structure consisting of a workspace directory (from now on called `$WORKSPACE`) and a root directory for the SweRV SoC (from now on called `$CORES_ROOT`). All further commands will be run from `$WORKSPACE` unless otherwise stated. The structure will look like this
+Create a directory structure consisting of a workspace directory (from now on called `$WORKSPACE`) and a root directory for the SweRV SoC (from now on called `$CORES_ROOT`). All further commands will be run from `$WORKSPACE` unless otherwise stated. The structure will look like this:
 
     ├──cores
     └──workspace
@@ -173,10 +173,11 @@ Another example to run is the Zephyr philosophers demo.
 ### Run RISC-V compliance tests
 
 1. Build the simulation model, if that hasn't already been done, with `fusesoc run --target=sim --setup --build swervolf`
-2. Download the RISC-V compliance tests somewhere. `git clone https://github.com/riscv/riscv-compliance` in a sibling directory to the workspace and work root. Your directory structure should now look like this
-├──cores
-├──riscv-compliance
-└──workspace
+2. Download the RISC-V compliance tests somewhere. `git clone https://github.com/riscv/riscv-compliance` in a sibling directory to the workspace and work root. Your directory structure should now look like this:
+
+       ├──cores
+       ├──riscv-compliance
+       └──workspace
 
 3. Enter the riscv-compliance directory and run `make TARGETDIR=$CORES_ROOT/Cores-SweRVolf/riscv-target/swerv riscv-target $RISCV_TARGET=swerv RISCV_DEVICE=rv32i RISCV_ISA=rv32imc TARGET_SIM=$WORKSPACE/build/swervolf_0/sim-verilator/Vswervolf_core_tb`
 
