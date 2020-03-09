@@ -71,7 +71,6 @@ module axi_uart_wrapper
    wire 		      psel;
    wire 		      penable;
    wire 		      pready;
-   wire 		      pslverr;
 
    wire [7:0] 		      wb_rdt;
 
@@ -143,7 +142,7 @@ module axi_uart_wrapper
       .PWDATA     (pwdata      ),
       .PRDATA     ({24'd0,wb_rdt}),
       .PREADY     (pready      ),
-      .PSLVERR    (pslverr     ));
+      .PSLVERR    (1'b0        ));
 
    wire 		      wb_ack;
    assign pready = !penable | wb_ack;

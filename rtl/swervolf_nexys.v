@@ -81,6 +81,8 @@ module swervolf_nexys_a7
    assign cpu.w_user = 1'b0;
    assign cpu.b_user = 1'b0;
    assign cpu.r_user = 1'b0;
+   assign mem.b_user = 1'b0;
+   assign mem.r_user = 1'b0;
 
    axi_cdc
      #(.AXI_USER_WIDTH (1),
