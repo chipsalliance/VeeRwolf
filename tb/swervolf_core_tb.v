@@ -42,7 +42,7 @@ module swervolf_core_tb
 `ifndef VERILATOR
    reg 	 clk = 1'b0;
    reg 	 rst = 1'b1;
-   always #20 clk <= !clk;
+   always #10 clk <= !clk;
    initial #100 rst <= 1'b0;
    wire  o_gpio;
    wire i_jtag_tck = 1'b0;
