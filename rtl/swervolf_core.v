@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2019 Western Digital Corporation or its affiliates.
+// Copyright 2019-2020 Western Digital Corporation or its affiliates.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,6 +88,8 @@ module swervolf_core
    wire        timer_irq;
    wire        uart_irq;
    wire        spi0_irq;
+   wire        sw_irq4;
+   wire        sw_irq3;
 
 `include "axi_intercon.vh"
 
@@ -185,6 +187,8 @@ module swervolf_core
       .i_miso    (i_flash_miso),
       .o_spi0_irq  (spi0_irq),
       .o_timer_irq (timer_irq),
+      .o_sw_irq3        (sw_irq3),
+      .o_sw_irq4        (sw_irq4),
       .i_ram_init_done  (i_ram_init_done),
       .i_ram_init_error (i_ram_init_error),
       .i_awid    (multicon_awid),
@@ -448,7 +452,7 @@ module swervolf_core
       .dma_bus_clk_en (1'b1),
 
       .timer_int (timer_irq),
-      .extintsrc_req ({6'd0, spi0_irq, uart_irq}),
+      .extintsrc_req ({4'd0, sw_irq4, sw_irq3, spi0_irq, uart_irq}),
 
       .dec_tlu_perfcnt0 (),
       .dec_tlu_perfcnt1 (),

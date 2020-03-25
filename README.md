@@ -52,6 +52,7 @@ The system controller contains common system functionality such as keeping regis
 | 0x08     | sim_print | Outputs a character in simulation. No effect on hardware
 | 0x09     | sim_exit | Exits a simulation. No effect on hardware
 | 0x0A     | init_status | Bit 0 = RAM initialization complete. Bit 1 = RAM initialization reported errors
+| 0x0B     | sw_irq                | Software-controlled external interrupts
 | 0x10-0x17 | gpio | 64 readable and writable GPIO bits |
 | 0x20-0x27 | mtime | mtime from RISC-V privilege spec |
 | 0x28-0x2f | mtimecmp |mtimecmp from RISC-V privilege spec |
@@ -60,6 +61,22 @@ The system controller contains common system functionality such as keeping regis
 | 0x50     | SPI_SPDR | Simple SPI data register |
 | 0x58     | SPI_SPER | Simple SPI extended register |
 | 0x60     | SPI_SPSS | Simple SPI slave select register |
+
+
+##### syscon_base+0x000B sw_irq
+
+This register allows configuration and assertion of IRQ line 3 and 4, for testing the SweRV PIC or having two extra software-controllable interrupt sources.
+
+| Bits | Name         | Description |
+| ---- | ------------ | -----------
+|    7 | sw_irq4      | Trigger IRQ line 4
+|    6 | sw_irq4_edge | 0 = IRQ4 is asserted until sw_irq4 is cleared, 1 = Writing to sw_irq4 only asserts IRQ4 for one clock cycle
+|    5 | sw_irq4_pol  | IRQ4 polarity. 0 = Active high, 1 = active low
+|    4 | <reserved>   |
+|    3 | sw_irq3      | Trigger IRQ line 3
+|    2 | sw_irq3_edge | 0 = IRQ3 is asserted until sw_irq3 is cleared, 1 = Writing to sw_irq3 only asserts IRQ3 for one clock cycle
+|    1 | sw_irq3_pol  | IRQ3 polarity. 0 = Active high, 1 = active low
+|    0 | <reserved>   |
 
 #### UART
 

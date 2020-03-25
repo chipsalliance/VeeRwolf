@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2019 Western Digital Corporation or its affiliates.
+// Copyright 2019-2020 Western Digital Corporation or its affiliates.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ module axi_multicon
     input wire 		       i_miso,
     output wire 	       o_spi0_irq,
     output reg 		       o_timer_irq,
+    output wire 	       o_sw_irq3,
+    output wire 	       o_sw_irq4,
     input wire 		       i_ram_init_done,
     input wire 		       i_ram_init_error,
     input wire [ID_WIDTH-1:0]  i_awid,
@@ -88,6 +90,13 @@ module axi_multicon
    reg [7:0] 	 wb_spi_dat_r;
    reg 		 reg_we_r;
    reg 		 wb_spi_cyc_r;
+
+   reg 		 sw_irq3;
+   reg 		 sw_irq3_edge;
+   reg 		 sw_irq3_pol;
+   reg 		 sw_irq4;
+   reg 		 sw_irq4_edge;
+   reg 		 sw_irq4_pol;
 
    AXI_BUS #(32, 64, ID_WIDTH, 1) slave();
 
@@ -192,24 +201,28 @@ module axi_multicon
    assign version[15: 8] = `VERSION_MINOR;
    assign version[ 7: 0] = `VERSION_REV;
 
-   localparam [2:0]
-     REG_VERSION  = 3'd0,
-     REG_SHA      = 3'd1,
-     REG_SIMPRINT = 3'd4,
-     REG_SIMEXIT  = 3'd5;
+   assign o_sw_irq4 = sw_irq4^sw_irq4_pol;
+   assign o_sw_irq3 = sw_irq3^sw_irq3_pol;
+
    //00 = ver
    //04 = sha
    //08 = simprint
    //09 = simexit
    //0A = RAM status
+   //0B = sw_irq
    //10 = gpio
    //20 = timer/timecmp
    //40 = SPI
    always @(posedge clk) begin
+      if (sw_irq3_edge)
+	sw_irq3 <= 1'b0;
+      if (sw_irq4_edge)
+	sw_irq4 <= 1'b0;
+
       if (reg_we & !reg_addr[6])
 	case (reg_addr[5:3])
-`ifdef SIMPRINT
 	  1: begin
+`ifdef SIMPRINT
 	     if (reg_be[0]) begin
 		$fwrite(f, "%c", reg_wdata[7:0]);
 		$write("%c", reg_wdata[7:0]);
@@ -218,9 +231,17 @@ module axi_multicon
 		$display("\nFinito");
 		$finish;
 	     end
-	  end
 `endif
-	  2 : begin
+	     if (reg_be[3]) begin
+		sw_irq4      <= reg_wdata[31];
+		sw_irq4_edge <= reg_wdata[30];
+		sw_irq4_pol  <= reg_wdata[29];
+		sw_irq3      <= reg_wdata[27];
+		sw_irq3_edge <= reg_wdata[26];
+		sw_irq3_pol  <= reg_wdata[25];
+	     end
+	  end
+	  2 : begin //0x10-0x17
 	     if (reg_be[0]) o_gpio[7:0]   <= reg_wdata[7:0]  ;
 	     if (reg_be[1]) o_gpio[15:8]  <= reg_wdata[15:8] ;
 	     if (reg_be[2]) o_gpio[23:16] <= reg_wdata[23:16];
@@ -230,7 +251,7 @@ module axi_multicon
 	     if (reg_be[6]) o_gpio[55:48] <= reg_wdata[55:48];
 	     if (reg_be[7]) o_gpio[63:56] <= reg_wdata[63:56];
 	  end
-	  5 : begin
+	  5 : begin //0x28-0x2f
 	     if (reg_be[0]) mtimecmp[7:0]   <= reg_wdata[7:0]  ;
 	     if (reg_be[1]) mtimecmp[15:8]  <= reg_wdata[15:8] ;
 	     if (reg_be[2]) mtimecmp[23:16] <= reg_wdata[23:16];
@@ -243,10 +264,22 @@ module axi_multicon
 	endcase
 
       case (reg_addr[5:3])
+	//0x00-0x07
 	0 : reg_rdata <= {32'h`VERSION_SHA, version};
-	1 : reg_rdata <= {46'd0, i_ram_init_error, i_ram_init_done, 16'd0};
+	//0x08-0x0F
+	1 : begin
+	   reg_rdata <= 64'd0;
+	   //0xB
+	   reg_rdata[31:29] <= {sw_irq4, sw_irq4_edge, sw_irq4_pol};
+	   reg_rdata[27:25] <= {sw_irq3, sw_irq3_edge, sw_irq3_pol};
+	   //0xA
+	   reg_rdata[17:16] <= {i_ram_init_error, i_ram_init_done};
+	end
+	//0x10-0x17
 	2 : reg_rdata <= i_gpio;
+	//0x20-0x27
 	4 : reg_rdata <= mtime;
+	//0x28-0x2F
 	5 : reg_rdata <= mtimecmp;
       endcase
 
