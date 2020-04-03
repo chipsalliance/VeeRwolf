@@ -97,6 +97,9 @@ targets:
 
     generate : [swerv_ahb_config]
     tools:
+      rivierapro:
+        vlog_options :
+          - config/common_defines.vh
       modelsim:
         vlog_options :
           - -mfcu

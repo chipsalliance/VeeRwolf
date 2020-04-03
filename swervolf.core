@@ -70,6 +70,10 @@ targets:
     generate : [intercon, swerv_default_config, version]
     parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file=hello.vh, rom_init_file, signature, timeout, vcd]
     tools:
+      rivierapro:
+        vlog_options :
+          - config/common_defines.vh
+          - -timescale 1ns/1ps
       modelsim:
         vlog_options :
           - -mfcu
@@ -91,6 +95,10 @@ targets:
     generate : [intercon, swerv_default_config]
     parameters : [SIMPRINT=true, ram_init_file, rom_init_file, flash_init_file, mem_clear=true, timeout, vcd]
     tools:
+      rivierapro:
+        vlog_options :
+          - config/common_defines.vh
+          - -timescale 1ns/1ps
       modelsim:
         vlog_options :
           - -mfcu
