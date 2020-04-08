@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:SweRV_EH1:1.5
+name : chipsalliance.org:cores:SweRV_EH1:1.5-r1
 
 filesets:
   rtl:
@@ -146,3 +146,4 @@ provider:
   user    : chipsalliance
   repo    : Cores-SweRV
   version : 70b6f74b119da3810cbe1aa40337cfc416b95b5b
+  patches : [cast_to_enum.patch]

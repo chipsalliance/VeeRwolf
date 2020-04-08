@@ -1,0 +1,30 @@
+From 241ad18e259462da2643941c8b5c5319c1633a2b Mon Sep 17 00:00:00 2001
+From: Dawid Zimonczyk <dawidz@aldec.com.pl>
+Date: Thu, 2 Apr 2020 15:48:17 +0200
+Subject: [PATCH] fix for assignment to enum variable from expression of
+ different type
+
+---
+ design/ifu/ifu_ifc_ctl.sv | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/design/ifu/ifu_ifc_ctl.sv b/design/ifu/ifu_ifc_ctl.sv
+index e382e68..7d856de 100644
+--- a/design/ifu/ifu_ifc_ctl.sv
++++ b/design/ifu/ifu_ifc_ctl.sv
+@@ -185,11 +185,11 @@ module ifu_ifc_ctl
+ //11 0-10- 01
+ //11 0-00- 11
+ 
+-   assign next_state[1] = (~state[1] & state[0] & ~reset_delayed & miss_f2 & ~goto_idle) |
+-                          (state[1] & ~reset_delayed & ~mb_empty_mod & ~goto_idle);
++   assign next_state[1] = state_t'((~state[1] & state[0] & ~reset_delayed & miss_f2 & ~goto_idle) |
++                          (state[1] & ~reset_delayed & ~mb_empty_mod & ~goto_idle));
+ 
+-   assign next_state[0] = (~goto_idle & leave_idle) | (state[0] & ~goto_idle) |
+-                          (reset_delayed);
++   assign next_state[0] = state_t'((~goto_idle & leave_idle) | (state[0] & ~goto_idle) |
++                          (reset_delayed));
+ 
+    assign flush_fb = exu_flush_final;
+ 
