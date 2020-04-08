@@ -159,11 +159,16 @@ To list all available targets, run
 
     fusesoc core show swervolf
 
+To build and run on Riviera-Pro simulator
+
+    fusesoc run --target=sim --tool=rivierapro swervolf --compilation_mode=common
+
 ### Run a precompiled example in simulation
 
 In simulation, SweRVolf supports preloading an application to memory with the `--ram_init_file` parameter. SweRVolf comes bundled with some example applications in the `sw` directory.
 
 To build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_hello.vh`.
+To build and run this example on Riviera-Pro: `fusesoc run --target=sim --tool=rivierapro swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_hello.vh --compilation_mode=common`.
 
 After running the above command, the simulation model should be built and run. At the end it will output
 
