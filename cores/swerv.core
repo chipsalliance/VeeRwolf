@@ -100,6 +100,8 @@ targets:
       rivierapro:
         vlog_options :
           - config/common_defines.vh
+        compilation_mode:
+          - common
       modelsim:
         vlog_options :
           - -mfcu
