@@ -74,6 +74,7 @@ targets:
         vlog_options :
           - config/common_defines.vh
           - -timescale 1ns/1ps
+        compilation_mode : common
       modelsim:
         vlog_options :
           - -mfcu
