@@ -38,6 +38,8 @@ module axi_multicon
     output wire 	       o_sw_irq4,
     input wire 		       i_ram_init_done,
     input wire 		       i_ram_init_error,
+    output reg [31:0] 	       o_nmi_vec,
+    output wire 	       o_nmi_int,
     input wire [ID_WIDTH-1:0]  i_awid,
     input wire [31:0] 	       i_awaddr,
     input wire [7:0] 	       i_awlen,
@@ -94,9 +96,17 @@ module axi_multicon
    reg 		 sw_irq3;
    reg 		 sw_irq3_edge;
    reg 		 sw_irq3_pol;
+   reg 		 sw_irq3_timer;
    reg 		 sw_irq4;
    reg 		 sw_irq4_edge;
    reg 		 sw_irq4_pol;
+   reg 		 sw_irq4_timer;
+
+   reg 		 irq_timer_en;
+   reg [31:0] 	 irq_timer_cnt;
+
+   reg 		 nmi_int;
+   reg 		 nmi_int_r;
 
    AXI_BUS #(32, 64, ID_WIDTH, 1) slave();
 
@@ -204,6 +214,9 @@ module axi_multicon
    assign o_sw_irq4 = sw_irq4^sw_irq4_pol;
    assign o_sw_irq3 = sw_irq3^sw_irq3_pol;
 
+   assign o_nmi_int = nmi_int | nmi_int_r;
+
+
    //00 = ver
    //04 = sha
    //08 = simprint
@@ -219,9 +232,25 @@ module axi_multicon
       if (sw_irq4_edge)
 	sw_irq4 <= 1'b0;
 
+      if (irq_timer_en)
+	irq_timer_cnt <= irq_timer_cnt - 1;
+
+      nmi_int   <= 1'b0;
+      nmi_int_r <= nmi_int;
+
+      if (irq_timer_cnt == 32'd1) begin
+	 irq_timer_en <= 1'b0;
+	 if (sw_irq3_timer)
+	   sw_irq3 <= 1'b1;
+	 if (sw_irq4_timer)
+	   sw_irq4 <= 1'b1;
+	 if (!(sw_irq3_timer | sw_irq4_timer))
+	   nmi_int <= 1'b1;
+      end
+
       if (reg_we & !reg_addr[6])
 	case (reg_addr[5:3])
-	  1: begin
+	  1: begin //0x08-0x0F
 `ifdef SIMPRINT
 	     if (reg_be[0]) begin
 		$fwrite(f, "%c", reg_wdata[7:0]);
@@ -233,13 +262,19 @@ module axi_multicon
 	     end
 `endif
 	     if (reg_be[3]) begin
-		sw_irq4      <= reg_wdata[31];
-		sw_irq4_edge <= reg_wdata[30];
-		sw_irq4_pol  <= reg_wdata[29];
-		sw_irq3      <= reg_wdata[27];
-		sw_irq3_edge <= reg_wdata[26];
-		sw_irq3_pol  <= reg_wdata[25];
+		sw_irq4       <= reg_wdata[31];
+		sw_irq4_edge  <= reg_wdata[30];
+		sw_irq4_pol   <= reg_wdata[29];
+		sw_irq4_timer <= reg_wdata[28];
+		sw_irq3       <= reg_wdata[27];
+		sw_irq3_edge  <= reg_wdata[26];
+		sw_irq3_pol   <= reg_wdata[25];
+		sw_irq3_timer <= reg_wdata[24];
 	     end
+	     if (reg_be[4]) o_nmi_vec[7:0]   <= reg_wdata[39:32];
+	     if (reg_be[5]) o_nmi_vec[15:8]  <= reg_wdata[47:40];
+	     if (reg_be[6]) o_nmi_vec[23:16] <= reg_wdata[55:48];
+	     if (reg_be[7]) o_nmi_vec[31:24] <= reg_wdata[63:56];
 	  end
 	  2 : begin //0x10-0x17
 	     if (reg_be[0]) o_gpio[7:0]   <= reg_wdata[7:0]  ;
@@ -261,6 +296,16 @@ module axi_multicon
 	     if (reg_be[6]) mtimecmp[55:48] <= reg_wdata[55:48];
 	     if (reg_be[7]) mtimecmp[63:56] <= reg_wdata[63:56];
 	  end
+	  6 : begin //0x30-3f
+	     if (reg_be[0]) irq_timer_cnt[7:0]   <= reg_wdata[7:0]  ;
+	     if (reg_be[1]) irq_timer_cnt[15:8]  <= reg_wdata[15:8] ;
+	     if (reg_be[2]) irq_timer_cnt[23:16] <= reg_wdata[23:16];
+	     if (reg_be[3]) irq_timer_cnt[31:24] <= reg_wdata[31:24];
+	     if (reg_be[4])
+	       irq_timer_en <= reg_wdata[32];
+	  end
+
+
 	endcase
 
       case (reg_addr[5:3])
@@ -268,12 +313,16 @@ module axi_multicon
 	0 : reg_rdata <= {32'h`VERSION_SHA, version};
 	//0x08-0x0F
 	1 : begin
-	   reg_rdata <= 64'd0;
+	   //0xC-0xF
+	   reg_rdata[63:32] <= o_nmi_vec;
 	   //0xB
-	   reg_rdata[31:29] <= {sw_irq4, sw_irq4_edge, sw_irq4_pol};
-	   reg_rdata[27:25] <= {sw_irq3, sw_irq3_edge, sw_irq3_pol};
+	   reg_rdata[31:28] <= {sw_irq4, sw_irq4_edge, sw_irq4_pol, sw_irq4_timer};
+	   reg_rdata[27:24] <= {sw_irq3, sw_irq3_edge, sw_irq3_pol, sw_irq3_timer};
 	   //0xA
+	   reg_rdata[23:18] <= 6'd0;
 	   reg_rdata[17:16] <= {i_ram_init_error, i_ram_init_done};
+	   //0x8-0x9
+	   reg_rdata[15:0]  <= 16'd0;
 	end
 	//0x10-0x17
 	2 : reg_rdata <= i_gpio;
@@ -281,6 +330,8 @@ module axi_multicon
 	4 : reg_rdata <= mtime;
 	//0x28-0x2F
 	5 : reg_rdata <= mtimecmp;
+	//0x30-0x37
+	6 : reg_rdata <= {31'd0, irq_timer_en, irq_timer_cnt};
       endcase
 
       mtime <= mtime + 64'd1;

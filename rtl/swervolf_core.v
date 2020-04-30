@@ -90,6 +90,9 @@ module swervolf_core
    wire        spi0_irq;
    wire        sw_irq4;
    wire        sw_irq3;
+   wire        nmi_int;
+
+   wire [31:0] nmi_vec;
 
 `include "axi_intercon.vh"
 
@@ -191,6 +194,8 @@ module swervolf_core
       .o_sw_irq4        (sw_irq4),
       .i_ram_init_done  (i_ram_init_done),
       .i_ram_init_error (i_ram_init_error),
+      .o_nmi_vec        (nmi_vec),
+      .o_nmi_int        (nmi_int),
       .i_awid    (multicon_awid),
       .i_awaddr  (multicon_awaddr),
       .i_awlen   (multicon_awlen),
@@ -265,8 +270,8 @@ module swervolf_core
       .rst_l   (rstn),
       .dbg_rst_l   (rstn),
       .rst_vec (31'h40000000),
-      .nmi_int (1'b0),
-      .nmi_vec (31'h8880000),
+      .nmi_int (nmi_int),
+      .nmi_vec (nmi_vec[31:1]),
 
       .trace_rv_i_insn_ip      (),
       .trace_rv_i_address_ip   (),

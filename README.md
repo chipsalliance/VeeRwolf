@@ -53,9 +53,12 @@ The system controller contains common system functionality such as keeping regis
 | 0x09     | sim_exit | Exits a simulation. No effect on hardware
 | 0x0A     | init_status | Bit 0 = RAM initialization complete. Bit 1 = RAM initialization reported errors
 | 0x0B     | sw_irq                | Software-controlled external interrupts
+| 0x0C-0x0F | nmi_vec | Interrupt vector for NMI |
 | 0x10-0x17 | gpio | 64 readable and writable GPIO bits |
 | 0x20-0x27 | mtime | mtime from RISC-V privilege spec |
 | 0x28-0x2f | mtimecmp |mtimecmp from RISC-V privilege spec |
+| 0x30-0x33 | irq_timer_cnt | IRQ timer counter |
+| 0x34      | irq_timer_ctrl | IRQ timer control |
 | 0x40     | SPI_SPCR | Simple SPI Control register |
 | 0x48     | SPI_SPSR | Simple SPI status register |
 | 0x50     | SPI_SPDR | Simple SPI data register |
@@ -65,18 +68,30 @@ The system controller contains common system functionality such as keeping regis
 
 ##### syscon_base+0x000B sw_irq
 
-This register allows configuration and assertion of IRQ line 3 and 4, for testing the SweRV PIC or having two extra software-controllable interrupt sources.
+![](swervolf_irq.png)
+
+This register allows configuration and assertion of IRQ line 3 and 4, for testing the SweRV PIC or having two extra software-controllable interrupt sources. Interrupts can be triggered by writing to the sw_irq*n* bits when the timer bit is set to 0, or by a timeout of the irq_timer, when the timer bit is set to one. If both sw_irq3_timer and sw_irq4_timer are set to 0, the IRQ timer instead asserts an NMI when it reaches 0.
+
+If sw_irq3_timer or sw_irq4_timer are asserted, the interrupt trigger is connected to 
 
 | Bits | Name         | Description |
 | ---- | ------------ | -----------
 |    7 | sw_irq4      | Trigger IRQ line 4
 |    6 | sw_irq4_edge | 0 = IRQ4 is asserted until sw_irq4 is cleared, 1 = Writing to sw_irq4 only asserts IRQ4 for one clock cycle
 |    5 | sw_irq4_pol  | IRQ4 polarity. 0 = Active high, 1 = active low
-|    4 | <reserved>   |
+|    4 | sw_irq4_timer| 0 = IRQ4 is triggered by sw_irq4, 1 = IRQ4 is triggered by irq_timer timeout
 |    3 | sw_irq3      | Trigger IRQ line 3
 |    2 | sw_irq3_edge | 0 = IRQ3 is asserted until sw_irq3 is cleared, 1 = Writing to sw_irq3 only asserts IRQ3 for one clock cycle
 |    1 | sw_irq3_pol  | IRQ3 polarity. 0 = Active high, 1 = active low
-|    0 | <reserved>   |
+|    0 | sw_irq3_timer| 0 = IRQ3 is triggered by sw_irq3, 1 = IRQ3 is triggered by irq_timer timeout
+
+##### syscon_base+0x0030 irq_timer_cnt
+
+Set or read the IRQ timer counter value. Granularity is in system clock frequency cycles.
+
+##### syscon_base+0x0034 irq_timer_en
+
+Bit 0 enables or disables one-shot IRQ countdown timer. Automatically disables itself when reaching zero
 
 #### UART
 
