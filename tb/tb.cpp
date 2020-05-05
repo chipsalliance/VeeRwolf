@@ -33,6 +33,9 @@ using namespace std;
 
 static bool done;
 
+const int JTAG_VPI_SERVER_PORT = 5555;
+const int JTAG_VPI_USE_ONLY_LOOPBACK = true;
+
 vluint64_t main_time = 0;       // Current simulation time
 // This is a 64-bit integer to reduce wrap over issues and
 // allow modulus.  You can also use a double, if you wish.
@@ -113,7 +116,11 @@ int main(int argc, char **argv, char **env)
   VerilatorJtagServer* jtag = NULL;
   if (arg_jtag[0]) {
     jtag = new VerilatorJtagServer(10); /* Jtag clock is 10 period */
-    jtag->init_jtag_server(5555);
+    if (jtag->init_jtag_server(JTAG_VPI_SERVER_PORT, JTAG_VPI_USE_ONLY_LOOPBACK) 
+		!= VerilatorJtagServer::SUCCESS) {
+      printf("Could not initialize jtag_vpi server. Ending simulation.\n");
+      exit(1);
+    }    
   }
 
   uart_context_t uart_context;
@@ -140,13 +147,23 @@ int main(int argc, char **argv, char **env)
     if (tfp)
       tfp->dump(main_time);
     if (baud_rate) do_uart(&uart_context, top->o_uart_tx);
-    if (jtag && (main_time > 300))
-      jtag->doJTAG(main_time/20, //doJtag requires t to only increment by one
+    if (jtag && (main_time > 300)) {
+      int ret = jtag->doJTAG(main_time/20, //doJtag requires t to only increment by one
 		   &top->i_jtag_tms,
 		   &top->i_jtag_tdi,
 		   &top->i_jtag_tck,
 		   top->o_jtag_tdo);
-
+      if (ret != VerilatorJtagServer::SUCCESS) {
+        if (ret == VerilatorJtagServer::CLIENT_DISCONNECTED) {
+          printf("Ending simulation. Reason: jtag_vpi client disconnected.\n");
+          done = true;
+        }
+        else {
+          printf("Ending simulation. Reason: jtag_vpi error encountered.\n");
+          done = true;
+        }
+      }
+    }
     if (gpio0 != top->o_gpio) {
       printf("%lu: gpio0 is %s\n", main_time, top->o_gpio ? "on" : "off");
       gpio0 = top->o_gpio;
@@ -158,7 +175,9 @@ int main(int argc, char **argv, char **env)
     top->clk = !top->clk;
     main_time+=10;
   }
+
   if (tfp)
     tfp->close();
+
   exit(0);
 }

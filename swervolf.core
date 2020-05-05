@@ -34,7 +34,7 @@ filesets:
 
   verilator_tb:
     files: [tb/tb.cpp : {file_type : cppSource}]
-    depend : [jtag_vpi]
+    depend : [">=::jtag_vpi:0-r5"]
   verilator_waiver: {files: [data/verilator_waiver.vlt : {file_type : vlt}]}
 
   spi_tb:
