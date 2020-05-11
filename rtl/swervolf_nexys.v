@@ -84,22 +84,19 @@ module swervolf_nexys_a7
    assign mem.b_user = 1'b0;
    assign mem.r_user = 1'b0;
 
-   axi_cdc
+   axi_cdc_intf
      #(.AXI_USER_WIDTH (1),
+       .AXI_ADDR_WIDTH (32),
+       .AXI_DATA_WIDTH (64),
        .AXI_ID_WIDTH   (6))
    cdc
      (
-      .clk_slave_i   (clk_core),
-      .rst_slave_ni  (~rst_core),
-      .axi_slave     (cpu),
-      .isolate_slave_i    (1'b0),
-      .test_cgbypass_i    (1'b0),
-
-      .clk_master_i   (user_clk),
-      .rst_master_ni  (~user_rst),
-      .axi_master     (mem),
-      .isolate_master_i     (1'b0),
-      .clock_down_master_i  (1'b0));
+      .src_clk_i  (clk_core),
+      .src_rst_ni (~rst_core),
+      .src        (cpu),
+      .dst_clk_i  (user_clk),
+      .dst_rst_ni (~user_rst),
+      .dst        (mem));
 
    litedram_top
      #(.ID_WIDTH (6))

@@ -15,6 +15,7 @@ filesets:
     depend :
       - fusesoc:utils:generators
       - uart16550
+      - ">=pulp-platform.org::axi:0.23.0-r1"
       - "pulp-platform.org::axi2apb"
       - "pulp-platform.org::axi_mem_if"
       - ">=pulp-platform.org::axi_node:1.1.1-r2"
@@ -50,7 +51,7 @@ filesets:
       - rtl/clk_gen_nexys.v : {file_type : verilogSource}
       - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
       - rtl/swervolf_nexys.v    : {file_type : systemVerilogSource}
-    depend : [":swervolf:litedram", "pulp-platform.org::axi_slice_dc"]
+    depend : [":swervolf:litedram"]
 
   bootrom:
     files :
