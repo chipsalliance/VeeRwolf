@@ -27,6 +27,8 @@ module clk_gen_nexys
    output     o_clk_core,
    output reg o_rst_core);
 
+   parameter CPU_TYPE = "";
+
    wire   clkfb;
    wire   locked;
    reg 	  locked_r;
@@ -35,7 +37,7 @@ module clk_gen_nexys
      #(.BANDWIDTH("OPTIMIZED"),
        .CLKFBOUT_MULT(16),
        .CLKIN1_PERIOD(10.0), //100MHz
-       .CLKOUT0_DIVIDE(32),
+       .CLKOUT0_DIVIDE((CPU_TYPE == "EL2") ? 64 : 32),
        .DIVCLK_DIVIDE(1),
        .STARTUP_WAIT("FALSE"))
    PLLE2_BASE_inst

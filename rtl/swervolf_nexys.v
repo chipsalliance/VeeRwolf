@@ -23,7 +23,8 @@
 
 `default_nettype none
 module swervolf_nexys_a7
-  #(parameter bootrom_file = "bootloader.vh")
+  #(parameter bootrom_file = "bootloader.vh",
+    parameter cpu_type = "EH1")
    (input wire 	       clk,
     input wire 	       rstn,
     output wire [12:0] ddram_a,
@@ -66,7 +67,9 @@ module swervolf_nexys_a7
    wire 	 user_clk;
    wire 	 user_rst;
 
-   clk_gen_nexys clk_gen
+   clk_gen_nexys
+     #(.CPU_TYPE (cpu_type))
+   clk_gen
      (.i_clk (user_clk),
       .i_rst (user_rst),
       .o_clk_core (clk_core),
