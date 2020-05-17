@@ -18,7 +18,6 @@ filesets:
       - ">=pulp-platform.org::axi:0.23.0-r1"
       - "pulp-platform.org::axi2apb"
       - "pulp-platform.org::axi_mem_if"
-      - ">=pulp-platform.org::axi_node:1.1.1-r2"
       - ">=chipsalliance.org:cores:SweRV_EH1:1.5"
       - simple_spi
 

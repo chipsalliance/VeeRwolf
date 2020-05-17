@@ -2,42 +2,25 @@
 
 //These non-critical warnings must be fixed upstream. In the meantime they are waived to easier spot other warnings
 
-//pulp-platform.org::axi_node
-lint_off -rule PINMISSING -file "*/pulp-platform.org__axi_node*/src/axi_node_wrap_with_slices.sv" -lines 85
-lint_off -rule PINMISSING -file "*/pulp-platform.org__axi_node*/src/axi_node_wrap_with_slices.sv" -lines 100
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_address_decoder_AW.sv" -lines 84
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_request_block.sv" -lines 101
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_response_block.sv" -lines 68
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_response_block.sv" -lines 75
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_address_decoder_AR.sv" -lines 75
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_node*/src/axi_address_decoder_AW.sv" -lines 84
-
-//pulp-platform.org::axi:0.6
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_0.6/src/axi_intf.sv" -lines 57
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_0.6/src/axi_intf.sv" -lines 77
-
 //pulp-platform.org::axi:0.21.0
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_id_prepend.sv" -lines 85-86
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_id_prepend.sv" -lines 93-94
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_atop_filter.sv" -lines 120
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux.sv" -lines 459
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux.sv" -lines 467
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux.sv" -lines 479
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 126
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 162-163
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 174
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 182
 lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 216
 lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 234
-
-//pulp-platform.org::common_cells:1.11.0
-lint_off -rule WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/rrarbiter.sv" -lines 84
-lint_off -rule WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/rrarbiter.sv" -lines 116-117
-lint_off -rule WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/rrarbiter.sv" -lines 121-122
-lint_off -rule WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/lzc.sv" -lines 46
-lint_off -rule WIDTH -file "*/pulp-platform.org__common_cells_1.11.0/src/lzc.sv" -lines 55
-lint_off -rule CMPCONST -file "*/pulp-platform.org__common_cells_1.11.0/src/fifo_v2.sv" -lines 48
+lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_mux.sv" -lines 61
+lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux.sv" -lines 48
 
 //pulp-platform.org::common_cells:1.16.4
 lint_off -rule CMPCONST -file "*/pulp-platform.org__common_cells_*/src/deprecated/fifo_v2.sv" -lines 48
+lint_off -rule WIDTH -file "*/pulp-platform.org__common_cells_1.16.4/src/rr_arb_tree.sv" -lines 195
 
 //pulp-platform.org::axi_mem_if:0.2.0
 lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 119-120
