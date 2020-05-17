@@ -26,137 +26,110 @@ module axi_uart_wrapper
   #(parameter ID_WIDTH = 0,
     parameter INIT_FILE = "")
   (input wire 		      clk,
-   input wire 		      rst_n,
+   input wire 		     rst_n,
 
-   input wire 		      i_uart_rx,
-   output wire 		      o_uart_tx,
-   output wire 		      o_uart_irq,
-   input wire [ID_WIDTH-1:0]  i_awid,
-   input wire [11:0] 	      i_awaddr,
-   input wire [7:0] 	      i_awlen,
-   input wire [2:0] 	      i_awsize,
-   input wire [1:0] 	      i_awburst,
-   input wire 		      i_awvalid,
-   output wire 		      o_awready,
+   input wire 		     i_uart_rx,
+   output wire 		     o_uart_tx,
+   output wire 		     o_uart_irq,
+   input wire [ID_WIDTH-1:0] i_awid,
+   input wire [11:0] 	     i_awaddr,
+   input wire [7:0] 	     i_awlen,
+   input wire [2:0] 	     i_awsize,
+   input wire [1:0] 	     i_awburst,
+   input wire 		     i_awvalid,
+   output wire 		     o_awready,
 
-   input wire [ID_WIDTH-1:0]  i_arid,
-   input wire [11:0] 	      i_araddr,
-   input wire [7:0] 	      i_arlen,
-   input wire [2:0] 	      i_arsize,
-   input wire [1:0] 	      i_arburst,
-   input wire 		      i_arvalid,
-   output wire 		      o_arready,
+   input wire [ID_WIDTH-1:0] i_arid,
+   input wire [11:0] 	     i_araddr,
+   input wire [7:0] 	     i_arlen,
+   input wire [2:0] 	     i_arsize,
+   input wire [1:0] 	     i_arburst,
+   input wire 		     i_arvalid,
+   output wire 		     o_arready,
 
-   input wire [63:0] 	      i_wdata,
-   input wire [7:0] 	      i_wstrb,
-   input wire 		      i_wlast,
-   input wire 		      i_wvalid,
-   output wire 		      o_wready,
+   input wire [63:0] 	     i_wdata,
+   input wire [7:0] 	     i_wstrb,
+   input wire 		     i_wlast,
+   input wire 		     i_wvalid,
+   output wire 		     o_wready,
 
-   output wire [ID_WIDTH-1:0] o_bid,
-   output wire [1:0] 	      o_bresp,
-   output wire 		      o_bvalid,
-   input wire 		      i_bready,
+   output reg [ID_WIDTH-1:0] o_bid,
+   output wire [1:0] 	     o_bresp,
+   output wire 		     o_bvalid,
+   input wire 		     i_bready,
 
-   output wire [ID_WIDTH-1:0] o_rid,
-   output wire [63:0] 	      o_rdata,
-   output wire [1:0] 	      o_rresp,
-   output wire 		      o_rlast,
-   output wire 		      o_rvalid,
-   input wire 		      i_rready);
+   output reg [ID_WIDTH-1:0] o_rid,
+   output wire [63:0] 	     o_rdata,
+   output wire [1:0] 	     o_rresp,
+   output wire 		     o_rlast,
+   output wire 		     o_rvalid,
+   input wire 		     i_rready);
 
-   wire [11:0] 		      paddr;
-   wire [31:0] 		      pwdata;
-   wire 		      pwrite;
-   wire 		      psel;
-   wire 		      penable;
-   wire 		      pready;
+   assign o_rlast = 1'b1;
+
+   wire [11:2] 		      wb_adr;
+   wire [31:0] 		      wb_dat;
+   wire 		      wb_we;
+   wire 		      wb_cyc;
+   wire 		      wb_stb;
+   wire 		      wb_ack;
 
    wire [7:0] 		      wb_rdt;
 
-   axi2apb_64_32
-     #(
-       .AXI4_ADDRESS_WIDTH (12),
-       .AXI4_ID_WIDTH    (ID_WIDTH),
-       .AXI4_USER_WIDTH  (1),
-       .BUFF_DEPTH_SLAVE (2))
-   axi2apb_i
+   always @(posedge clk)
+     if (i_awvalid & o_awready)
+       o_bid <= i_awid;
+
+   always @(posedge clk)
+     if (i_arvalid & o_arready)
+       o_rid <= i_arid;
+
+   axi2wb axi2wb
      (
-      .ACLK       (clk),
-      .ARESETn    (rst_n),
-      .test_en_i  (1'b0),
+      .i_clk (clk),
+      .i_rst (~rst_n),
+      .o_wb_adr     (wb_adr),
+      .o_wb_dat     (wb_dat),
+      .o_wb_sel     (),
+      .o_wb_we      (wb_we),
+      .o_wb_cyc     (wb_cyc),
+      .o_wb_stb     (wb_stb),
+      .i_wb_rdt     ({24'd0,wb_rdt}),
+      .i_wb_ack     (wb_ack),
+      .i_wb_err     (1'b0),
 
-      .AWID_i     (i_awid        ),
-      .AWADDR_i   (i_awaddr      ),
-      .AWLEN_i    (i_awlen       ),
-      .AWSIZE_i   (i_awsize      ),
-      .AWBURST_i  (i_awburst     ),
-      .AWLOCK_i   (1'd0          ),
-      .AWCACHE_i  (4'd0          ),
-      .AWPROT_i   (3'd0          ),
-      .AWREGION_i (4'd0          ),
-      .AWUSER_i   (1'd0          ),
-      .AWQOS_i    (4'd0          ),
-      .AWVALID_i  (i_awvalid     ),
-      .AWREADY_o  (o_awready     ),
+      .i_awaddr     (i_awaddr),
+      .i_awvalid    (i_awvalid),
+      .o_awready    (o_awready),
 
-      .WDATA_i    (i_wdata       ),
-      .WSTRB_i    (i_wstrb       ),
-      .WLAST_i    (i_wlast       ),
-      .WUSER_i    (1'd0          ),
-      .WVALID_i   (i_wvalid      ),
-      .WREADY_o   (o_wready      ),
+      .i_araddr     (i_araddr),
+      .i_arvalid    (i_arvalid),
+      .o_arready    (o_arready),
 
-      .BID_o      (o_bid         ),
-      .BRESP_o    (o_bresp       ),
-      .BVALID_o   (o_bvalid      ),
-      .BUSER_o    (              ),
-      .BREADY_i   (i_bready      ),
+      .i_wdata     (i_wdata),
+      .i_wstrb     (i_wstrb),
+      .i_wvalid    (i_wvalid),
+      .o_wready    (o_wready),
 
-      .ARID_i     (i_arid        ),
-      .ARADDR_i   (i_araddr      ),
-      .ARLEN_i    (i_arlen       ),
-      .ARSIZE_i   (i_arsize      ),
-      .ARBURST_i  (i_arburst     ),
-      .ARLOCK_i   (1'd0          ),
-      .ARCACHE_i  (4'd0          ),
-      .ARPROT_i   (3'd0          ),
-      .ARREGION_i (4'd0          ),
-      .ARUSER_i   (1'd0          ),
-      .ARQOS_i    (4'd0          ),
-      .ARVALID_i  (i_arvalid     ),
-      .ARREADY_o  (o_arready     ),
+      .o_bvalid    (o_bvalid),
+      .i_bready    (i_bready),
 
-      .RID_o      (o_rid         ),
-      .RDATA_o    (o_rdata       ),
-      .RRESP_o    (o_rresp       ),
-      .RLAST_o    (o_rlast       ),
-      .RUSER_o    (              ),
-      .RVALID_o   (o_rvalid      ),
-      .RREADY_i   (i_rready      ),
+      .o_rdata     (o_rdata),
+      .o_rvalid    (o_rvalid),
+      .i_rready    (i_rready)
+      );
 
-      .PENABLE    (penable     ),
-      .PWRITE     (pwrite      ),
-      .PADDR      (paddr       ),
-      .PSEL       (psel        ),
-      .PWDATA     (pwdata      ),
-      .PRDATA     ({24'd0,wb_rdt}),
-      .PREADY     (pready      ),
-      .PSLVERR    (1'b0        ));
-
-   wire 		      wb_ack;
-   assign pready = !penable | wb_ack;
 
    uart_top uart16550_0
      (
       // Wishbone slave interface
       .wb_clk_i	(clk),
       .wb_rst_i	(~rst_n),
-      .wb_adr_i	(paddr[4:2]),
-      .wb_dat_i	(pwdata[7:0]),
-      .wb_we_i	(pwrite),
-      .wb_cyc_i	(psel),
-      .wb_stb_i	(penable),
+      .wb_adr_i	(wb_adr[4:2]),
+      .wb_dat_i	(wb_dat[7:0]),
+      .wb_we_i	(wb_we),
+      .wb_cyc_i	(wb_cyc),
+      .wb_stb_i	(wb_stb),
       .wb_sel_i	(4'b0), // Not used in 8-bit mode
       .wb_dat_o	(wb_rdt),
       .wb_ack_o	(wb_ack),
