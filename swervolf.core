@@ -9,6 +9,7 @@ filesets:
       - rtl/axi2wb.v
       - rtl/axi_mem_wrapper.v
       - rtl/axi_uart_wrapper.v
+      - rtl/swervolf_syscon.v
       - rtl/axi_multicon.v
       - rtl/swerv_wrapper.sv
       - rtl/swervolf_core.v
@@ -20,6 +21,7 @@ filesets:
       - "pulp-platform.org::axi_mem_if"
       - ">=chipsalliance.org:cores:SweRV_EH1:1.5"
       - simple_spi
+      - wb_intercon
 
   bfm:
     files:
@@ -67,7 +69,7 @@ targets:
       - "tool_verilator? (verilator_tb)"
       - "tool_verilator? (verilator_waiver)"
 
-    generate : [intercon, swerv_default_config, version]
+    generate : [intercon, swerv_default_config, version, wb_intercon]
     parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file=hello.vh, rom_init_file, signature, timeout, vcd]
     tools:
       rivierapro:
@@ -93,7 +95,7 @@ targets:
       - bfm
       - spi_tb
 
-    generate : [intercon, swerv_default_config]
+    generate : [intercon, swerv_default_config, wb_intercon]
     parameters : [SIMPRINT=true, ram_init_file, rom_init_file, flash_init_file, mem_clear=true, timeout, vcd]
     tools:
       rivierapro:
@@ -115,13 +117,26 @@ targets:
       - bootrom
       - core
       - nexys_a7_files
-    generate : [intercon, swerv_default_config, version]
+    generate : [intercon, swerv_default_config, version, wb_intercon]
     parameters : [bootrom_file]
     tools:
       vivado: {part : xc7a100tcsg324-1}
     toplevel : swervolf_nexys_a7
 
 generate:
+  wb_intercon:
+    generator: wb_intercon_gen
+    parameters:
+      masters:
+        cpu:
+          slaves : [sys, spi_flash]
+      slaves:
+        sys:
+          offset : 0x00000000
+          size   : 0x00000040
+        spi_flash:
+          offset : 0x00000040
+          size   : 0x00000040
   intercon:
     generator: axi_intercon_gen
     parameters:

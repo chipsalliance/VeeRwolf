@@ -16,7 +16,7 @@
 //********************************************************************************
 // $Id$
 //
-// Function: SweRVolf SoC-level controller
+// Function: SweRVolf Wishbone subsystem
 // Comments:
 //
 //********************************************************************************
@@ -25,350 +25,190 @@
 module axi_multicon
   #(parameter ID_WIDTH = 0)
    (input wire		  clk,
-    input wire 		       rst_n,
-    input wire [63:0] 	       i_gpio,
-    output reg [63:0] 	       o_gpio,
-    output wire 	       o_sclk,
-    output wire 	       o_cs_n,
-    output wire 	       o_mosi,
-    input wire 		       i_miso,
-    output wire 	       o_spi0_irq,
-    output reg 		       o_timer_irq,
-    output wire 	       o_sw_irq3,
-    output wire 	       o_sw_irq4,
-    input wire 		       i_ram_init_done,
-    input wire 		       i_ram_init_error,
-    output reg [31:0] 	       o_nmi_vec,
-    output wire 	       o_nmi_int,
-    input wire [ID_WIDTH-1:0]  i_awid,
-    input wire [31:0] 	       i_awaddr,
-    input wire [7:0] 	       i_awlen,
-    input wire [2:0] 	       i_awsize,
-    input wire [1:0] 	       i_awburst,
-    input wire 		       i_awvalid,
-    output wire 	       o_awready,
+    input wire 		      rst_n,
+    input wire [63:0] 	      i_gpio,
+    output wire [63:0] 	      o_gpio,
+    output wire 	      o_sclk,
+    output wire 	      o_cs_n,
+    output wire 	      o_mosi,
+    input wire 		      i_miso,
+    output wire 	      o_spi0_irq,
+    output wire 	      o_timer_irq,
+    output wire 	      o_sw_irq3,
+    output wire 	      o_sw_irq4,
+    input wire 		      i_ram_init_done,
+    input wire 		      i_ram_init_error,
+    output wire [31:0] 	      o_nmi_vec,
+    output wire 	      o_nmi_int,
+    input wire [ID_WIDTH-1:0] i_awid,
+    input wire [31:0] 	      i_awaddr,
+    input wire [7:0] 	      i_awlen,
+    input wire [2:0] 	      i_awsize,
+    input wire [1:0] 	      i_awburst,
+    input wire 		      i_awvalid,
+    output wire 	      o_awready,
 
-    input wire [ID_WIDTH-1:0]  i_arid,
-    input wire [31:0] 	       i_araddr,
-    input wire [7:0] 	       i_arlen,
-    input wire [2:0] 	       i_arsize,
-    input wire [1:0] 	       i_arburst,
-    input wire 		       i_arvalid,
-    output wire 	       o_arready,
+    input wire [ID_WIDTH-1:0] i_arid,
+    input wire [31:0] 	      i_araddr,
+    input wire [7:0] 	      i_arlen,
+    input wire [2:0] 	      i_arsize,
+    input wire [1:0] 	      i_arburst,
+    input wire 		      i_arvalid,
+    output wire 	      o_arready,
 
-    input wire [63:0] 	       i_wdata,
-    input wire [7:0] 	       i_wstrb,
-    input wire 		       i_wlast,
-    input wire 		       i_wvalid,
-    output wire 	       o_wready,
+    input wire [63:0] 	      i_wdata,
+    input wire [7:0] 	      i_wstrb,
+    input wire 		      i_wlast,
+    input wire 		      i_wvalid,
+    output wire 	      o_wready,
 
-    output wire [ID_WIDTH-1:0] o_bid,
-    output wire [1:0] 	       o_bresp,
-    output wire 	       o_bvalid,
-    input wire 		       i_bready,
+    output reg [ID_WIDTH-1:0] o_bid,
+    output wire [1:0] 	      o_bresp,
+    output wire 	      o_bvalid,
+    input wire 		      i_bready,
 
-    output wire [ID_WIDTH-1:0] o_rid,
-    output wire [63:0] 	       o_rdata,
-    output wire [1:0] 	       o_rresp,
-    output wire 	       o_rlast,
-    output wire 	       o_rvalid,
-    input wire 		       i_rready);
+    output reg [ID_WIDTH-1:0] o_rid,
+    output wire [63:0] 	      o_rdata,
+    output wire [1:0] 	      o_rresp,
+    output wire 	      o_rlast,
+    output wire 	      o_rvalid,
+    input wire 		      i_rready);
 
-   wire 	 reg_we;
-   wire [31:0] 	 reg_addr;
-   wire 	 reg_req;
-   wire [7:0] 	 reg_be;
-   wire [63:0] 	 reg_wdata;
-   reg [63:0] 	 reg_rdata;
-   wire [63:0] 	 rdata;
-   wire [7:0] 	 spi_rdt;
+   wire 		       wb_clk = clk;
+   wire 		       wb_rst = ~rst_n;
 
-   wire [2:0] 	 wb_spi_adr;
-   wire [7:0] 	 wb_spi_dat;
-   wire 	 wb_spi_cyc;
+`include "wb_intercon.vh"
 
-   wire [2:0] 	 spi_adr;
-   reg [2:0] 	 spi_adr_r;
-   reg [7:0] 	 wb_spi_dat_r;
-   reg 		 reg_we_r;
-   reg 		 wb_spi_cyc_r;
+   assign o_rlast = 1'b1;
 
-   reg 		 sw_irq3;
-   reg 		 sw_irq3_edge;
-   reg 		 sw_irq3_pol;
-   reg 		 sw_irq3_timer;
-   reg 		 sw_irq4;
-   reg 		 sw_irq4_edge;
-   reg 		 sw_irq4_pol;
-   reg 		 sw_irq4_timer;
+   always @(posedge clk)
+     if (i_awvalid & o_awready)
+       o_bid <= i_awid;
 
-   reg 		 irq_timer_en;
-   reg [31:0] 	 irq_timer_cnt;
+   always @(posedge clk)
+     if (i_arvalid & o_arready)
+       o_rid <= i_arid;
 
-   reg 		 nmi_int;
-   reg 		 nmi_int_r;
+   wire [11:2] 		       wb_adr;
 
-   AXI_BUS #(32, 64, ID_WIDTH, 1) slave();
+   assign		       wb_m2s_cpu_adr = {20'd0,wb_adr,2'b00};
 
-   assign slave.aw_id    = i_awid   ;
-   assign slave.aw_addr  = i_awaddr ;
-   assign slave.aw_len   = i_awlen  ;
-   assign slave.aw_size  = i_awsize ;
-   assign slave.aw_burst = i_awburst;
-   assign slave.aw_lock  = 1'd0;
-   assign slave.aw_cache = 4'd0;
-   assign slave.aw_prot  = 3'd0;
-   assign slave.aw_qos   = 4'd0;
-   assign slave.aw_region = 4'd0;
-   assign slave.aw_atop  = 6'd0;
-   assign slave.aw_user  = 1'd0;
-   assign slave.aw_valid = i_awvalid;
-   assign o_awready = slave.aw_ready;
+   axi2wb axi2wb
+     (
+      .i_clk      (clk),
+      .i_rst      (wb_rst),
+      .o_wb_adr   (wb_adr),
+      .o_wb_dat   (wb_m2s_cpu_dat),
+      .o_wb_sel   (wb_m2s_cpu_sel),
+      .o_wb_we    (wb_m2s_cpu_we),
+      .o_wb_cyc   (wb_m2s_cpu_cyc),
+      .o_wb_stb   (wb_m2s_cpu_stb),
+      .i_wb_rdt   (wb_s2m_cpu_dat),
+      .i_wb_ack   (wb_s2m_cpu_ack),
+      .i_wb_err   (wb_s2m_cpu_err),
 
-   assign slave.ar_id    = i_arid   ;
-   assign slave.ar_addr  = i_araddr ;
-   assign slave.ar_len   = i_arlen  ;
-   assign slave.ar_size  = i_arsize ;
-   assign slave.ar_burst = i_arburst;
-   assign slave.ar_lock  = 1'd0;
-   assign slave.ar_cache = 4'd0;
-   assign slave.ar_prot  = 3'd0;
-   assign slave.ar_qos   = 4'd0;
-   assign slave.ar_region = 4'd0;
-   assign slave.ar_user  = 1'd0;
-   assign slave.ar_valid = i_arvalid;
-   assign o_arready = slave.ar_ready;
+      .i_awaddr   (i_awaddr[11:0]),
+      .i_awvalid  (i_awvalid),
+      .o_awready  (o_awready),
 
-   assign slave.w_data  = i_wdata ;
-   assign slave.w_strb  = i_wstrb ;
-   assign slave.w_last  = i_wlast ;
-   assign slave.w_user  = 1'd0;
-   assign slave.w_valid = i_wvalid;
-   assign o_wready = slave.w_ready;
+      .i_araddr   (i_araddr[11:0]),
+      .i_arvalid  (i_arvalid),
+      .o_arready  (o_arready),
 
-   assign o_bid    = slave.b_id   ;
-   assign o_bresp  = slave.b_resp ;
-   assign o_bvalid = slave.b_valid;
-   assign slave.b_ready = i_bready;
+      .i_wdata   (i_wdata),
+      .i_wstrb   (i_wstrb),
+      .i_wvalid  (i_wvalid),
+      .o_wready  (o_wready),
 
-   assign o_rid    = slave.r_id   ;
-   assign o_rdata  = slave.r_data ;
-   assign o_rresp  = slave.r_resp ;
-   assign o_rlast  = slave.r_last ;
-   assign o_rvalid = slave.r_valid;
-   assign slave.r_ready = i_rready;
+      .o_bvalid  (o_bvalid),
+      .i_bready  (i_bready),
 
-   axi2mem
-     #(.AXI_ID_WIDTH   (ID_WIDTH),
-       .AXI_ADDR_WIDTH (32),
-       .AXI_DATA_WIDTH (64),
-       .AXI_USER_WIDTH (0))
-   ram_axi2mem
-     (.clk_i  (clk),
-      .rst_ni (rst_n),
-      .slave  (slave),
-      .req_o  (reg_req),
-      .we_o   (reg_we),
-      .addr_o (reg_addr),
-      .be_o   (reg_be),
-      .data_o (reg_wdata),
-      .data_i (rdata));
+      .o_rdata   (o_rdata),
+      .o_rvalid  (o_rvalid),
+      .i_rready  (i_rready));
 
-   reg [63:0] 	 mtime;
-   reg [63:0] 	 mtimecmp;
-`ifdef SIMPRINT
-   reg [1023:0]  signature_file;
-   integer 	f = 0;
-   initial begin
-      if ($value$plusargs("signature=%s", signature_file)) begin
-	 $display("Writing signature to %0s", signature_file);
-	 f = $fopen(signature_file, "w");
-      end
-   end
-`endif
+   swervolf_syscon syscon
+     (.i_clk            (clk),
+      .i_rst            (wb_rst),
 
-`ifndef VERSION_DIRTY
- `define VERSION_DIRTY 1
-`endif
-`ifndef VERSION_MAJOR
- `define VERSION_MAJOR 255
-`endif
-`ifndef VERSION_MINOR
- `define VERSION_MINOR 255
-`endif
-`ifndef VERSION_REV
- `define VERSION_REV 255
-`endif
-`ifndef VERSION_SHA
- `define VERSION_SHA deadbeef
-`endif
+      .i_gpio           (i_gpio),
+      .o_gpio           (o_gpio),
+      .o_timer_irq      (o_timer_irq),
+      .o_sw_irq3        (o_sw_irq3),
+      .o_sw_irq4        (o_sw_irq4),
+      .i_ram_init_done  (i_ram_init_done),
+      .i_ram_init_error (i_ram_init_error),
+      .o_nmi_vec        (o_nmi_vec),
+      .o_nmi_int        (o_nmi_int),
 
-   wire [31:0] version;
-
-   assign version[31]    = `VERSION_DIRTY;
-   assign version[30:24] = 7'd0;
-   assign version[23:16] = `VERSION_MAJOR;
-   assign version[15: 8] = `VERSION_MINOR;
-   assign version[ 7: 0] = `VERSION_REV;
-
-   assign o_sw_irq4 = sw_irq4^sw_irq4_pol;
-   assign o_sw_irq3 = sw_irq3^sw_irq3_pol;
-
-   assign o_nmi_int = nmi_int | nmi_int_r;
+      .i_wb_adr         (wb_m2s_sys_adr[5:0]),
+      .i_wb_dat         (wb_m2s_sys_dat),
+      .i_wb_sel         (wb_m2s_sys_sel),
+      .i_wb_we          (wb_m2s_sys_we),
+      .i_wb_cyc         (wb_m2s_sys_cyc),
+      .i_wb_stb         (wb_m2s_sys_stb),
+      .o_wb_rdt         (wb_s2m_sys_dat),
+      .o_wb_ack         (wb_s2m_sys_ack));
 
 
-   //00 = ver
-   //04 = sha
-   //08 = simprint
-   //09 = simexit
-   //0A = RAM status
-   //0B = sw_irq
-   //10 = gpio
-   //20 = timer/timecmp
-   //40 = SPI
-   always @(posedge clk) begin
-      if (sw_irq3_edge)
-	sw_irq3 <= 1'b0;
-      if (sw_irq4_edge)
-	sw_irq4 <= 1'b0;
-
-      if (irq_timer_en)
-	irq_timer_cnt <= irq_timer_cnt - 1;
-
-      nmi_int   <= 1'b0;
-      nmi_int_r <= nmi_int;
-
-      if (irq_timer_cnt == 32'd1) begin
-	 irq_timer_en <= 1'b0;
-	 if (sw_irq3_timer)
-	   sw_irq3 <= 1'b1;
-	 if (sw_irq4_timer)
-	   sw_irq4 <= 1'b1;
-	 if (!(sw_irq3_timer | sw_irq4_timer))
-	   nmi_int <= 1'b1;
-      end
-
-      if (reg_we & !reg_addr[6])
-	case (reg_addr[5:3])
-	  1: begin //0x08-0x0F
-`ifdef SIMPRINT
-	     if (reg_be[0]) begin
-		$fwrite(f, "%c", reg_wdata[7:0]);
-		$write("%c", reg_wdata[7:0]);
-	     end
-	     if (reg_be[1]) begin
-		$display("\nFinito");
-		$finish;
-	     end
-`endif
-	     if (reg_be[3]) begin
-		sw_irq4       <= reg_wdata[31];
-		sw_irq4_edge  <= reg_wdata[30];
-		sw_irq4_pol   <= reg_wdata[29];
-		sw_irq4_timer <= reg_wdata[28];
-		sw_irq3       <= reg_wdata[27];
-		sw_irq3_edge  <= reg_wdata[26];
-		sw_irq3_pol   <= reg_wdata[25];
-		sw_irq3_timer <= reg_wdata[24];
-	     end
-	     if (reg_be[4]) o_nmi_vec[7:0]   <= reg_wdata[39:32];
-	     if (reg_be[5]) o_nmi_vec[15:8]  <= reg_wdata[47:40];
-	     if (reg_be[6]) o_nmi_vec[23:16] <= reg_wdata[55:48];
-	     if (reg_be[7]) o_nmi_vec[31:24] <= reg_wdata[63:56];
-	  end
-	  2 : begin //0x10-0x17
-	     if (reg_be[0]) o_gpio[7:0]   <= reg_wdata[7:0]  ;
-	     if (reg_be[1]) o_gpio[15:8]  <= reg_wdata[15:8] ;
-	     if (reg_be[2]) o_gpio[23:16] <= reg_wdata[23:16];
-	     if (reg_be[3]) o_gpio[31:24] <= reg_wdata[31:24];
-	     if (reg_be[4]) o_gpio[39:32] <= reg_wdata[39:32];
-	     if (reg_be[5]) o_gpio[47:40] <= reg_wdata[47:40];
-	     if (reg_be[6]) o_gpio[55:48] <= reg_wdata[55:48];
-	     if (reg_be[7]) o_gpio[63:56] <= reg_wdata[63:56];
-	  end
-	  5 : begin //0x28-0x2f
-	     if (reg_be[0]) mtimecmp[7:0]   <= reg_wdata[7:0]  ;
-	     if (reg_be[1]) mtimecmp[15:8]  <= reg_wdata[15:8] ;
-	     if (reg_be[2]) mtimecmp[23:16] <= reg_wdata[23:16];
-	     if (reg_be[3]) mtimecmp[31:24] <= reg_wdata[31:24];
-	     if (reg_be[4]) mtimecmp[39:32] <= reg_wdata[39:32];
-	     if (reg_be[5]) mtimecmp[47:40] <= reg_wdata[47:40];
-	     if (reg_be[6]) mtimecmp[55:48] <= reg_wdata[55:48];
-	     if (reg_be[7]) mtimecmp[63:56] <= reg_wdata[63:56];
-	  end
-	  6 : begin //0x30-3f
-	     if (reg_be[0]) irq_timer_cnt[7:0]   <= reg_wdata[7:0]  ;
-	     if (reg_be[1]) irq_timer_cnt[15:8]  <= reg_wdata[15:8] ;
-	     if (reg_be[2]) irq_timer_cnt[23:16] <= reg_wdata[23:16];
-	     if (reg_be[3]) irq_timer_cnt[31:24] <= reg_wdata[31:24];
-	     if (reg_be[4])
-	       irq_timer_en <= reg_wdata[32];
-	  end
-
-
-	endcase
-
-      case (reg_addr[5:3])
-	//0x00-0x07
-	0 : reg_rdata <= {32'h`VERSION_SHA, version};
-	//0x08-0x0F
-	1 : begin
-	   //0xC-0xF
-	   reg_rdata[63:32] <= o_nmi_vec;
-	   //0xB
-	   reg_rdata[31:28] <= {sw_irq4, sw_irq4_edge, sw_irq4_pol, sw_irq4_timer};
-	   reg_rdata[27:24] <= {sw_irq3, sw_irq3_edge, sw_irq3_pol, sw_irq3_timer};
-	   //0xA
-	   reg_rdata[23:18] <= 6'd0;
-	   reg_rdata[17:16] <= {i_ram_init_error, i_ram_init_done};
-	   //0x8-0x9
-	   reg_rdata[15:0]  <= 16'd0;
-	end
-	//0x10-0x17
-	2 : reg_rdata <= i_gpio;
-	//0x20-0x27
-	4 : reg_rdata <= mtime;
-	//0x28-0x2F
-	5 : reg_rdata <= mtimecmp;
-	//0x30-0x37
-	6 : reg_rdata <= {31'd0, irq_timer_en, irq_timer_cnt};
-      endcase
-
-      mtime <= mtime + 64'd1;
-      o_timer_irq <= (mtime >= mtimecmp);
-      spi_adr_r <= spi_adr;
-      wb_spi_dat_r <= wb_spi_dat;
-      reg_we_r <= reg_we;
-      wb_spi_cyc_r <= wb_spi_cyc;
-
-      if (!rst_n) begin
-	 mtime <= 64'd0;
-	 mtimecmp <= 64'd0;
-      end
-   end
-
-   wire [7:0] wb_spi_rdt;
-
-   assign rdata = reg_addr[6] ? {8{wb_spi_rdt}} : reg_rdata;
-
-   assign spi_adr = reg_addr[5:3];
-
-   assign wb_spi_adr = reg_req ? spi_adr : spi_adr_r;
-   assign wb_spi_dat = !reg_req ? wb_spi_dat_r : reg_wdata[7:0];
-
-   assign wb_spi_cyc = reg_req & reg_addr[6];
+   wire [7:0] 		       spi_rdt;
+   assign wb_s2m_spi_flash_dat = {24'd0,spi_rdt};
 
    simple_spi spi
      (// Wishbone slave interface
       .clk_i  (clk),
-      .rst_i  (~rst_n),
-      .adr_i  (wb_spi_adr),
-      .dat_i  (wb_spi_dat),
-      .we_i   (reg_we | reg_we_r),
-      .cyc_i  (wb_spi_cyc | wb_spi_cyc_r),
-      .stb_i  (wb_spi_cyc | wb_spi_cyc_r),
-      .dat_o  (wb_spi_rdt),
-      .ack_o  (),
+      .rst_i  (wb_rst),
+      /* Note! Below is a horrible hack that needs some explanation
+
+       The AXI bus is 64-bit and there is no support for telling the slave
+       that it just wants to read a part of a 64-bit word.
+
+       On the slave side, the SPI controller has an 8-bit databus.
+       So in order to ensure that only one register gets accessed by the 64-bit
+       master, the registers are placed 64 bits apart from each other, at
+       addresses 0x0, 0x8, 0x10, 0x18 and 0x20 instead of the original 0x0, 0x1,
+       0x2, 0x3 and 0x4. This works easy enough by just cutting of the three
+       least significant bits of the address before passing it to the slave.
+
+       Now, to complicate things, there is an wb2axi bridge that converts 64-bit
+       datapath into 32 bits between the master and slave. Since the master
+       can't indicate what part of the 64-bit word it actually wants to read,
+       every 64-bit read gets turned into two consecutive 32-bit reads on the
+       wishbone side.
+
+       E.g. a read from address 0x8 on the 64-bit AXI side gets turned into two
+       read operations from 0x8 and 0xc on the 32-bit Wishbone side.
+
+       Usually this is not a real problem. Just a bit inefficient. But in this
+       case we have the SPDR register that holds the incoming data. When we
+       read a byte from that register, it is removed from the SPI FIFO and
+       can't be read again. Now, if we read from this register two times, every
+       time we just want to read a byte, this means that we throw away half of
+       our received data and things break down.
+
+       Writes are no problem since, there is a byte mask that tells which
+       bytes to really write
+
+       In order to work around this issue, we look at bit 2. Why? Because a
+       64-bit read to any of the mapped registers (which are 64-bit aligned)
+       will get turned into two read operations. First, one against the actual
+       register, and then an additional read from address+4, i.e. address, but
+       with bit 2 set as well. We still need to respond to the second read but
+       it doesn't matter what data it contains since no one should look at it.
+
+       So, when we see a read with bit 2 set, we redirect this access to
+       register zero. Doesn't really matter which register as long as we pick
+       a non-volatile one.
+
+       TODO: Make something sensible here instead
+       */
+      .adr_i  (wb_m2s_spi_flash_adr[2] ? 3'd0 : wb_m2s_spi_flash_adr[5:3]),
+      .dat_i  (wb_m2s_spi_flash_dat[7:0]),
+      .we_i   (wb_m2s_spi_flash_we),
+      .cyc_i  (wb_m2s_spi_flash_cyc),
+      .stb_i  (wb_m2s_spi_flash_stb),
+      .dat_o  (spi_rdt),
+      .ack_o  (wb_s2m_spi_flash_ack),
       .inta_o (o_spi0_irq),
       // SPI interface
       .sck_o  (o_sclk),
