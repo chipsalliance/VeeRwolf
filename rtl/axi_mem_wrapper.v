@@ -28,113 +28,119 @@ module axi_mem_wrapper
     parameter mem_clear = 0,
     parameter INIT_FILE = "")
   (input wire 		      clk,
-   input wire 		      rst_n,
+   input wire 		     rst_n,
 
-   input wire [ID_WIDTH-1:0]  i_awid,
-   input wire [31:0] 	      i_awaddr,
-   input wire [7:0] 	      i_awlen,
-   input wire [2:0] 	      i_awsize,
-   input wire [1:0] 	      i_awburst,
-   input wire 		      i_awvalid,
-   output wire 		      o_awready,
+   input wire [ID_WIDTH-1:0] i_awid,
+   input wire [31:0] 	     i_awaddr,
+   input wire [7:0] 	     i_awlen,
+   input wire [2:0] 	     i_awsize,
+   input wire [1:0] 	     i_awburst,
+   input wire 		     i_awvalid,
+   output wire 		     o_awready,
 
-   input wire [ID_WIDTH-1:0]  i_arid,
-   input wire [31:0] 	      i_araddr,
-   input wire [7:0] 	      i_arlen,
-   input wire [2:0] 	      i_arsize,
-   input wire [1:0] 	      i_arburst,
-   input wire 		      i_arvalid,
-   output wire 		      o_arready,
+   input wire [ID_WIDTH-1:0] i_arid,
+   input wire [31:0] 	     i_araddr,
+   input wire [7:0] 	     i_arlen,
+   input wire [2:0] 	     i_arsize,
+   input wire [1:0] 	     i_arburst,
+   input wire 		     i_arvalid,
+   output wire 		     o_arready,
 
-   input wire [63:0] 	      i_wdata,
-   input wire [7:0] 	      i_wstrb,
-   input wire 		      i_wlast,
-   input wire 		      i_wvalid,
-   output wire 		      o_wready,
+   input wire [63:0] 	     i_wdata,
+   input wire [7:0] 	     i_wstrb,
+   input wire 		     i_wlast,
+   input wire 		     i_wvalid,
+   output wire 		     o_wready,
 
-   output wire [ID_WIDTH-1:0] o_bid,
-   output wire [1:0] 	      o_bresp,
-   output wire 		      o_bvalid,
-   input wire 		      i_bready,
+   output reg [ID_WIDTH-1:0] o_bid,
+   output wire [1:0] 	     o_bresp,
+   output wire 		     o_bvalid,
+   input wire 		     i_bready,
 
-   output wire [ID_WIDTH-1:0] o_rid,
-   output wire [63:0] 	      o_rdata,
-   output wire [1:0] 	      o_rresp,
-   output wire 		      o_rlast,
-   output wire 		      o_rvalid,
-   input wire 		      i_rready);
+   output reg [ID_WIDTH-1:0] o_rid,
+   output wire [63:0] 	     o_rdata,
+   output wire [1:0] 	     o_rresp,
+   output wire 		     o_rlast,
+   output wire 		     o_rvalid,
+   input wire 		     i_rready);
 
-   wire 	 mem_we;
+   localparam AW = $clog2(MEM_SIZE);
+
+   assign o_rlast = 1'b1;
+
+   wire [AW-1:2] wb_adr;
+   wire [31:0] 		      wb_dat;
+   wire [3:0] 		      wb_sel;
+   wire 		      wb_we;
+   wire 		      wb_cyc;
+   wire 		      wb_stb;
+   reg 			      wb_ack;
+
+   wire [31:0] 		      wb_rdt;
+
+   always @(posedge clk)
+     if (i_awvalid & o_awready)
+       o_bid <= i_awid;
+
+   always @(posedge clk)
+     if (i_arvalid & o_arready)
+       o_rid <= i_arid;
+
+   axi2wb
+     #(.AW (AW))
+   axi2wb
+     (
+      .i_clk (clk),
+      .i_rst (~rst_n),
+      .o_wb_adr     (wb_adr),
+      .o_wb_dat     (wb_dat),
+      .o_wb_sel     (wb_sel),
+      .o_wb_we      (wb_we),
+      .o_wb_cyc     (wb_cyc),
+      .o_wb_stb     (wb_stb),
+      .i_wb_rdt     (wb_rdt),
+      .i_wb_ack     (wb_ack),
+      .i_wb_err     (1'b0),
+
+      .i_awaddr     (i_awaddr[AW-1:0]),
+      .i_awvalid    (i_awvalid),
+      .o_awready    (o_awready),
+
+      .i_araddr     (i_araddr[AW-1:0]),
+      .i_arvalid    (i_arvalid),
+      .o_arready    (o_arready),
+
+      .i_wdata     (i_wdata),
+      .i_wstrb     (i_wstrb),
+      .i_wvalid    (i_wvalid),
+      .o_wready    (o_wready),
+
+      .o_bvalid    (o_bvalid),
+      .i_bready    (i_bready),
+
+      .o_rdata     (o_rdata),
+      .o_rvalid    (o_rvalid),
+      .i_rready    (i_rready)
+      );
+
    wire [31:0] 	 mem_addr;
-   wire [7:0] 	 mem_be;
    wire [63:0] 	 mem_wdata;
    wire [63:0] 	 mem_rdata;
 
-   AXI_BUS #(32, 64, ID_WIDTH, 1) slave();
+   wire [7:0] 	 mem_we;
 
-   assign slave.aw_id    = i_awid   ;
-   assign slave.aw_addr  = i_awaddr ;
-   assign slave.aw_len   = i_awlen  ;
-   assign slave.aw_size  = i_awsize ;
-   assign slave.aw_burst = i_awburst;
-   assign slave.aw_lock  = 1'd0;
-   assign slave.aw_cache = 4'd0;
-   assign slave.aw_prot  = 3'd0;
-   assign slave.aw_qos   = 4'd0;
-   assign slave.aw_region = 4'd0;
-   assign slave.aw_atop  = 6'd0;
-   assign slave.aw_user  = 1'd0;
-   assign slave.aw_valid = i_awvalid;
-   assign o_awready = slave.aw_ready;
+   assign mem_we[3:0] = (wb_cyc & wb_stb & wb_we & !wb_adr[2]) ? wb_sel : 4'd0;
+   assign mem_we[7:4] = (wb_cyc & wb_stb & wb_we &  wb_adr[2]) ? wb_sel : 4'd0;
 
-   assign slave.ar_id    = i_arid   ;
-   assign slave.ar_addr  = i_araddr ;
-   assign slave.ar_len   = i_arlen  ;
-   assign slave.ar_size  = i_arsize ;
-   assign slave.ar_burst = i_arburst;
-   assign slave.ar_lock  = 1'd0;
-   assign slave.ar_cache = 4'd0;
-   assign slave.ar_prot  = 3'd0;
-   assign slave.ar_qos   = 4'd0;
-   assign slave.ar_region = 4'd0;
-   assign slave.ar_user  = 1'd0;
-   assign slave.ar_valid = i_arvalid;
-   assign o_arready = slave.ar_ready;
+   assign mem_wdata = {wb_dat, wb_dat};
 
-   assign slave.w_data  = i_wdata ;
-   assign slave.w_strb  = i_wstrb ;
-   assign slave.w_last  = i_wlast ;
-   assign slave.w_user  = 1'd0;
-   assign slave.w_valid = i_wvalid;
-   assign o_wready = slave.w_ready;
+   assign wb_rdt = wb_adr[2] ? mem_rdata[63:32] : mem_rdata[31:0];
 
-   assign o_bid    = slave.b_id   ;
-   assign o_bresp  = slave.b_resp ;
-   assign o_bvalid = slave.b_valid;
-   assign slave.b_ready = i_bready;
-
-   assign o_rid    = slave.r_id   ;
-   assign o_rdata  = slave.r_data ;
-   assign o_rresp  = slave.r_resp ;
-   assign o_rlast  = slave.r_last ;
-   assign o_rvalid = slave.r_valid;
-   assign slave.r_ready = i_rready;
-
-   axi2mem
-     #(.AXI_ID_WIDTH   (ID_WIDTH),
-       .AXI_ADDR_WIDTH (32),
-       .AXI_DATA_WIDTH (64),
-       .AXI_USER_WIDTH (0))
-   ram_axi2mem
-     (.clk_i  (clk),
-      .rst_ni (rst_n),
-      .slave  (slave),
-      .req_o  (),
-      .we_o   (mem_we),
-      .addr_o (mem_addr),
-      .be_o   (mem_be),
-      .data_o (mem_wdata),
-      .data_i (mem_rdata));
+   always @(posedge clk) begin
+      wb_ack <= wb_cyc & wb_stb & !wb_ack;
+      if (~rst_n)
+	wb_ack <= 1'b0;
+   end
 
    dpram64
      #(.SIZE (MEM_SIZE),
@@ -142,10 +148,10 @@ module axi_mem_wrapper
        .memfile (INIT_FILE))
    ram
      (.clk   (clk),
-      .we    ({8{mem_we}} & mem_be),
+      .we    (mem_we),
       .din   (mem_wdata),
-      .waddr ({mem_addr[$clog2(MEM_SIZE)-1:3],3'b000}),
-      .raddr ({mem_addr[$clog2(MEM_SIZE)-1:3],3'b000}),
+      .waddr ({wb_adr[AW-1:3],3'b000}),
+      .raddr ({wb_adr[AW-1:3],3'b000}),
       .dout  (mem_rdata));
 
 endmodule
