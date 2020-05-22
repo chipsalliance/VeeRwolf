@@ -136,133 +136,199 @@ module swervolf_core
    assign ram_rvalid     = i_ram_rvalid;
    assign o_ram_rready   = ram_rready;
 
-   axi_mem_wrapper
-     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2),
-       .MEM_SIZE  (BOOTROM_SIZE),
+   assign io_rlast = 1'b1;
+
+   reg [`RV_LSU_BUS_TAG+1:0]  bid;
+   reg [`RV_LSU_BUS_TAG+1:0]  rid;
+   
+   always @(posedge clk)
+     if (io_awvalid & io_awready)
+       bid <= io_awid;
+
+   assign io_bid = bid;
+
+   always @(posedge clk)
+     if (io_arvalid & io_arready)
+       rid <= io_arid;
+
+   assign io_rid = rid;
+
+   wire 		      wb_clk = clk;
+   wire 		      wb_rst = ~rst_n;
+
+`include "wb_intercon.vh"
+   
+   wire [15:2] 		       wb_adr;
+
+   assign		       wb_m2s_io_adr = {16'd0,wb_adr,2'b00};
+
+   axi2wb
+     #(.AW (16))
+   axi2wb
+     (
+      .i_clk       (clk),
+      .i_rst       (~rst_n),
+      .o_wb_adr    (wb_adr),
+      .o_wb_dat    (wb_m2s_io_dat),
+      .o_wb_sel    (wb_m2s_io_sel),
+      .o_wb_we     (wb_m2s_io_we),
+      .o_wb_cyc    (wb_m2s_io_cyc),
+      .o_wb_stb    (wb_m2s_io_stb),
+      .i_wb_rdt    (wb_s2m_io_dat),
+      .i_wb_ack    (wb_s2m_io_ack),
+      .i_wb_err    (1'b0),
+
+      .i_awaddr    (io_awaddr[15:0]),
+      .i_awvalid   (io_awvalid),
+      .o_awready   (io_awready),
+
+      .i_araddr    (io_araddr[15:0]),
+      .i_arvalid   (io_arvalid),
+      .o_arready   (io_arready),
+
+      .i_wdata     (io_wdata),
+      .i_wstrb     (io_wstrb),
+      .i_wvalid    (io_wvalid),
+      .o_wready    (io_wready),
+
+      .o_bvalid    (io_bvalid),
+      .i_bready    (io_bready),
+
+      .o_rdata     (io_rdata),
+      .o_rvalid    (io_rvalid),
+      .i_rready    (io_rready));
+
+   wb_mem_wrapper
+     #(.MEM_SIZE  (BOOTROM_SIZE),
        .INIT_FILE (bootrom_file))
    bootrom
-     (.clk      (clk),
-      .rst_n    (rst_n),
-      .i_awid    (rom_awid),
-      .i_awaddr  (rom_awaddr),
-      .i_awlen   (rom_awlen),
-      .i_awsize  (rom_awsize),
-      .i_awburst (rom_awburst),
-      .i_awvalid (rom_awvalid),
-      .o_awready (rom_awready),
+     (.i_clk    (wb_clk),
+      .i_rst    (wb_rst),
+      .i_wb_adr (wb_m2s_rom_adr[$clog2(BOOTROM_SIZE)-1:2]),
+      .i_wb_dat (wb_m2s_rom_dat),
+      .i_wb_sel (wb_m2s_rom_sel),
+      .i_wb_we  (wb_m2s_rom_we),
+      .i_wb_cyc (wb_m2s_rom_cyc),
+      .i_wb_stb (wb_m2s_rom_stb),
+      .o_wb_rdt (wb_s2m_rom_dat),
+      .o_wb_ack (wb_s2m_rom_ack));
 
-      .i_arid    (rom_arid),
-      .i_araddr  (rom_araddr),
-      .i_arlen   (rom_arlen),
-      .i_arsize  (rom_arsize),
-      .i_arburst (rom_arburst),
-      .i_arvalid (rom_arvalid),
-      .o_arready (rom_arready),
+   swervolf_syscon syscon
+     (.i_clk            (clk),
+      .i_rst            (wb_rst),
 
-      .i_wdata  (rom_wdata),
-      .i_wstrb  (rom_wstrb),
-      .i_wlast  (rom_wlast),
-      .i_wvalid (rom_wvalid),
-      .o_wready (rom_wready),
-
-      .o_bid    (rom_bid),
-      .o_bresp  (rom_bresp),
-      .o_bvalid (rom_bvalid),
-      .i_bready (rom_bready),
-
-      .o_rid    (rom_rid),
-      .o_rdata  (rom_rdata),
-      .o_rresp  (rom_rresp),
-      .o_rlast  (rom_rlast),
-      .o_rvalid (rom_rvalid),
-      .i_rready (rom_rready));
-
-   axi_multicon
-     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2))
-   multicon
-     (.clk       (clk),
-      .rst_n     (rst_n),
-      .i_gpio    (i_gpio),
-      .o_gpio    (o_gpio),
-      .o_sclk    (o_flash_sclk),
-      .o_cs_n    (o_flash_cs_n),
-      .o_mosi    (o_flash_mosi),
-      .i_miso    (i_flash_miso),
-      .o_spi0_irq  (spi0_irq),
-      .o_timer_irq (timer_irq),
+      .i_gpio           (i_gpio),
+      .o_gpio           (o_gpio),
+      .o_timer_irq      (timer_irq),
       .o_sw_irq3        (sw_irq3),
       .o_sw_irq4        (sw_irq4),
       .i_ram_init_done  (i_ram_init_done),
       .i_ram_init_error (i_ram_init_error),
       .o_nmi_vec        (nmi_vec),
       .o_nmi_int        (nmi_int),
-      .i_awid    (multicon_awid),
-      .i_awaddr  (multicon_awaddr),
-      .i_awlen   (multicon_awlen),
-      .i_awsize  (multicon_awsize),
-      .i_awburst (multicon_awburst),
-      .i_awvalid (multicon_awvalid),
-      .o_awready (multicon_awready),
-      .i_arid    (multicon_arid),
-      .i_araddr  (multicon_araddr),
-      .i_arlen   (multicon_arlen),
-      .i_arsize  (multicon_arsize),
-      .i_arburst (multicon_arburst),
-      .i_arvalid (multicon_arvalid),
-      .o_arready (multicon_arready),
-      .i_wdata   (multicon_wdata),
-      .i_wstrb   (multicon_wstrb),
-      .i_wlast   (multicon_wlast),
-      .i_wvalid  (multicon_wvalid),
-      .o_wready  (multicon_wready),
-      .o_bid     (multicon_bid),
-      .o_bresp   (multicon_bresp),
-      .o_bvalid  (multicon_bvalid),
-      .i_bready  (multicon_bready),
-      .o_rid     (multicon_rid),
-      .o_rdata   (multicon_rdata),
-      .o_rresp   (multicon_rresp),
-      .o_rlast   (multicon_rlast),
-      .o_rvalid  (multicon_rvalid),
-      .i_rready  (multicon_rready));
 
-   axi_uart_wrapper
-     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2))
-   uart
-     (.clk        (clk),
-      .rst_n      (rst_n),
-      .i_uart_rx  (i_uart_rx),
-      .o_uart_tx  (o_uart_tx),
-      .o_uart_irq (uart_irq),
-      .i_awid     (uart_awid),
-      .i_awaddr   (uart_awaddr[11:0]),
-      .i_awlen    (uart_awlen),
-      .i_awsize   (uart_awsize),
-      .i_awburst  (uart_awburst),
-      .i_awvalid  (uart_awvalid),
-      .o_awready  (uart_awready),
-      .i_arid     (uart_arid),
-      .i_araddr   (uart_araddr[11:0]),
-      .i_arlen    (uart_arlen),
-      .i_arsize   (uart_arsize),
-      .i_arburst  (uart_arburst),
-      .i_arvalid  (uart_arvalid),
-      .o_arready  (uart_arready),
-      .i_wdata    (uart_wdata),
-      .i_wstrb    (uart_wstrb),
-      .i_wlast    (uart_wlast),
-      .i_wvalid   (uart_wvalid),
-      .o_wready   (uart_wready),
-      .o_bid      (uart_bid),
-      .o_bresp    (uart_bresp),
-      .o_bvalid   (uart_bvalid),
-      .i_bready   (uart_bready),
-      .o_rid      (uart_rid),
-      .o_rdata    (uart_rdata),
-      .o_rresp    (uart_rresp),
-      .o_rlast    (uart_rlast),
-      .o_rvalid   (uart_rvalid),
-      .i_rready   (uart_rready));
+      .i_wb_adr         (wb_m2s_sys_adr[5:0]),
+      .i_wb_dat         (wb_m2s_sys_dat),
+      .i_wb_sel         (wb_m2s_sys_sel),
+      .i_wb_we          (wb_m2s_sys_we),
+      .i_wb_cyc         (wb_m2s_sys_cyc),
+      .i_wb_stb         (wb_m2s_sys_stb),
+      .o_wb_rdt         (wb_s2m_sys_dat),
+      .o_wb_ack         (wb_s2m_sys_ack));
+
+   wire [7:0] 		       spi_rdt;
+   assign wb_s2m_spi_flash_dat = {24'd0,spi_rdt};
+
+   simple_spi spi
+     (// Wishbone slave interface
+      .clk_i  (clk),
+      .rst_i  (wb_rst),
+      /* Note! Below is a horrible hack that needs some explanation
+
+       The AXI bus is 64-bit and there is no support for telling the slave
+       that it just wants to read a part of a 64-bit word.
+
+       On the slave side, the SPI controller has an 8-bit databus.
+       So in order to ensure that only one register gets accessed by the 64-bit
+       master, the registers are placed 64 bits apart from each other, at
+       addresses 0x0, 0x8, 0x10, 0x18 and 0x20 instead of the original 0x0, 0x1,
+       0x2, 0x3 and 0x4. This works easy enough by just cutting of the three
+       least significant bits of the address before passing it to the slave.
+
+       Now, to complicate things, there is an wb2axi bridge that converts 64-bit
+       datapath into 32 bits between the master and slave. Since the master
+       can't indicate what part of the 64-bit word it actually wants to read,
+       every 64-bit read gets turned into two consecutive 32-bit reads on the
+       wishbone side.
+
+       E.g. a read from address 0x8 on the 64-bit AXI side gets turned into two
+       read operations from 0x8 and 0xc on the 32-bit Wishbone side.
+
+       Usually this is not a real problem. Just a bit inefficient. But in this
+       case we have the SPDR register that holds the incoming data. When we
+       read a byte from that register, it is removed from the SPI FIFO and
+       can't be read again. Now, if we read from this register two times, every
+       time we just want to read a byte, this means that we throw away half of
+       our received data and things break down.
+
+       Writes are no problem since, there is a byte mask that tells which
+       bytes to really write
+
+       In order to work around this issue, we look at bit 2. Why? Because a
+       64-bit read to any of the mapped registers (which are 64-bit aligned)
+       will get turned into two read operations. First, one against the actual
+       register, and then an additional read from address+4, i.e. address, but
+       with bit 2 set as well. We still need to respond to the second read but
+       it doesn't matter what data it contains since no one should look at it.
+
+       So, when we see a read with bit 2 set, we redirect this access to
+       register zero. Doesn't really matter which register as long as we pick
+       a non-volatile one.
+
+       TODO: Make something sensible here instead
+       */
+      .adr_i  (wb_m2s_spi_flash_adr[2] ? 3'd0 : wb_m2s_spi_flash_adr[5:3]),
+      .dat_i  (wb_m2s_spi_flash_dat[7:0]),
+      .we_i   (wb_m2s_spi_flash_we),
+      .cyc_i  (wb_m2s_spi_flash_cyc),
+      .stb_i  (wb_m2s_spi_flash_stb),
+      .dat_o  (spi_rdt),
+      .ack_o  (wb_s2m_spi_flash_ack),
+      .inta_o (spi0_irq),
+      // SPI interface
+      .sck_o  (o_flash_sclk),
+      .ss_o   (o_flash_cs_n),
+      .mosi_o (o_flash_mosi),
+      .miso_i (i_flash_miso));
+
+   wire [7:0] 		       uart_rdt;
+   assign wb_s2m_uart_dat = {24'd0, uart_rdt};
+
+   uart_top uart16550_0
+     (// Wishbone slave interface
+      .wb_clk_i	(clk),
+      .wb_rst_i	(~rst_n),
+      .wb_adr_i	(wb_m2s_uart_adr[4:2]),
+      .wb_dat_i	(wb_m2s_uart_dat[7:0]),
+      .wb_we_i	(wb_m2s_uart_we),
+      .wb_cyc_i	(wb_m2s_uart_cyc),
+      .wb_stb_i	(wb_m2s_uart_stb),
+      .wb_sel_i	(4'b0), // Not used in 8-bit mode
+      .wb_dat_o	(uart_rdt),
+      .wb_ack_o	(wb_s2m_uart_ack),
+
+      // Outputs
+      .int_o     (uart_irq),
+      .stx_pad_o (o_uart_tx),
+      .rts_pad_o (),
+      .dtr_pad_o (),
+
+      // Inputs
+      .srx_pad_i (i_uart_rx),
+      .cts_pad_i (1'b0),
+      .dsr_pad_i (1'b0),
+      .ri_pad_i  (1'b0),
+      .dcd_pad_i (1'b0));
 
    swerv_wrapper_dmi rvtop
      (

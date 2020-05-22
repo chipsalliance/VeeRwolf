@@ -7,10 +7,9 @@ filesets:
     files:
       - rtl/dpram64.v
       - rtl/axi2wb.v
-      - rtl/axi_mem_wrapper.v
+      - rtl/wb_mem_wrapper.v
       - rtl/axi_uart_wrapper.v
       - rtl/swervolf_syscon.v
-      - rtl/axi_multicon.v
       - rtl/swerv_wrapper.sv
       - rtl/swervolf_core.v
     file_type : systemVerilogSource
@@ -30,6 +29,7 @@ filesets:
   tb:
     files:
       - sw/hello.vh : {file_type : user, copyto : hello.vh}
+      - rtl/axi_mem_wrapper.v : {file_type : verilogSource}
       - tb/swervolf_core_tb.v : {file_type : systemVerilogSource}
 
   verilator_tb:
@@ -127,15 +127,21 @@ generate:
     generator: wb_intercon_gen
     parameters:
       masters:
-        cpu:
-          slaves : [sys, spi_flash]
+        io:
+          slaves : [rom, sys, spi_flash, uart]
       slaves:
-        sys:
+        rom:
           offset : 0x00000000
+          size   : 0x00001000
+        sys:
+          offset : 0x00001000
           size   : 0x00000040
         spi_flash:
-          offset : 0x00000040
+          offset : 0x00001040
           size   : 0x00000040
+        uart:
+          offset : 0x00002000
+          size   : 0x00001000
   intercon:
     generator: axi_intercon_gen
     parameters:
@@ -148,15 +154,9 @@ generate:
         sb:
           id_width : 1
       slaves:
-        rom:
+        io:
           offset : 0x80000000
-          size   : 0x00001000
-        multicon:
-          offset : 0x80001000
-          size   : 0x00001000
-        uart:
-          offset : 0x80002000
-          size   : 0x00001000
+          size   : 0x00004000
         ram:
           offset : 0x00000000
           size   : 0x08000000 #128MiB
