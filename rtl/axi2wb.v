@@ -23,12 +23,13 @@
 
 `default_nettype none
 module axi2wb
+  #(parameter AW = 12)
   (
    input wire i_clk,
    input wire i_rst,
 
    // Wishbone master
-   output reg [11:2] o_wb_adr,
+   output reg [AW-1:2] o_wb_adr,
    output reg [31:0] o_wb_dat,
    output reg [3:0] o_wb_sel,
    output reg o_wb_we,
@@ -41,11 +42,11 @@ module axi2wb
 
    // AXI slave
    // AXI adress write channel
-   input wire [11:0] i_awaddr,
+   input wire [AW-1:0] i_awaddr,
    input wire i_awvalid,
    output reg o_awready,
    //AXI adress read channel
-   input wire [11:0] i_araddr,
+   input wire [AW-1:0] i_araddr,
    input wire i_arvalid,
    output reg o_arready,
    //AXI write channel
@@ -105,7 +106,7 @@ module axi2wb
 	 o_arready <= 1'b0;
 	 o_rvalid <= 1'b0;
 	 o_bvalid <= 1'b0;
-	 o_wb_adr <= 10'b0;
+	 o_wb_adr <= {AW-2{1'b0}};
 	 o_wb_cyc <= 1'b0;
 	 o_wb_stb <= 1'b0;
 	 o_wb_sel <= 4'd0;
@@ -143,7 +144,7 @@ module axi2wb
 	   IDLE : begin
 	      arbiter <= 1'b1;
 	      if (i_awvalid && arbiter) begin
-		 o_wb_adr[11:3] <= i_awaddr[11:3];
+		 o_wb_adr[AW-1:3] <= i_awaddr[AW-1:3];
 		 o_awready <= 1'b1;
 		 arbiter <= 1'b0;
 		 if (i_wvalid) begin
@@ -162,7 +163,7 @@ module axi2wb
 		 end
 	      end
 	      else if (i_arvalid) begin
-		 o_wb_adr[11:2] <= i_araddr[11:2];
+		 o_wb_adr[AW-1:2] <= i_araddr[AW-1:2];
 		 o_wb_sel <= 4'hF;
 		 o_wb_cyc <= 1'b1;
 		 o_wb_stb <= 1'b1;
@@ -248,7 +249,7 @@ module axi2wb
 	      o_arready <= 1'b0;
 	      o_rvalid <= 1'b0;
 	      o_bvalid <= 1'b0;
-	      o_wb_adr <= 10'b0;
+	      o_wb_adr <= {AW-2{1'b0}};
 	      o_wb_cyc <= 1'b0;
 	      o_wb_stb <= 1'b0;
 	      o_wb_sel <= 4'd0;
@@ -271,7 +272,7 @@ module axi2wb
    faxil_slave
      #(
          .C_AXI_DATA_WIDTH(64),
-	 .C_AXI_ADDR_WIDTH(12),
+	 .C_AXI_ADDR_WIDTH(AW),
 	 .F_OPT_BRESP      (1'b1),
 	 .F_OPT_RRESP      (1'b1),
 	 .F_AXI_MAXWAIT    (16),
@@ -364,7 +365,7 @@ module axi2wb
    end
 
    fwbc_master
-     #(.AW (10),
+     #(.AW (AW-2),
        .DW (32),
        .F_MAX_DELAY (4),
        .OPT_BUS_ABORT (0))
