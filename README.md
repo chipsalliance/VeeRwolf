@@ -158,16 +158,21 @@ An SPI controller is connected to the on-board SPI Flash. This can be used for s
 
 Install [verilator](https://www.veripool.org/wiki/verilator)
 
-Create a directory structure consisting of a workspace directory (from now on called `$WORKSPACE`) and a root directory for the SweRV SoC (from now on called `$CORES_ROOT`). All further commands will be run from `$WORKSPACE` unless otherwise stated. The structure will look like this:
-
-    ├──cores
-    └──workspace
+Create an empty directory, e.g. named swervolf, to use as the root of the project. This directory will from now on be called `$WORKSPACE`. All further commands will be run from `$WORKSPACE` unless otherwise stated. After entering the workspace directory, run `export WORKSPACE=$(pwd)` to set the $WORKSPACE shell variable.
 
 1. Make sure you have [FuseSoC](https://github.com/olofk/fusesoc) installed or install it with `pip install fusesoc`
-2. Initialize the FuseSoC base library with `fusesoc init`
-3. From `$CORES_ROOT`, clone the SweRVolf repository `git clone https://github.com/chipsalliance/Cores-SweRVolf`
-4. Add the cores directory as a FuseSoC core library `fusesoc library add swervolf ../cores`
-5. Make sure you have verilator installed to run the simulation. **Note** This requires at least version 3.918. The version that is shipped with Ubuntu 18.04 will NOT work
+2. Add the FuseSoC base library to the workspace with `fusesoc library add fusesoc-cores https://github.com/fusesoc/fusesoc-cores`
+3. Add the swervolf library with `fusesoc library add swervolf https://github.com/chipsalliance/Cores-SweRVolf`
+4. Make sure you have verilator installed to run the simulation. **Note** This requires at least version 3.918. The version that is shipped with Ubuntu 18.04 will NOT work
+
+Your workspace shall now look like this:
+
+    $WORKSPACE
+    └──fusesoc_libraries
+       ├──fusesoc-cores
+       └──swervolf
+
+After step 3, the SweRVolf sources will be located in `$WORKSPACE/fusesoc_libraries/swervolf`. For convenience, this directory will from now on be refered to as `$SWERVOLF_ROOT`. Run `export SWERVOLF_ROOT=$WORKSPACE/fusesoc_libraries/swervolf` to set this as a shell variable
 
 ## Running the SoC
 
@@ -195,12 +200,14 @@ To build and run on Riviera-Pro simulator
 
     fusesoc run --target=sim --tool=rivierapro swervolf
 
+After building any of the targets, there will now be a `build` in your workspace. This directory contains everything needed to rebuild the target. It can be safely removed and gets rebuilt when building a target again. To use a different build directory, pass `--build-root=<output dir>` to the run arguments.
+
 ### Run a precompiled example in simulation
 
 In simulation, SweRVolf supports preloading an application to memory with the `--ram_init_file` parameter. SweRVolf comes bundled with some example applications in the `sw` directory.
 
-To build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_hello.vh`.
-To build and run this example on Riviera-Pro: `fusesoc run --target=sim --tool=rivierapro swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_hello.vh`.
+To build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim swervolf --ram_init_file=$SWERVOLF_ROOT/sw/zephyr_hello.vh`.
+To build and run this example on Riviera-Pro: `fusesoc run --target=sim --tool=rivierapro swervolf --ram_init_file=$SWERVOLF_ROOT/sw/zephyr_hello.vh`.
 
 After running the above command, the simulation model should be built and run. At the end it will output
 
@@ -212,22 +219,25 @@ At this point the simulation can be aborted with `Ctrl-C`.
 
 Another example to run is the Zephyr philosophers demo.
 
-    fusesoc run --run --target=sim swervolf --ram_init_file=../cores/Cores-SweRVolf/sw/zephyr_philosophers.vh
+    fusesoc run --run --target=sim swervolf --ram_init_file=$SWERVOLF_ROOT/sw/zephyr_philosophers.vh
 
 * Note the `--run` option which will prevent rebuilding the simulator model
 
 ### Run RISC-V compliance tests
 
 1. Build the simulation model, if that hasn't already been done, with `fusesoc run --target=sim --setup --build swervolf`
-2. Download the RISC-V compliance tests somewhere. `git clone https://github.com/riscv/riscv-compliance` in a sibling directory to the workspace and work root. Your directory structure should now look like this:
+2. Download the RISC-V compliance tests to the workspace with `git clone https://github.com/riscv/riscv-compliance`. Your directory structure should now look like this:
 
-       ├──cores
-       ├──riscv-compliance
-       └──workspace
+        $WORKSPACE
+        ├──build
+        ├──fusesoc_libraries
+        └──riscv-compliance
 
-3. Enter the riscv-compliance directory and run `make TARGETDIR=$CORES_ROOT/Cores-SweRVolf/riscv-target/swerv riscv-target $RISCV_TARGET=swerv RISCV_DEVICE=rv32i RISCV_ISA=rv32imc TARGET_SIM=$WORKSPACE/build/swervolf_0/sim-verilator/Vswervolf_core_tb`
+3. Enter the riscv-compliance directory and run `make TARGETDIR=$SWERVOLF_ROOT/riscv-target RISCV_TARGET=swerv RISCV_DEVICE=rv32i RISCV_ISA=rv32i TARGET_SIM=$WORKSPACE/build/swervolf_0.6/sim-verilator/Vswervolf_core_tb`
 
 *Note: Other test suites can be run by replacing RISCV_ISA=rv32imc with rv32im or rv32i*
+
+*Note: The `TARGET_SIM` path needs to be updated to reflect the actual location of `Vswervolf_core_tb`*
 
 ### Run on hardware
 
@@ -240,7 +250,7 @@ If the board is connected, it will automatically be programmed when the FPGA ima
 The default bootloader will boot from SPI Flash, RAM or serial depending on the boot mode set by the switches. The default bootloader can be replaced with the `--bootrom_file` parameter. Note that the boot ROM is not connected to the data port, so it can only execute instructions. Data can not be read or written to this segment. The below example will compile the memtest application and use that as boot ROM instead.
 
     make -C ../cores/Cores-SweRVolf/sw memtest.vh
-    fusesoc run --target=nexys_a7 swervolf --bootrom_file=../cores/Cores-SweRVolf/sw/memtest.vh
+    fusesoc run --target=nexys_a7 swervolf --bootrom_file=$SWERVOLF_ROOT/sw/memtest.vh
 
 ## Build Zephyr applications
 
@@ -249,11 +259,11 @@ The default bootloader will boot from SPI Flash, RAM or serial depending on the 
 3. Build the code with
     mkdir build
     cd build
-    cmake -GNinja -DBOARD=swervolf_nexys -DBOARD_ROOT=$CORES_ROOT/swervolf/zephyr -DSOC_ROOT=$CORES_ROOT/swervolf/zephyr -DDTS_ROOT=$CORES_ROOT/swervolf/zephyr ..
+    cmake -GNinja -DBOARD=swervolf_nexys -DBOARD_ROOT=$SWERVOLF_ROOT/zephyr -DSOC_ROOT=$SWERVOLF_ROOT/zephyr -DDTS_ROOT=$SWERVOLF_ROOT/zephyr ..
     ninja
 4. There will now be a binary file in `zephyr/zephyr.bin`
 5. Enter the FuseSoC workspace directory and convert the binary file into a suitable verilog hex file with
-    `python $CORES_ROOT/swervolf/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex`
+    `python $SWERVOLF_ROOT/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex`
 6. The new hex file can now be embedded as a bootloader for a new FPGA build with
 
     fusesoc run --target=nexys_a7 swervolf --bootrom_file=$APP.hex
@@ -291,7 +301,7 @@ After compilation, the simulation should now say
 
 This means that it's ready to accept a JTAG client.
 
-Open a new terminal, navigate to the workspace directory and run `openocd -f $CORES_ROOT/Cores-SweRVolf/data/swervolf_sim.cfg` to connect OpenOCD to the simulation instance. If successful, OpenOCD should output
+Open a new terminal, navigate to the workspace directory and run `openocd -f $SWERVOLF_ROOT/data/swervolf_sim.cfg` to connect OpenOCD to the simulation instance. If successful, OpenOCD should output
 
     Info : only one transport option; autoselect 'jtag'
     Info : Set server port to 5555
@@ -321,7 +331,7 @@ SweRVolf can be debugged using the same USB cable that is used for programming t
 
 Programming the board with OpenOCD can be performed by running (from $WORKSPACE)
 
-    openocd -f ../cores/Cores-SweRVolf/data/swervolf_nexys_program.cfg
+    openocd -f $SWERVOLF_ROOT/data/swervolf_nexys_program.cfg
 
 To change the default FPGA image to load, add `-c "set BITFILE /path/to/bitfile"` as the first argument to openocd.
 
@@ -336,7 +346,7 @@ If everything goes as expected, this should output
 
 OpenOCD can now be connected to SweRVolf by running
 
-    openocd -f ../cores/Cores-SweRVolf/data/swervolf_nexys_debug.cfg
+    openocd -f $SWERVOLF_ROOT/data/swervolf_nexys_debug.cfg
 
 This should output
 
@@ -384,7 +394,7 @@ The `mkimage` tool available from u-boot is used to prepare an image to be writt
 
     mkimage -A riscv -C none -T standalone -a 0x0 -e 0x0 -n '' -d $IMAGE.bin $IMAGE.ub
 
-Refer to the uimage manual for a description of each parameter. There arae also Makefile targets in `sw/Makefile` that can be used as reference.
+Refer to the uimage manual for a description of each parameter. There are also Makefile targets in `$SWERVOLF_ROOT/sw/Makefile` that can be used as reference.
 
 ### Writing SPI Flash
 
@@ -403,7 +413,7 @@ The simulated Flash contents can be changed at compile-time with the `--flash_in
 For Nexys A7, OpenOCD is used to write to Flash. As the connection to the SPI Flash goes through the FPGA, this consists of a two-stage process where a proxy FPGA image is first written, which will handle communication between OpenOCD and the SPI Flash
 
 1. Obtain the proxy FPGA image from [here](https://github.com/quartiq/bscan_spi_bitstreams/blob/master/bscan_spi_xc7a100t.bit) and place it in `$WORKSPACE`
-2. Run `openocd -c "set BINFILE $IMAGE" -f ../cores/Cores-SweRVolf/data/swervolf_nexys_write_flash.cfg`, where `$IMAGE` is the path to the uImage file that should be written to Flash
+2. Run `openocd -c "set BINFILE $IMAGE" -f $SWERVOLF_ROOT/data/swervolf_nexys_write_flash.cfg`, where `$IMAGE` is the path to the uImage file that should be written to Flash
 
 ### Set up SPI uImage loader
 
