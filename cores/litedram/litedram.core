@@ -5,7 +5,6 @@ name : :swervolf:litedram:0
 filesets:
   common:
     files:
-      - VexRiscv.v
       - litedram_top.v
     file_type : verilogSource
 
@@ -15,6 +14,7 @@ filesets:
       - mem_1.init         : {file_type : user, copyto: mem_1.init}
       - litedram_core.v
     file_type : verilogSource
+    depend : [">=::serv:1.0.2"]
 
   xdc: {files : [litedram.xdc : {file_type : xdc}]}
   tb:
@@ -36,4 +36,3 @@ targets:
       xsim:
         xelab_options : [-d, x1Gb, -d, sg25E, -d, x16, -L, unisims_ver, -L secureip, --timescale, 1ns/1ns]
     toplevel : [glbl, litedram_tb]
-
