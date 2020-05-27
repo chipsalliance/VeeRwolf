@@ -38,7 +38,7 @@ lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/a
 //::simple_spi:1.6-r1
 lint_off -rule CASEINCOMPLETE -file "*/simple_spi_1.6/rtl/verilog/simple_spi_top.v" -lines 244
 
-//chipsalliance.org:cores:SweRV_EH1:1.5-r1
-lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_SweRV_EH1_1.5-r1/design/pic_ctrl.sv" -lines 463-464
-lint_off -rule WIDTH -file "*/chipsalliance.org_cores_SweRV_EH1_1.5-r1/design/ifu/ifu_ifc_ctl.sv" -lines 189
-lint_off -rule WIDTH -file "*/chipsalliance.org_cores_SweRV_EH1_1.5-r1/design/ifu/ifu_ifc_ctl.sv" -lines 192
+//chipsalliance.org:cores:SweRV_EH1:1.6
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_SweRV_EH1_1.6/design/pic_ctrl.sv" -lines 463-464
+lint_off -rule WIDTH -file "*/chipsalliance.org_cores_SweRV_EH1_1.6/design/ifu/ifu_ifc_ctl.sv" -lines 189
+lint_off -rule WIDTH -file "*/chipsalliance.org_cores_SweRV_EH1_1.6/design/ifu/ifu_ifc_ctl.sv" -lines 192
