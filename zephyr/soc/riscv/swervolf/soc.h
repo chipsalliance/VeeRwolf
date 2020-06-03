@@ -8,7 +8,7 @@
 #define __RISCV32_SWERVOLF_SOC_H_
 
 #include "soc_common.h"
-#include <generated_dts_board.h>
+#include <devicetree.h>
 
 #define DT_ALIAS_LED0_GPIOS_CONTROLLER "LED0"
 #define DT_ALIAS_LED0_GPIOS_PIN        0

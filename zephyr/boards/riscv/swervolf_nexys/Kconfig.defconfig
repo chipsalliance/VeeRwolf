@@ -1,13 +1,10 @@
-if BOARD_SWERVOLF_NEXYS
 
 config BOARD
 	default "swervolf_nexys"
-
+	depends on BOARD_SWERVOLF_NEXYS
 if FLASH
 
 config SPI_NOR
 	def_bool y
-
-endif
 
 endif

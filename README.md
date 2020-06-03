@@ -258,11 +258,8 @@ The default bootloader will boot from SPI Flash, RAM or serial depending on the 
 1. Download and install Zephyr according to the official guidelines at https://www.zephyrproject.org/
 2. Enter the directory of the application to build in the samples directory (e.g. `basic/blinky` for the Zephyr blinky example). From now on, the program to build and run will be called `$APP`
 3. Build the code with
-    mkdir build
-    cd build
-    cmake -GNinja -DBOARD=swervolf_nexys -DBOARD_ROOT=$SWERVOLF_ROOT/zephyr -DSOC_ROOT=$SWERVOLF_ROOT/zephyr -DDTS_ROOT=$SWERVOLF_ROOT/zephyr ..
-    ninja
-4. There will now be a binary file in `zephyr/zephyr.bin`
+    west build -b swervolf_nexys -- -DBOARD_ROOT=$SWERVOLF_ROOT/zephyr -DSOC_ROOT=$SWERVOLF_ROOT/zephyr -DDTS_ROOT=$SWERVOLF_ROOT/zephyr
+4. There will now be a binary file in `build/zephyr/zephyr.bin`
 5. Enter the FuseSoC workspace directory and convert the binary file into a suitable verilog hex file with
     `python3 $SWERVOLF_ROOT/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex`
 6. The new hex file can now be embedded as a bootloader for a new FPGA build with
