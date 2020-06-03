@@ -246,6 +246,16 @@ module swervolf_syscon
 	 mtime <= 64'd0;
 	 mtimecmp <= 64'd0;
 	 o_wb_ack <= 1'b0;
+	 o_nmi_vec <= 32'd0;
+	 sw_irq3 <= 1'b0;
+	 sw_irq3_edge <= 1'b0;
+	 sw_irq3_pol <= 1'b0;
+	 sw_irq3_timer <= 1'b0;
+	 sw_irq4 <= 1'b0;
+	 sw_irq4_edge <= 1'b0;
+	 sw_irq4_pol <= 1'b0;
+	 sw_irq4_timer <= 1'b0;
+	 irq_timer_en <= 1'b0;
       end
    end
 endmodule

@@ -76,6 +76,13 @@ module swervolf_core_tb
       end else if (!(|bootrom_file))
 	//Jump to address 0 if no bootloader is selected
 	swervolf.bootrom.ram.mem[0] = 64'h0000000000000067;
+	swervolf.bootrom.ram.mem[1] = 64'h0000000000000000;
+	swervolf.bootrom.ram.mem[2] = 64'h0000000000000000;
+	swervolf.bootrom.ram.mem[3] = 64'h0000000000000000;
+	swervolf.bootrom.ram.mem[4] = 64'h0000000000000000;
+	swervolf.bootrom.ram.mem[5] = 64'h0000000000000000;
+	swervolf.bootrom.ram.mem[6] = 64'h0000000000000000;
+	swervolf.bootrom.ram.mem[7] = 64'h0000000000000000;
    end
 
    wire [63:0] gpio_out;
@@ -130,6 +137,7 @@ module swervolf_core_tb
    
    axi_mem_wrapper
      #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2),
+       .mem_clear (1'b0),
        .MEM_SIZE  (RAM_SIZE),
        .INIT_FILE (""))
    ram
@@ -189,7 +197,8 @@ module swervolf_core_tb
       .dmi_hard_reset (dmi_hard_reset)); 
 
    swervolf_core
-     #(.bootrom_file (bootrom_file))
+     #(.bootrom_file (bootrom_file),
+       .mem_clear    (0))
    swervolf
      (.clk  (clk),
       .rstn (!rst),

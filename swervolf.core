@@ -77,10 +77,12 @@ targets:
         compilation_mode : common
       modelsim:
         vlog_options :
-          - -mfcu
+          - +acc=npr
+          - "-mfcu"
           - -cuautoname=du
           - config/common_defines.vh
-          - -timescale 1ns/1ns
+          - "-timescale 1ns/1ns"
+          - "-svinputport=compat"
       verilator:
         verilator_options : [--trace, -Wno-fatal]
     toplevel : swervolf_core_tb
