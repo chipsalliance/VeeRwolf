@@ -44,10 +44,11 @@ The system controller contains common system functionality such as keeping regis
 
 | Address  | Register              | Description |
 | -------- | --------------------- | -----------
-| 0x00     | version_rev  | SweRVolf revision |
+| 0x00     | version_patch | SweRVolf patch version |
 | 0x01     | version_minor | SweRVolf minor version |
 | 0x02     | version_major |SweRVolf major version |
 | 0x03     | version_misc | Bit 7 is set when SweRVolf was built from modified sources |
+|          |              | Bit 6:0 revision since last patch version |
 | 0x04-0x07     | version_sha | SHA hash of the build
 | 0x08     | sim_print | Outputs a character in simulation. No effect on hardware
 | 0x09     | sim_exit | Exits a simulation. No effect on hardware

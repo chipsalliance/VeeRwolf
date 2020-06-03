@@ -92,10 +92,10 @@ module swervolf_syscon
    wire [31:0] version;
 
    assign version[31]    = `VERSION_DIRTY;
-   assign version[30:24] = 7'd0;
+   assign version[30:24] = `VERSION_REV;
    assign version[23:16] = `VERSION_MAJOR;
    assign version[15: 8] = `VERSION_MINOR;
-   assign version[ 7: 0] = `VERSION_REV;
+   assign version[ 7: 0] = `VERSION_PATCH;
 
    assign o_sw_irq4 = sw_irq4^sw_irq4_pol;
    assign o_sw_irq3 = sw_irq3^sw_irq3_pol;
