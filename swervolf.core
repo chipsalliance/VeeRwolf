@@ -8,7 +8,6 @@ filesets:
       - rtl/dpram64.v
       - rtl/axi2wb.v
       - rtl/wb_mem_wrapper.v
-      - rtl/axi_uart_wrapper.v
       - rtl/swervolf_syscon.v
       - rtl/swerv_wrapper.sv
       - rtl/swervolf_core.v
