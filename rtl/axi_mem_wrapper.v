@@ -52,12 +52,12 @@ module axi_mem_wrapper
    input wire 		     i_wvalid,
    output wire 		     o_wready,
 
-   output reg [ID_WIDTH-1:0] o_bid,
+   output wire [ID_WIDTH-1:0] o_bid,
    output wire [1:0] 	     o_bresp,
    output wire 		     o_bvalid,
    input wire 		     i_bready,
 
-   output reg [ID_WIDTH-1:0] o_rid,
+   output wire [ID_WIDTH-1:0] o_rid,
    output wire [63:0] 	     o_rdata,
    output wire [1:0] 	     o_rresp,
    output wire 		     o_rlast,
@@ -65,8 +65,6 @@ module axi_mem_wrapper
    input wire 		     i_rready);
 
    localparam AW = $clog2(MEM_SIZE);
-
-   assign o_rlast = 1'b1;
 
    wire [AW-1:2] wb_adr;
    wire [31:0] 		      wb_dat;
@@ -78,16 +76,9 @@ module axi_mem_wrapper
 
    wire [31:0] 		      wb_rdt;
 
-   always @(posedge clk)
-     if (i_awvalid & o_awready)
-       o_bid <= i_awid;
-
-   always @(posedge clk)
-     if (i_arvalid & o_arready)
-       o_rid <= i_arid;
-
    axi2wb
-     #(.AW (AW))
+     #(.AW (AW),
+       .IW (ID_WIDTH))
    axi2wb
      (
       .i_clk (clk),
@@ -103,10 +94,12 @@ module axi_mem_wrapper
       .i_wb_err     (1'b0),
 
       .i_awaddr     (i_awaddr[AW-1:0]),
+      .i_awid       (i_awid),
       .i_awvalid    (i_awvalid),
       .o_awready    (o_awready),
 
       .i_araddr     (i_araddr[AW-1:0]),
+      .i_arid       (i_arid),
       .i_arvalid    (i_arvalid),
       .o_arready    (o_arready),
 
@@ -115,10 +108,15 @@ module axi_mem_wrapper
       .i_wvalid    (i_wvalid),
       .o_wready    (o_wready),
 
+      .o_bid       (o_bid),
+      .o_bresp     (o_bresp),
       .o_bvalid    (o_bvalid),
       .i_bready    (i_bready),
 
       .o_rdata     (o_rdata),
+      .o_rid       (o_rid),
+      .o_rresp     (o_rresp),
+      .o_rlast     (o_rlast),
       .o_rvalid    (o_rvalid),
       .i_rready    (i_rready)
       );

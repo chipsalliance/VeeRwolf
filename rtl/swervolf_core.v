@@ -136,23 +136,6 @@ module swervolf_core
    assign ram_rvalid     = i_ram_rvalid;
    assign o_ram_rready   = ram_rready;
 
-   assign io_rlast = 1'b1;
-
-   reg [`RV_LSU_BUS_TAG+1:0]  bid;
-   reg [`RV_LSU_BUS_TAG+1:0]  rid;
-   
-   always @(posedge clk)
-     if (io_awvalid & io_awready)
-       bid <= io_awid;
-
-   assign io_bid = bid;
-
-   always @(posedge clk)
-     if (io_arvalid & io_arready)
-       rid <= io_arid;
-
-   assign io_rid = rid;
-
    wire 		      wb_clk = clk;
    wire 		      wb_rst = ~rst_n;
 
@@ -163,7 +146,8 @@ module swervolf_core
    assign		       wb_m2s_io_adr = {16'd0,wb_adr,2'b00};
 
    axi2wb
-     #(.AW (16))
+     #(.AW (16),
+       .IW (`RV_LSU_BUS_TAG+2))
    axi2wb
      (
       .i_clk       (clk),
@@ -179,10 +163,12 @@ module swervolf_core
       .i_wb_err    (1'b0),
 
       .i_awaddr    (io_awaddr[15:0]),
+      .i_awid      (io_awid),
       .i_awvalid   (io_awvalid),
       .o_awready   (io_awready),
 
       .i_araddr    (io_araddr[15:0]),
+      .i_arid      (io_arid),
       .i_arvalid   (io_arvalid),
       .o_arready   (io_arready),
 
@@ -191,10 +177,15 @@ module swervolf_core
       .i_wvalid    (io_wvalid),
       .o_wready    (io_wready),
 
+      .o_bid       (io_bid),
+      .o_bresp     (io_bresp),
       .o_bvalid    (io_bvalid),
       .i_bready    (io_bready),
 
       .o_rdata     (io_rdata),
+      .o_rid       (io_rid),
+      .o_rresp     (io_rresp),
+      .o_rlast     (io_rlast),
       .o_rvalid    (io_rvalid),
       .i_rready    (io_rready));
 

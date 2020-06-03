@@ -23,7 +23,8 @@
 
 `default_nettype none
 module axi2wb
-  #(parameter AW = 12)
+  #(parameter AW = 12,
+    parameter IW = 0)
   (
    input wire i_clk,
    input wire i_rst,
@@ -43,10 +44,12 @@ module axi2wb
    // AXI slave
    // AXI adress write channel
    input wire [AW-1:0] i_awaddr,
+   input wire [IW-1:0] i_awid,
    input wire i_awvalid,
    output reg o_awready,
    //AXI adress read channel
    input wire [AW-1:0] i_araddr,
+   input wire [IW-1:0] i_arid,
    input wire i_arvalid,
    output reg o_arready,
    //AXI write channel
@@ -55,13 +58,22 @@ module axi2wb
    input wire i_wvalid,
    output reg o_wready,
    //AXI response channel
+   output reg [IW-1:0] o_bid,
+   output wire [1:0] o_bresp,
    output reg o_bvalid,
    input wire i_bready,
    //AXI read channel
    output reg [63:0] o_rdata,
+   output reg [IW-1:0] o_rid,
+   output wire [1:0] o_rresp,
+   output wire o_rlast,
    output reg o_rvalid,
    input wire i_rready
    );
+
+   assign o_bresp = 2'b00;
+   assign o_rresp = 2'b00;
+   assign o_rlast = 1'b1;
 
    reg        hi_32b_w;
    reg 	      arbiter;
@@ -118,9 +130,17 @@ module axi2wb
 	 aw_req <= 1'b0;
 	 w_req <= 1'b0;
 	 ar_req <= 1'b0;
+	 o_bid <= {IW{1'b0}};
+	 o_rid <= {IW{1'b0}};
 
       end
       else begin
+	 if (i_awvalid & o_awready)
+	   o_bid <= i_awid;
+
+	 if (i_arvalid & o_arready)
+	   o_rid <= i_arid;
+
 	 o_awready <= 1'b0;
 	 o_wready <= 1'b0;
 	 o_arready <= 1'b0;
