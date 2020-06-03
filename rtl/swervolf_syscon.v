@@ -142,7 +142,7 @@ module swervolf_syscon
 	  2: begin //0x08-0x0B
 `ifdef SIMPRINT
 	     if (i_wb_sel[0]) begin
-		$fwrite(f, "%c", i_wb_dat[7:0]);
+		if (|f) $fwrite(f, "%c", i_wb_dat[7:0]);
 		$write("%c", i_wb_dat[7:0]);
 	     end
 	     if (i_wb_sel[1]) begin
