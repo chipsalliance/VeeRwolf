@@ -140,10 +140,12 @@ module swervolf_core
    wire 		      wb_rst = ~rst_n;
 
 `include "wb_intercon.vh"
-   
+
    wire [15:2] 		       wb_adr;
 
    assign		       wb_m2s_io_adr = {16'd0,wb_adr,2'b00};
+   assign wb_m2s_io_cti = 3'b000;
+   assign wb_m2s_io_bte = 2'b00;
 
    axi2wb
      #(.AW (16),
@@ -160,7 +162,7 @@ module swervolf_core
       .o_wb_stb    (wb_m2s_io_stb),
       .i_wb_rdt    (wb_s2m_io_dat),
       .i_wb_ack    (wb_s2m_io_ack),
-      .i_wb_err    (1'b0),
+      .i_wb_err    (wb_s2m_io_err),
 
       .i_awaddr    (io_awaddr[15:0]),
       .i_awid      (io_awid),
@@ -204,6 +206,9 @@ module swervolf_core
       .o_wb_rdt (wb_s2m_rom_dat),
       .o_wb_ack (wb_s2m_rom_ack));
 
+   assign wb_s2m_rom_err = 1'b0;
+   assign wb_s2m_rom_rty = 1'b0;
+
    swervolf_syscon syscon
      (.i_clk            (clk),
       .i_rst            (wb_rst),
@@ -226,6 +231,9 @@ module swervolf_core
       .i_wb_stb         (wb_m2s_sys_stb),
       .o_wb_rdt         (wb_s2m_sys_dat),
       .o_wb_ack         (wb_s2m_sys_ack));
+
+   assign wb_s2m_sys_err = 1'b0;
+   assign wb_s2m_sys_rty = 1'b0;
 
    wire [7:0] 		       spi_rdt;
    assign wb_s2m_spi_flash_dat = {24'd0,spi_rdt};
@@ -292,8 +300,13 @@ module swervolf_core
       .mosi_o (o_flash_mosi),
       .miso_i (i_flash_miso));
 
+   assign wb_s2m_spi_flash_err = 1'b0;
+   assign wb_s2m_spi_flash_rty = 1'b0;
+
    wire [7:0] 		       uart_rdt;
    assign wb_s2m_uart_dat = {24'd0, uart_rdt};
+   assign wb_s2m_uart_err = 1'b0;
+   assign wb_s2m_uart_rty = 1'b0;
 
    uart_top uart16550_0
      (// Wishbone slave interface
