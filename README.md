@@ -264,7 +264,7 @@ The default bootloader will boot from SPI Flash, RAM or serial depending on the 
     ninja
 4. There will now be a binary file in `zephyr/zephyr.bin`
 5. Enter the FuseSoC workspace directory and convert the binary file into a suitable verilog hex file with
-    `python $SWERVOLF_ROOT/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex`
+    `python3 $SWERVOLF_ROOT/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex`
 6. The new hex file can now be embedded as a bootloader for a new FPGA build with
 
     fusesoc run --target=nexys_a7 swervolf --bootrom_file=$APP.hex
