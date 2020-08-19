@@ -2,7 +2,7 @@
 
 //These non-critical warnings must be fixed upstream. In the meantime they are waived to easier spot other warnings
 
-//pulp-platform.org::axi:0.21.0
+//pulp-platform.org::axi:0.23.0
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_id_prepend.sv" -lines 85-86
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_id_prepend.sv" -lines 93-94
 lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_atop_filter.sv" -lines 120
@@ -39,6 +39,4 @@ lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/a
 lint_off -rule CASEINCOMPLETE -file "*/simple_spi_1.6/rtl/verilog/simple_spi_top.v" -lines 244
 
 //chipsalliance.org:cores:SweRV_EH1:1.6
-lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_SweRV_EH1_1.6/design/pic_ctrl.sv" -lines 463-464
-lint_off -rule WIDTH -file "*/chipsalliance.org_cores_SweRV_EH1_1.6/design/ifu/ifu_ifc_ctl.sv" -lines 189
-lint_off -rule WIDTH -file "*/chipsalliance.org_cores_SweRV_EH1_1.6/design/ifu/ifu_ifc_ctl.sv" -lines 192
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_SweRV_EH1_1.7/design/pic_ctrl.sv" -lines 463-464

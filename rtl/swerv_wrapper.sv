@@ -285,7 +285,7 @@ module swerv_wrapper_dmi
    // PIC ports
 
    // Icache & Itag ports
-   logic [31:3]  ic_rw_addr;
+   logic [31:2]  ic_rw_addr;
    logic [3:0]   ic_wr_en  ;     // Which way to write
    logic         ic_rd_en ;
 
