@@ -1,7 +1,11 @@
-SweRVolf
+SweRVEL2zybo
 ========
 
-SweRVolf is a [FuseSoC](https://github.com/olofk/fusesoc)-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
+SweRVEL2zybo is a [FuseSoC](https://github.com/olofk/fusesoc)-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core, targeted for teh zybo board. It is forked from SweRVolf.
+
+
+
+To be updated:
 
 This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), [Zephyr OS](https://www.zephyrproject.org) or other software in simulators or on FPGA boards. Focus is on portability, extendability and ease of use; to allow SweRV users to quickly get software running, modify the SoC to their needs or port it to new target devices.
 
