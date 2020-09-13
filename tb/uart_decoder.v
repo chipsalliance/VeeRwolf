@@ -1,5 +1,5 @@
 module uart_decoder
-  #(parameter BAUD_RATE)
+  #(parameter BAUD_RATE = 0)
    (input rx);
 
    localparam T = 1000000000/BAUD_RATE;
