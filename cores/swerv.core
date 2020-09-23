@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:SweRV_EH1:1.7
+name : chipsalliance.org:cores:SweRV_EH1:1.8
 
 filesets:
   rtl:
@@ -97,15 +97,16 @@ targets:
 
     generate : [swerv_ahb_config]
     tools:
-      rivierapro:
-        vlog_options :
-          - config/common_defines.vh
-        compilation_mode : common
       modelsim:
         vlog_options :
           - -mfcu
           - -cuautoname=du
           - config/common_defines.vh
+      rivierapro:
+        vlog_options :
+          - config/common_defines.vh
+          - "-err VCP2694 W1"
+        compilation_mode : common
       verilator:
         verilator_options : [--trace, -Wno-fatal]
     toplevel : tb_top
@@ -149,5 +150,4 @@ provider:
   name    : github
   user    : chipsalliance
   repo    : Cores-SweRV
-  version : 48f01f101eeeb8c75013afb4546e01b0fda08984
-  patches : [cast_to_enum.patch]
+  version : 7332edc0adaa7e9a0c842d169154429e8d987786

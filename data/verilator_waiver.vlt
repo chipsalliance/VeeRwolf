@@ -38,5 +38,5 @@ lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/a
 //::simple_spi:1.6-r1
 lint_off -rule CASEINCOMPLETE -file "*/simple_spi_1.6/rtl/verilog/simple_spi_top.v" -lines 244
 
-//chipsalliance.org:cores:SweRV_EH1:1.6
-lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_SweRV_EH1_1.7/design/pic_ctrl.sv" -lines 463-464
+//chipsalliance.org:cores:SweRV_EH1:1.8
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_SweRV_EH1_1.8/design/pic_ctrl.sv" -lines 467-468
