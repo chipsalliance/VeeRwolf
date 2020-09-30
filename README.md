@@ -278,7 +278,7 @@ SweRVolf supports debugging both on hardware and in simulation. There are differ
 
 ### Prerequisites
 
-Install the RISC-V-specific version of OpenOCD
+Install the RISC-V-specific version of OpenOCD. (The OpenOCD code shall be no older than commit 22d771d2 from Sep 14, 2020.)
 
     git clone https://github.com/riscv/riscv-openocd
     cd riscv-openocd
