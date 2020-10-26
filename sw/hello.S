@@ -32,7 +32,7 @@ next:
 
 	/* Halt simulation */
 	li  a1,     HALT_ADDR
-	sw zero, 0(a1)
+	sb zero, 0(a1)
 str:
 	.section .data
 	.string "SweRV+FuseSoC rocks\n"
