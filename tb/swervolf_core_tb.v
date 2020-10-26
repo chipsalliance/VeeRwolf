@@ -189,7 +189,8 @@ module swervolf_core_tb
       .dmi_hard_reset (dmi_hard_reset)); 
 
    swervolf_core
-     #(.bootrom_file (bootrom_file))
+     #(.bootrom_file (bootrom_file),
+       .clk_freq_hz (32'd50_000_000))
    swervolf
      (.clk  (clk),
       .rstn (!rst),

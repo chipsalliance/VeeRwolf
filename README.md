@@ -60,6 +60,7 @@ The system controller contains common system functionality such as keeping regis
 | 0x28-0x2f | mtimecmp |mtimecmp from RISC-V privilege spec |
 | 0x30-0x33 | irq_timer_cnt | IRQ timer counter |
 | 0x34      | irq_timer_ctrl | IRQ timer control |
+| 0x3C-0x3F | clk_freq_hz | Clock frequency of main clock in Hz |
 | 0x40     | SPI_SPCR | Simple SPI Control register |
 | 0x48     | SPI_SPSR | Simple SPI status register |
 | 0x50     | SPI_SPDR | Simple SPI data register |

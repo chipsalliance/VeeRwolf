@@ -23,7 +23,8 @@
 
 `default_nettype none
 module swervolf_core
-  #(parameter bootrom_file  = "")
+  #(parameter bootrom_file  = "",
+    parameter clk_freq_hz = 0)
    (input wire 	clk,
     input wire 	       rstn,
     input wire 	       dmi_reg_en,
@@ -209,7 +210,9 @@ module swervolf_core
    assign wb_s2m_rom_err = 1'b0;
    assign wb_s2m_rom_rty = 1'b0;
 
-   swervolf_syscon syscon
+   swervolf_syscon
+     #(.clk_freq_hz (clk_freq_hz))
+   syscon
      (.i_clk            (clk),
       .i_rst            (wb_rst),
 

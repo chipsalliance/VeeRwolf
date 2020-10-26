@@ -22,6 +22,7 @@
 //********************************************************************************
 
 module swervolf_syscon
+  #(parameter [31:0] clk_freq_hz = 0)
   (input wire i_clk,
    input wire 	     i_rst,
 
@@ -237,6 +238,8 @@ module swervolf_syscon
 	12 : o_wb_rdt <= irq_timer_cnt;
 	//0x34-0x37
 	13 : o_wb_rdt <= {31'd0, irq_timer_en};
+	//0x3C
+	15 : o_wb_rdt <= clk_freq_hz;
       endcase
 
       mtime <= mtime + 64'd1;

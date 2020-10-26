@@ -195,7 +195,8 @@ module swervolf_nexys_a7
       .version        (4'd1));
 
    swervolf_core
-     #(.bootrom_file (bootrom_file))
+     #(.bootrom_file (bootrom_file),
+       .clk_freq_hz  (32'd50_000_000))
    swervolf
      (.clk  (clk_core),
       .rstn (~rst_core),
