@@ -34,6 +34,19 @@
 .globl _start
 .globl boot_fail
 _start:
+	/* Setup mrac CSR
+
+	Mark lower half of 32-bit address space as
+	non-cacheable without side effects (mapped to RAM)
+	and upper half as non-cacheable with side-effects
+	(device memory).
+
+	Bit pattern 1010101010101010_0000000000000000
+
+	*/
+	li	t0, 0xAAAA0000
+	csrw	0x7c0, t0
+
 	jal	uart_init
 
 	la	a5, boot_msg
