@@ -4,7 +4,10 @@
 #endif
 
 #define RAM_INIT_DONE 0x8000100A
+#define CLK_FREQ_HZ   0x8000103C
 #define UART_BASE     0x80002000
+
+#define BAUD_RATE 115200
 
 #define REG_BRDL (4*0x00) /* Baud rate divisor (LSB)        */
 #define REG_IER (4*0x01)  /* Interrupt enable reg.          */
@@ -99,7 +102,11 @@ uart_init:
 	sb	t3, REG_LCR(a4)
 
 	/* Set divisor regs */
-	li	t4, 27
+	li	t3, CLK_FREQ_HZ
+	lw	t4, 0(t3)
+	li	t3, BAUD_RATE
+	divu	t3, t4, t3
+	srli	t4, t3, 4
 	sb	t4, REG_BRDL(a4)
 
 	/* 8 data bits, 1 stop bit, no parity, clear DLAB */
