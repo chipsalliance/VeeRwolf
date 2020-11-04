@@ -256,22 +256,40 @@ The default bootloader will boot from SPI Flash, RAM or serial depending on the 
 
 ## Build Zephyr applications
 
-1. Download and install Zephyr according to the official guidelines at https://www.zephyrproject.org/
-2. Enter the directory of the application to build in the samples directory (e.g. `basic/blinky` for the Zephyr blinky example). From now on, the program to build and run will be called `$APP`
-3. Build the code with
-    west build -b swervolf_nexys -- -DBOARD_ROOT=$SWERVOLF_ROOT/zephyr -DSOC_ROOT=$SWERVOLF_ROOT/zephyr -DDTS_ROOT=$SWERVOLF_ROOT/zephyr
-4. There will now be a binary file in `build/zephyr/zephyr.bin`
-5. Enter the FuseSoC workspace directory and convert the binary file into a suitable verilog hex file with
-    `python3 $SWERVOLF_ROOT/sw/makehex.py $ZEPHYR_BASE/samples/$APP/build/zephyr/zephyr.bin > $APP.hex`
-6. The new hex file can now be embedded as a bootloader for a new FPGA build with
+        $WORKSPACE
+        ├──fusesoc_libraries
+        ├──...
+        └──zephyr
 
-    fusesoc run --target=nexys_a7 swervolf --bootrom_file=$APP.hex
+1.Create a West (Zephyr's build tool) workspace in the same directory as the FuseSoC workspace by running
+    west init
+2. Add the SweRVolf-specific drivers and BSP with
 
-or in a simulation with
+    west config manifest.path fusesoc_libraries/swervolf
+    west update
+
+   The workspace should now look like this
+
+        $WORKSPACE
+        ├──fusesoc_libraries
+        |  ├──...
+        |  └──swervolf
+        ├──...
+        └──zephyr
+
+3. Enter the directory of the application to build. Zephyr comes with a number of example applications in the samples directory (`$WORKSPACE/zephyr/samples`), e.g. `$WORKSPACE/zephyr/samples/basic/blinky` contains the Zephyr blinky example. From now on, the program to build and run will be called `$APP`
+4. Build the code with `west build -b swervolf_nexys`
+
+After building the code there will now be an executable .elf file in `build/zephyr/zephyr.elf` and a binary file in `build/zephyr/zephyr.bin`. The executable file can be loaded into SwerVolf with a debugger and the binary file can be further converted and loaded into RAM for simulations.
+
+To load the .elf file with a debugger, see [Loading programs with OpenOCD](#loading-programs-with-openocd)
+
+To use the .bin file in a simulator, it must first be converted into a suitable verilog hex file. From the directory where the application was built, run
+    `python3 $SWERVOLF_ROOT/sw/makehex.py build/zephyr/zephyr.bin > $WORKSPACE/$APP.hex` to create a hex file in the workspace directory. This can now be loaded into a simulator with
 
     fusesoc run --target=sim swervolf --ram_init_file=$APP.hex
 
-The SweRVolf demo application in `sw/swervolf_zephyr_demo` is also a Zephyr program and can be built in the same way
+The SweRVolf demo application in `$SWERVOLF_ROOT/sw/swervolf_zephyr_demo` is also a Zephyr program and can be built in the same way
 
 ## Debugging
 

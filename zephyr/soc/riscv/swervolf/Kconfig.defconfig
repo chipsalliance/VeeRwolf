@@ -3,8 +3,12 @@ if SOC_RISCV32_SWERVOLF
 config SOC
 	def_string "swervolf"
 
+#Not used but must be defined
 config SYS_CLOCK_HW_CYCLES_PER_SEC
 	def_int 50000000
+
+config TIMER_READS_ITS_FREQUENCY_AT_RUNTIME
+       def_bool y
 
 config RISCV_SOC_INTERRUPT_INIT
 	def_bool y

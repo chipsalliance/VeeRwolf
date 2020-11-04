@@ -55,5 +55,14 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 		};
+		gpio_led0: gpio@80001010 {
+			compatible = "swervolf,gpio";
+			reg = <0x80001010 0x10>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <32>;
+			label = "FPGA_LED0";
+		};
+
 	};
 };
