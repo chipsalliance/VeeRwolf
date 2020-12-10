@@ -37,7 +37,7 @@ module swervolf_core_tb
 `endif
   ;
 
-   localparam RAM_SIZE     = 32'h10000;
+   localparam RAM_SIZE     = 32'h100000;
 
 `ifndef VERILATOR
    reg 	 clk = 1'b0;
