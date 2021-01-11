@@ -85,6 +85,11 @@ targets:
           - -suppress 2583
       verilator:
         verilator_options : [--trace, -Wno-fatal]
+      xsim:
+        compilation_mode : common
+        #-d XSIM is required to disable formal properties in axi & common_cells
+        #For interactive wave debug, also add "-debug all" or "-debug typical"
+        xelab_options : [-d, XSIM]
     toplevel : swervolf_core_tb
 
   spi_tb:
