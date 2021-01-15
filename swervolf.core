@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : ::swervolf:0.7.2
+name : ::swervolf:0.7.3
 
 filesets:
   core:
