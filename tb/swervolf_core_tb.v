@@ -185,7 +185,6 @@ module swervolf_core_tb
       .tdo       (o_jtag_tdo),
       .tdoEnable (),
       // Processor Signals
-      .scan_mode      (1'b0),
       .core_rst_n     (!rst),
       .core_clk       (clk),
       .jtag_id        (31'd0),
