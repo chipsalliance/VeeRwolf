@@ -9,14 +9,16 @@ filesets:
       - rtl/axi2wb.v
       - rtl/wb_mem_wrapper.v
       - rtl/swervolf_syscon.v
-      - rtl/swerv_wrapper.sv
+      - "!cpu_el2? (rtl/swerv_wrapper.sv)"
+      - "cpu_el2?  (rtl/el2_swerv_wrapper.sv)"
       - rtl/swervolf_core.v
     file_type : systemVerilogSource
     depend :
       - fusesoc:utils:generators
       - uart16550
       - ">=pulp-platform.org::axi:0.23.0-r1"
-      - ">=chipsalliance.org:cores:SweRV_EH1:1.5"
+      - "!cpu_el2? (>=chipsalliance.org:cores:SweRV_EH1:1.5)"
+      - "cpu_el2?  (>=chipsalliance.org:cores:SweRV_EL2:1.3)"
       - simple_spi
       - wb_intercon
 
@@ -67,7 +69,7 @@ targets:
       - "tool_verilator? (verilator_tb)"
       - "tool_verilator? (verilator_waiver)"
 
-    generate : [intercon, swerv_default_config, version, wb_intercon]
+    generate : [intercon, "cpu_el2? (el2_default_config)", "!cpu_el2? (swerv_default_config)", version, wb_intercon]
     parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file=hello.vh, rom_init_file, signature, timeout, vcd]
     tools:
       rivierapro:
@@ -122,8 +124,8 @@ targets:
       - bootrom
       - core
       - nexys_a7_files
-    generate : [intercon, swerv_default_config, version, wb_intercon]
-    parameters : [bootrom_file]
+    generate : [intercon, "!cpu_el2? (swerv_default_config)", "cpu_el2? (swerv_el2_nexys_a7_config)", version, wb_intercon]
+    parameters : [bootrom_file, "cpu_el2? (cpu_type=EL2)"]
     tools:
       vivado: {part : xc7a100tcsg324-1}
     toplevel : swervolf_nexys_a7
@@ -173,6 +175,28 @@ generate:
     parameters:
       args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
 
+  el2_default_config:
+    generator: swerv_el2_config
+    position : first
+    parameters:
+      args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
+
+  swerv_el2_nexys_a7_config:
+    generator: swerv_el2_config
+    position : first
+    parameters:
+      args :
+        - -unset=assert_on
+        - -set=reset_vec=0x80000000
+        - -set=ret_stack_size=2
+        - -set=btb_size=32
+        - -set=bht_size=128
+        - -set=dccm_size=16
+        - -set=dccm_num_banks=2
+        - -set=iccm_enable=0
+        - -set=icache_enable=0
+        - -set=dccm_enable=0
+
   version:
     generator: gitversion
 
@@ -181,6 +205,11 @@ parameters:
     datatype    : bool
     description : Enable simulation character output
     paramtype   : vlogdefine
+
+  cpu_type:
+    datatype    : str
+    description : Controls whether to use SweRV EH1 or SweRV EL2. Implicitly set by the target
+    paramtype   : vlogparam
 
   mem_clear:
     datatype    : bool
