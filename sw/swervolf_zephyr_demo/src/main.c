@@ -38,6 +38,15 @@ void main(void)
   else
     printk("Warning! Memory test did not complete\n");
 
+  printk("CPU type: ");
+  uint32_t marchid;
+  __asm__ volatile ("csrr %0, marchid" : "=r" (marchid));
+  switch (marchid) {
+  case 11 : printk("EH1\n"); break;
+  case 16 : printk("EL2\n"); break;
+  default : printk("Unknown (marchid=%d)\n", marchid);
+  }
+
   //Exit simulation. No effect on hardware
   sys_write8(1, 0x80001009);
 
