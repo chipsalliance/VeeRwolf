@@ -157,6 +157,43 @@ UART and JTAG communication is tunneled through the microUSB port on the board a
 
 An SPI controller is connected to the on-board SPI Flash. This can be used for storing data such as program to be loaded into memory during boot. The [SPI uImage loader](#spi-uimage-loader) chapter goes into more detail on how to prepare, write and boot a program stored in SPI Flash
 
+## SweRVolf Basys 3
+
+SweRVolf Basys 3 is a version of the SweRVolf SoC created for the Digilent Basys 3 board. It uses 64kB on-chip memory for RAM, has GPIO connected to LEDs and switches, supports booting from SPI Flash and uses the microUSB port for UART and JTAG communication. The default bootloader for the SweRVolf Basys 3 target will attempt to load a program stored in SPI Flash by default.
+
+![](swervolf_basys3.png)
+
+*SwerVolf Basys 3 target*
+
+### I/O
+
+The active on-board I/O consists of LEDs, switches and the microUSB connector for UART, JTAG and power.
+
+#### LEDs
+
+16 LEDs are controlled by memory-mapped GPIO at address 0x80001010-0x80001011
+
+#### Switches
+
+16 Switches are mapped GPIO addresses at 0x80001012-0x80001013
+
+During boot up, the two topmost switches (sw14, sw15) control the boot mode.
+
+| sw15 | sw14 | Boot mode                  |
+| ---- | ---- | -------------------------- |
+|  off |  off | Boot from SPI Flash        |
+|  off |   on | Boot from serial           |
+|   on |  off | Boot from address 0 in RAM |
+|   on |   on | Undefined                  |
+
+#### micro USB
+
+UART and JTAG communication is tunneled through the microUSB port on the board and will appear as `/dev/ttyUSB0`, `/dev/ttyUSB1` or similar depending on OS configuration. A terminal emulator can be used to connect to the UART (e.g. by running `screen /dev/ttyUSB0 115200`) and OpenOCD can connect to the JTAG port to program the FPGA or connect the debug proxy. The [debugging](#debugging) chapter goes into more detail on how to connect a debugger.
+
+#### SPI Flash
+
+An SPI controller is connected to the on-board SPI Flash. This can be used for storing data such as program to be loaded into memory during boot. The [SPI uImage loader](#spi-uimage-loader) chapter goes into more detail on how to prepare, write and boot a program stored in SPI Flash
+
 # How to use
 
 ## Prerequisites

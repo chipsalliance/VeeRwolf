@@ -153,3 +153,4 @@ module axi_mem_wrapper
       .dout  (mem_rdata));
 
 endmodule
+`default_nettype wire
