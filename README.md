@@ -3,7 +3,7 @@ SweRVolf
 
 [![LibreCores](https://www.librecores.org/olofk/swervolf/badge.svg?style=flat)](https://www.librecores.org/olofk/swervolf)
 
-SweRVolf is a [FuseSoC](https://github.com/olofk/fusesoc)-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
+SweRVolf is a [FuseSoC](https://github.com/olofk/fusesoc)-based reference platform for the SweRV family of RISC-V cores. Currently, [SweRV EH1](https://github.com/chipsalliance/Cores-SweRV) and [SweRV EL2](https://github.com/chipsalliance/Cores-SweRV-EL2) are supported. See [CPU configuration](#cpu-configuration) to learn how to switch between them.
 
 This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), [Zephyr OS](https://www.zephyrproject.org), [TockOS](https://github.com/tock/tock/tree/master/boards/swervolf) or other software in simulators or on FPGA boards. Focus is on portability, extendability and ease of use; to allow SweRV users to quickly get software running, modify the SoC to their needs or port it to new target devices.
 
@@ -441,3 +441,7 @@ The final step is to prepare the bootloader for SweRVolf which will be responsib
 ### Serial boot
 
 In serial boot mode, the UART waits for a program in Intel Hex format to be sent to the UART. Upon completion, the program will be launched.
+
+## CPU configuration
+
+SweRVolf currently supports the SweRV EH1 and EL2 cores. For all targets SweRV EH1 is used by default unless there are hardware limitations (e.g. FPGA size) that only allows using SweRV EL2. All targets can optionally use SweRV EL2 by passing  `--flag=cpu_el2` as a run option to FuseSoC, e.g. `fusesoc run --target=sim --flag=cpu_el2 swervolf` will run the default simulation example using SweRV EL2. Also note that the max frequency of the processors can differ. E.g. on the Nexys A7 board SweRV EH1 will run at 50MHz while SweRV EL2 runs at 25MHz. The `clk_freq_hz` register in the system controller will always show the correct value. The bootloader and Zephyr board support is also set up to automatically adapt timer and UART speeds to the runtime-detected clock speed.
