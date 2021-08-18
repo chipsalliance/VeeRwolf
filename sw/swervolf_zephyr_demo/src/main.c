@@ -47,6 +47,8 @@ void main(void)
   default : printk("Unknown (marchid=%d)\n", marchid);
   }
 
+  printk("Clock frequency: %d MHz\n", sys_read32(0x8000103c)/1000000);
+
   //Exit simulation. No effect on hardware
   sys_write8(1, 0x80001009);
 
