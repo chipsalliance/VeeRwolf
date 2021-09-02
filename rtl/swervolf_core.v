@@ -150,7 +150,7 @@ module swervolf_core
 
    axi2wb
      #(.AW (16),
-       .IW (`RV_LSU_BUS_TAG+2))
+       .IW (`RV_LSU_BUS_TAG+3))
    axi2wb
      (
       .i_clk       (clk),
