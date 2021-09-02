@@ -57,7 +57,8 @@ The system controller contains common system functionality such as keeping regis
 | 0x0A     | init_status | Bit 0 = RAM initialization complete. Bit 1 = RAM initialization reported errors
 | 0x0B     | sw_irq                | Software-controlled external interrupts
 | 0x0C-0x0F | nmi_vec | Interrupt vector for NMI |
-| 0x10-0x17 | gpio | 64 readable and writable GPIO bits |
+| 0x10-0x13 | gpio0 | 32 readable and writable GPIO bits |
+| 0x18-0x1B | gpio1 | 32 readable and writable GPIO bits |
 | 0x20-0x27 | mtime | mtime from RISC-V privilege spec |
 | 0x28-0x2f | mtimecmp |mtimecmp from RISC-V privilege spec |
 | 0x30-0x33 | irq_timer_cnt | IRQ timer counter |

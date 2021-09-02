@@ -174,7 +174,7 @@ module swervolf_syscon
 	     if (i_wb_sel[2]) o_gpio[23:16] <= i_wb_dat[23:16];
 	     if (i_wb_sel[3]) o_gpio[31:24] <= i_wb_dat[31:24];
 	  end
-	  5: begin //0x14-0x17
+	  6: begin //0x14-0x17
 	     if (i_wb_sel[0]) o_gpio[39:32] <= i_wb_dat[7:0];
 	     if (i_wb_sel[1]) o_gpio[47:40] <= i_wb_dat[15:8];
 	     if (i_wb_sel[2]) o_gpio[55:48] <= i_wb_dat[23:16];
@@ -224,8 +224,8 @@ module swervolf_syscon
 	3 : o_wb_rdt <= o_nmi_vec;
 	//0x10-0x13
 	4 : o_wb_rdt <= i_gpio[31:0];
-	//0x14-0x17
-	5 : o_wb_rdt <= i_gpio[63:32];
+	//0x18-0x1B
+	6 : o_wb_rdt <= i_gpio[63:32];
 	//0x20-0x23
 	8 : o_wb_rdt <= mtime[31:0];
 	//0x24-0x27
