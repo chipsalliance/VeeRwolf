@@ -1,6 +1,7 @@
 CAPI=2:
 
 name : chipsalliance.org:cores:SweRV_EH1:1.8
+description : SweRV EH1 RISC-V Core
 
 filesets:
   rtl:

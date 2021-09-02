@@ -1,24 +1,29 @@
 CAPI=2:
 
 name : ::swervolf:0.7.3
+description : Reference SoC for the SweRV family of cores
 
 filesets:
+  eh1:
+    files: [rtl/swerv_wrapper.sv : {file_type : systemVerilogSource}]
+    depend: ["=chipsalliance.org:cores:SweRV_EH1:1.8"]
+
+  el2:
+    files: [rtl/el2_swerv_wrapper.sv : {file_type : systemVerilogSource}]
+    depend: ["=chipsalliance.org:cores:SweRV_EL2:1.3"]
+
   core:
     files:
       - rtl/dpram64.v
       - rtl/axi2wb.v
       - rtl/wb_mem_wrapper.v
       - rtl/swervolf_syscon.v
-      - "!cpu_el2? (rtl/swerv_wrapper.sv)"
-      - "cpu_el2?  (rtl/el2_swerv_wrapper.sv)"
       - rtl/swervolf_core.v
     file_type : systemVerilogSource
     depend :
       - fusesoc:utils:generators
       - uart16550
       - ">=pulp-platform.org::axi:0.23.0-r1"
-      - "!cpu_el2? (>=chipsalliance.org:cores:SweRV_EH1:1.5)"
-      - "cpu_el2?  (=chipsalliance.org:cores:SweRV_EL2:1.3)"
       - simple_spi
       - wb_intercon
 
@@ -61,7 +66,10 @@ filesets:
 targets:
   sim:
     default_tool : verilator
+    description : Default simulation target
     filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
       - core
       - "!tool_verilator? (bfm)"
       - tb
@@ -96,6 +104,7 @@ targets:
 
   spi_tb:
     default_tool : modelsim
+    description : Simulation target with real SPI Flash model
     filesets :
       - bootrom
       - core
@@ -120,7 +129,10 @@ targets:
 
   nexys_a7:
     default_tool : vivado
+    description : FPGA image with SweRV EH1 or EL2 for the Digilent Nexys A7 FPGA board
     filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
       - bootrom
       - core
       - nexys_a7_files
