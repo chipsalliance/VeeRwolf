@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : ::swervolf:0.7.3
+name : ::swervolf:0.7.4
 description : Reference SoC for the SweRV family of cores
 
 filesets:
