@@ -143,8 +143,8 @@ During boot up, the two topmost switches (sw14, sw15) control the boot mode.
 | sw15 | sw14 | Boot mode                  |
 | ---- | ---- | -------------------------- |
 |  off |  off | Boot from SPI Flash        |
-|  off |   on | Boot from address 0 in RAM |
-|   on |  off | Boot from serial           |
+|  off |   on | Boot from serial           |
+|   on |  off | Boot from address 0 in RAM |
 |   on |   on | Undefined                  |
 
 *Note: Switch 0 has a dual purpose and selects whether to output serial communication from the SoC (0=off) or from the embedded self-test program in the DDR2 controller (1=on).*
