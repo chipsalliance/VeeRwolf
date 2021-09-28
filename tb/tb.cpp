@@ -29,6 +29,8 @@
 #include "verilated_vcd_c.h"
 #include "Vswervolf_core_tb.h"
 
+#include "vidbo.h"
+
 using namespace std;
 
 static bool done;
@@ -132,10 +134,31 @@ int main(int argc, char **argv, char **env)
   if (arg_timeout[0])
     timeout = atoi(arg_timeout+9);
 
+  vidbo_context_t vidbo_context;
+  bool vidbo = false;
+  int *input_vals = NULL;
+  int num_inputs = 0;
+  const char *arg_vidbo = Verilated::commandArgsPlusMatch("vidbo=");
+  if (true /*arg_vidbo[0]*/) {
+    vidbo = true;
+    /* TODO: set address/port from argument? */
+    vidbo_init(&vidbo_context, 8081);
+    const char * const inputs[] =
+      {"gpio.SW0" ,"gpio.SW1" ,"gpio.SW2" ,"gpio.SW3",
+       "gpio.SW4" ,"gpio.SW5" ,"gpio.SW6" ,"gpio.SW7",
+       "gpio.SW8" ,"gpio.SW9" ,"gpio.SW10","gpio.SW11",
+       "gpio.SW12","gpio.SW13","gpio.SW14","gpio.SW15"};
+
+    num_inputs = sizeof(inputs) / sizeof(inputs[0]);
+    input_vals = (int *)calloc(num_inputs, sizeof(int));
+    vidbo_register_inputs(inputs, num_inputs);
+  }
+
   signal(SIGINT, INThandler);
 
   top->clk = 1;
   top->rst = 1;
+  unsigned int last_o_gpio = 0;
   while (!(done || Verilated::gotFinish())) {
     if (main_time == 100) {
       printf("Releasing reset\n");
@@ -147,8 +170,12 @@ int main(int argc, char **argv, char **env)
     top->eval();
     if (tfp)
       tfp->dump(main_time);
-    if (baud_rate && do_uart(&uart_context, top->o_uart_tx))
-      putchar(uart_context.ch);
+    if (baud_rate && do_uart(&uart_context, top->o_uart_tx)) {
+      if (vidbo)
+	vidbo_send(&vidbo_context, main_time, "serial", "uart", uart_context.ch);
+      else
+	putchar(uart_context.ch);
+    }
     if (jtag && (main_time > 300)) {
       int ret = jtag->doJTAG(main_time/20, //doJtag requires t to only increment by one
 		   &top->i_jtag_tms,
@@ -166,14 +193,28 @@ int main(int argc, char **argv, char **env)
         }
       }
     }
-    if (gpio0 != (top->o_gpio & 0x1)) {
-      gpio0 = top->o_gpio & 0x1;
-      printf("%lu: gpio0 is %s\n", main_time, gpio0 ? "on" : "off");
+    if (last_o_gpio != top->o_gpio) {
+      last_o_gpio = top->o_gpio;
+      if (vidbo) {
+	char item[5] = {0}; //Space for LD??\0
+	for (int i=0 ; i<16 ; i++) {
+	  snprintf(item, 5, "LD%d", i);
+	  vidbo_send(&vidbo_context, main_time, "gpio", item, (top->o_gpio>>i) & 0x1);
+	}
+      }
+      else
+	printf("%lu: o_gpio is %08x\n", main_time, last_o_gpio);
     }
     if (timeout && (main_time >= timeout)) {
       printf("Timeout: Exiting at time %lu\n", main_time);
       done = true;
     }
+    if (vidbo && !(main_time % 10000))
+      if (vidbo_recv(&vidbo_context, input_vals)) {
+	top->i_gpio = 0;
+	for (int i=0 ; i<num_inputs ; i++)
+	  top->i_gpio |= ((!!input_vals[i]) << (i+16));
+      }
     top->clk = !top->clk;
     main_time+=10;
   }
