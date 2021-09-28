@@ -164,9 +164,9 @@ int main(int argc, char **argv, char **env)
         }
       }
     }
-    if (gpio0 != top->o_gpio) {
-      printf("%lu: gpio0 is %s\n", main_time, top->o_gpio ? "on" : "off");
-      gpio0 = top->o_gpio;
+    if (gpio0 != (top->o_gpio & 0x1)) {
+      gpio0 = top->o_gpio & 0x1;
+      printf("%lu: gpio0 is %s\n", main_time, gpio0 ? "on" : "off");
     }
     if (timeout && (main_time >= timeout)) {
       printf("Timeout: Exiting at time %lu\n", main_time);

@@ -26,14 +26,15 @@ module swervolf_core_tb
   #(parameter bootrom_file  = "")
 `ifdef VERILATOR
   (input wire clk,
-   input wire  rst,
-   input wire  i_jtag_tck,
-   input wire  i_jtag_tms,
-   input wire  i_jtag_tdi,
-   input wire  i_jtag_trst_n,
-   output wire o_jtag_tdo,
-   output wire o_uart_tx,
-   output wire o_gpio)
+   input wire 	      rst,
+   input wire 	      i_jtag_tck,
+   input wire 	      i_jtag_tms,
+   input wire 	      i_jtag_tdi,
+   input wire 	      i_jtag_trst_n,
+   output wire 	      o_jtag_tdo,
+   output wire 	      o_uart_tx,
+   input wire [31:0]  i_gpio,
+   output wire [15:0] o_gpio)
 `endif
   ;
 
@@ -44,7 +45,8 @@ module swervolf_core_tb
    reg 	 rst = 1'b1;
    always #10 clk <= !clk;
    initial #100 rst <= 1'b0;
-   wire  o_gpio;
+   wire [31:0] i_gpio;
+   wire [15:0] o_gpio;
    wire i_jtag_tck = 1'b0;
    wire i_jtag_tms = 1'b0;
    wire i_jtag_tdi = 1'b0;
@@ -87,7 +89,7 @@ module swervolf_core_tb
    end
 
    wire [63:0] gpio_out;
-   assign o_gpio = gpio_out[0];
+   assign o_gpio = gpio_out[15:0];
 
    wire [5:0]  ram_awid;
    wire [31:0] ram_awaddr;
@@ -254,7 +256,7 @@ module swervolf_core_tb
       .o_ram_rready        (ram_rready),
       .i_ram_init_done     (1'b1),
       .i_ram_init_error    (1'b0),
-      .i_gpio              (64'd0),
+      .i_gpio              ({32'd0, i_gpio}),
       .o_gpio              (gpio_out));
 
 endmodule
