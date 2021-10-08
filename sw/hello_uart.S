@@ -79,6 +79,7 @@ put_byte:
 
 	sb	t0, 0(a0)
 	ret
-str:
+
 	.section .data
+str:
 	.string "SweRV+FuseSoC rocks\n"
