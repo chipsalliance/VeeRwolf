@@ -267,8 +267,10 @@ Another example to run is the Zephyr philosophers demo.
 
 ### Run RISC-V compliance tests
 
+**Note:** The following instructions are valid for version 1.0 of the RISC-V compliance tests. The target-specific support for SweRVolf has not yet been ported to newer versions.
+
 1. Build the simulation model, if that hasn't already been done, with `fusesoc run --target=sim --setup --build swervolf`
-2. Download the RISC-V compliance tests to the workspace with `git clone https://github.com/riscv/riscv-compliance`. Your directory structure should now look like this:
+2. Download the RISC-V compliance tests to the workspace with `git clone https://github.com/riscv/riscv-compliance --branch 1.0`. Your directory structure should now look like this:
 
         $WORKSPACE
         ├──build
