@@ -46,6 +46,7 @@ module swervolf_arty_a7
     input wire 	       i_uart_rx,
     output wire        o_uart_tx,
     input wire  [3:0]  i_sw,
+    input wire  [3:0]  i_btn,
     output reg [15:0]  o_led);
 
    wire [63:0] 	       gpio_out;
@@ -53,6 +54,7 @@ module swervolf_arty_a7
 
    reg [3:0] 	       sw_r;
    reg [15:0] 	       sw_2r;
+   reg [3:0] 	       btn_r;
 
    wire 	       cpu_tx,litedram_tx;
 
@@ -261,7 +263,9 @@ module swervolf_arty_a7
       o_led <= led_int_r;
       led_int_r <= gpio_out[15:0];
       sw_r <= i_sw;
+      btn_r <= i_btn;
       sw_2r[3:0] <= sw_r;
+      sw_2r[7:4] <= btn_r;
    end
 
    assign o_uart_tx = sw_2r[0] ? litedram_tx : cpu_tx;
