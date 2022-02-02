@@ -59,6 +59,15 @@ filesets:
       - rtl/swervolf_nexys.v    : {file_type : systemVerilogSource}
     depend : [":swervolf:litedram"]
 
+  arty_a7_files:
+    files :
+      - data/vivado_waiver.tcl : {file_type : tclSource}
+      - data/swervolf_arty.xdc : {file_type : xdc}
+      - rtl/clk_gen_arty.v : {file_type : verilogSource}
+      - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
+      - rtl/swervolf_arty.v    : {file_type : systemVerilogSource}
+    depend : [":swervolf:litedram"]
+
   basys3_files:
     files :
       - data/vivado_waiver.tcl : {file_type : tclSource}
@@ -166,6 +175,20 @@ targets:
       vivado: {part : xc7a100tcsg324-1}
     toplevel : swervolf_nexys_a7
 
+  arty_a7:
+    default_tool : vivado
+    description : FPGA image with SweRV EL2 for the Digilent Arty A7 FPGA board
+    filesets :
+      - bootrom
+      - el2
+      - core
+      - arty_a7_files
+    generate : [intercon, swerv_el2_arty_a7_config, version, wb_intercon]
+    parameters : [bootrom_file]
+    tools:
+      vivado: {part : xc7a35tcsg324-1}
+    toplevel : swervolf_arty_a7
+
 generate:
   wb_intercon:
     generator: wb_intercon_gen
@@ -232,6 +255,28 @@ generate:
         - -set=iccm_enable=0
         - -set=icache_enable=0
         - -set=dccm_enable=0
+
+  swerv_el2_arty_a7_config:
+    generator: swerv_el2_config
+    position : first
+    parameters:
+      args :
+        - -unset=assert_on
+        - -set=reset_vec=0x80000000
+        - -set=ret_stack_size=2
+        - -set=btb_enable=0
+        - -set=btb_size=8
+        - -set=bht_size=32
+        - -set=dccm_size=16
+        - -set=dccm_num_banks=2
+        - -set=iccm_enable=0
+        - -set=icache_enable=0
+        - -set=dccm_enable=0
+        - -set=dma_buf_depth=2
+        - -set=div_bit=1
+        - -set=pic_total_int=2
+
+# - -target=default_ahb
 
   version:
     generator: gitversion
