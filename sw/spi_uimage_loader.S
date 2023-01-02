@@ -73,18 +73,15 @@ spi_boot:
 spi_init:
 	/* Clear slave selects */
 	sb	zero, SPI_SPSS(gp)
-	fence
 
 	/* Set clock divider to 4 (arbitrarily chosen value)
 	and enable controller */
 	addi	t1, zero, 0x40 | 0x01
 	sb	t1, SPI_SPCR(gp)
-	fence
 
 	/* Set appropriate slave select */
 	addi	t1, zero, 1
 	sb	t1, SPI_SPSS(gp)
-	fence
 
 	/* Set command to READ at BOOTROM_ADDR */
 	li	a0, ((BOOTROM_ADDR & 0xFF) <<24) | ((BOOTROM_ADDR & 0xFF00) << 8) | ((BOOTROM_ADDR & 0xFF0000) >> 8) | 0x3
@@ -144,7 +141,6 @@ copy_to_ram:
 
 	/* Write word to RAM */
 	sw	a1, 0(t1)
-	fence
 
 	/* Increase counter */
 	addi	s4, s4, 4
@@ -181,12 +177,10 @@ spi_xfer:
 spi_xfer_loop:
 	/* Send data in a0[7:0] */
 	sb	a0, SPI_SPDR(gp)
-	fence
 
 spi_xfer_poll:
 	/* Wait for data in RX FIFO */
 	lbu	t1, SPI_SPSR(gp)
-	fence
 	andi	t1, t1, SPI_SPSR_RX_CHECK
 	bnez	t1, spi_xfer_poll
 
