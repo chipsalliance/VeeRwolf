@@ -45,6 +45,7 @@ filesets:
 
   spi_tb:
     files:
+      - rtl/axi_ram.v : {file_type : verilogSource}
       - tb/s25fl128s.v
       - tb/swervolf_spi_tb.v
       - sw/hello.ubvh : {file_type : user, copyto : hello.ubvh}
@@ -121,6 +122,7 @@ targets:
         vlog_options :
           - -mfcu
           - -cuautoname=du
+          - src/pulp-platform.org__axi_0.25.0/include/axi/typedef.svh #Shady temporary workaround
           - config/common_defines.vh
           - -timescale 1ns/1ns
           - -svinputport=compat
@@ -138,12 +140,14 @@ targets:
     default_tool : modelsim
     description : Simulation target with real SPI Flash model
     filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
       - bootrom
       - core
       - bfm
       - spi_tb
 
-    generate : [intercon, swerv_default_config, wb_intercon]
+    generate : [intercon, swerv_default_config, version, wb_intercon]
     parameters : [SIMPRINT=true, ram_init_file, rom_init_file, flash_init_file, mem_clear=true, timeout, vcd]
     tools:
       rivierapro:
@@ -155,6 +159,7 @@ targets:
         vlog_options :
           - -mfcu
           - -cuautoname=du
+          - src/pulp-platform.org__axi_0.25.0/include/axi/typedef.svh #Shady temporary workaround
           - config/common_defines.vh
           - -timescale 1ns/1ns
     toplevel : swervolf_spi_tb
