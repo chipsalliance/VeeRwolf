@@ -24,6 +24,7 @@
 `default_nettype none
 module swervolf_core
   #(parameter bootrom_file  = "",
+    parameter [0:0] insn_trace = 1'b0,
     parameter clk_freq_hz = 0)
    (input wire 	clk,
     input wire 	       rstn,
@@ -337,6 +338,22 @@ module swervolf_core
       .ri_pad_i  (1'b0),
       .dcd_pad_i (1'b0));
 
+   wire [2:0]		       valid_ip;
+   wire [63:0]		       address_ip;
+   generate
+      if (insn_trace) begin
+
+	 integer		       tf;
+
+	 initial tf = $fopen("trace.bin", "wb");
+
+	 always @(posedge clk) begin
+	    if (valid_ip[0]) $fwrite(tf, "%u", address_ip[31:0]);
+	    if (valid_ip[1]) $fwrite(tf, "%u", address_ip[63:32]);
+	 end
+      end
+   endgenerate
+
    swerv_wrapper_dmi rvtop
      (
       .clk     (clk),
@@ -347,8 +364,8 @@ module swervolf_core
       .nmi_vec (nmi_vec[31:1]),
 
       .trace_rv_i_insn_ip      (),
-      .trace_rv_i_address_ip   (),
-      .trace_rv_i_valid_ip     (),
+      .trace_rv_i_address_ip   (address_ip),
+      .trace_rv_i_valid_ip     (valid_ip),
       .trace_rv_i_exception_ip (),
       .trace_rv_i_ecause_ip    (),
       .trace_rv_i_interrupt_ip (),
