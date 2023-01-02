@@ -65,7 +65,7 @@ module swervolf_core_tb
 	$display("JTAG VPI enabled. Not loading RAM");
       else if ($value$plusargs("ram_init_file=%s", ram_init_file)) begin
 	 $display("Loading RAM contents from %0s", ram_init_file);
-	 $readmemh(ram_init_file, ram.ram.mem);
+	 $readmemh(ram_init_file, ram.mem);
       end
    end
 
@@ -138,46 +138,52 @@ module swervolf_core_tb
    wire [31:0] dmi_reg_rdata;
    wire        dmi_hard_reset;
    
-   axi_mem_wrapper
-     #(.ID_WIDTH  (`RV_LSU_BUS_TAG+2),
-       .MEM_SIZE  (RAM_SIZE),
-       .INIT_FILE (""))
+   axi_ram
+     #(.DATA_WIDTH (64),
+       .ADDR_WIDTH ($clog2(RAM_SIZE)),
+       .ID_WIDTH  (`RV_LSU_BUS_TAG+2))
    ram
      (.clk       (clk),
-      .rst_n     (!rst),
-      .i_awid    (ram_awid),
-      .i_awaddr  (ram_awaddr),
-      .i_awlen   (ram_awlen),
-      .i_awsize  (ram_awsize),
-      .i_awburst (ram_awburst),
-      .i_awvalid (ram_awvalid),
-      .o_awready (ram_awready),
+      .rst       (rst),
+      .s_axi_awid    (ram_awid),
+      .s_axi_awaddr  (ram_awaddr[$clog2(RAM_SIZE)-1:0]),
+      .s_axi_awlen   (ram_awlen),
+      .s_axi_awsize  (ram_awsize),
+      .s_axi_awburst (ram_awburst),
+      .s_axi_awlock  (1'd0),
+      .s_axi_awcache (4'd0),
+      .s_axi_awprot  (3'd0),
+      .s_axi_awvalid (ram_awvalid),
+      .s_axi_awready (ram_awready),
 
-      .i_arid    (ram_arid),
-      .i_araddr  (ram_araddr),
-      .i_arlen   (ram_arlen),
-      .i_arsize  (ram_arsize),
-      .i_arburst (ram_arburst),
-      .i_arvalid (ram_arvalid),
-      .o_arready (ram_arready),
+      .s_axi_arid    (ram_arid),
+      .s_axi_araddr  (ram_araddr[$clog2(RAM_SIZE)-1:0]),
+      .s_axi_arlen   (ram_arlen),
+      .s_axi_arsize  (ram_arsize),
+      .s_axi_arburst (ram_arburst),
+      .s_axi_arlock  (1'd0),
+      .s_axi_arcache (4'd0),
+      .s_axi_arprot  (3'd0),
+      .s_axi_arvalid (ram_arvalid),
+      .s_axi_arready (ram_arready),
 
-      .i_wdata  (ram_wdata),
-      .i_wstrb  (ram_wstrb),
-      .i_wlast  (ram_wlast),
-      .i_wvalid (ram_wvalid),
-      .o_wready (ram_wready),
+      .s_axi_wdata  (ram_wdata),
+      .s_axi_wstrb  (ram_wstrb),
+      .s_axi_wlast  (ram_wlast),
+      .s_axi_wvalid (ram_wvalid),
+      .s_axi_wready (ram_wready),
 
-      .o_bid    (ram_bid),
-      .o_bresp  (ram_bresp),
-      .o_bvalid (ram_bvalid),
-      .i_bready (ram_bready),
+      .s_axi_bid    (ram_bid),
+      .s_axi_bresp  (ram_bresp),
+      .s_axi_bvalid (ram_bvalid),
+      .s_axi_bready (ram_bready),
 
-      .o_rid    (ram_rid),
-      .o_rdata  (ram_rdata),
-      .o_rresp  (ram_rresp),
-      .o_rlast  (ram_rlast),
-      .o_rvalid (ram_rvalid),
-      .i_rready (ram_rready));
+      .s_axi_rid    (ram_rid),
+      .s_axi_rdata  (ram_rdata),
+      .s_axi_rresp  (ram_rresp),
+      .s_axi_rlast  (ram_rlast),
+      .s_axi_rvalid (ram_rvalid),
+      .s_axi_rready (ram_rready));
 
    dmi_wrapper dmi_wrapper
      (.trst_n    (i_jtag_trst_n),

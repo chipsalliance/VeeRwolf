@@ -22,19 +22,6 @@ lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux
 lint_off -rule CMPCONST -file "*/pulp-platform.org__common_cells_*/src/deprecated/fifo_v2.sv" -lines 48
 lint_off -rule WIDTH -file "*/pulp-platform.org__common_cells_1.16.4/src/rr_arb_tree.sv" -lines 195
 
-//pulp-platform.org::axi_mem_if:0.2.0
-lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 119-120
-lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 188
-lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 230
-lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 62
-lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 64
-lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 66-69
-lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 84
-lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 86
-lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 115-116
-lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 196
-lint_off -rule WIDTH          -file "*/pulp-platform.org__axi_mem_if_0.2.0/src/axi2mem.sv" -lines 239
-
 //::simple_spi:1.6-r1
 lint_off -rule CASEINCOMPLETE -file "*/simple_spi_1.6/rtl/verilog/simple_spi_top.v" -lines 244
 
