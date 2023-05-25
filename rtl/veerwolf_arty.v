@@ -16,13 +16,13 @@
 //********************************************************************************
 // $Id$
 //
-// Function: SweRVolf toplevel for Arty A7 board
+// Function: VeeRwolf toplevel for Arty A7 board
 // Comments:
 //
 //********************************************************************************
 
 `default_nettype none
-module swervolf_arty_a7
+module veerwolf_arty_a7
   #(parameter bootrom_file = "bootloader.vh")
    (input wire 	       clk,
     input wire 	       rstn,
@@ -197,10 +197,10 @@ module swervolf_arty_a7
       .dmi_stat       (2'd0),
       .version        (4'd1));
 
-   swervolf_core
+   veerwolf_core
      #(.bootrom_file (bootrom_file),
        .clk_freq_hz  (32'd25_000_000))
-   swervolf
+   veerwolf
      (.clk  (clk_core),
       .rstn (~rst_core),
       .dmi_reg_rdata  (dmi_reg_rdata),

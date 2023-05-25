@@ -16,13 +16,13 @@
 //********************************************************************************
 // $Id$
 //
-// Function: SweRVolf toplevel for Nexys A7 board
+// Function: VeeRwolf toplevel for Nexys A7 board
 // Comments:
 //
 //********************************************************************************
 
 `default_nettype none
-module swervolf_basys3
+module veerwolf_basys3
   #(parameter bootrom_file = "bootloader.vh")
    (input wire 	       clk,
     output wire        o_flash_cs_n,
@@ -178,10 +178,10 @@ module swervolf_basys3
       .dmi_stat       (2'd0),
       .version        (4'd1));
 
-   swervolf_core
+   veerwolf_core
      #(.bootrom_file (bootrom_file),
        .clk_freq_hz  (32'd25_000_000))
-   swervolf
+   veerwolf
      (.clk  (clk_core),
       .rstn (~rst_core),
       .dmi_reg_rdata       (dmi_reg_rdata),

@@ -16,13 +16,13 @@
 //********************************************************************************
 // $Id$
 //
-// Function: SweRVolf tech-agnostic toplevel
+// Function: VeeRwolf tech-agnostic toplevel
 // Comments:
 //
 //********************************************************************************
 
 `default_nettype none
-module swervolf_core
+module veerwolf_core
   #(parameter bootrom_file  = "",
     parameter [0:0] insn_trace = 1'b0,
     parameter clk_freq_hz = 0)
@@ -211,7 +211,7 @@ module swervolf_core
    assign wb_s2m_rom_err = 1'b0;
    assign wb_s2m_rom_rty = 1'b0;
 
-   swervolf_syscon
+   veerwolf_syscon
      #(.clk_freq_hz (clk_freq_hz))
    syscon
      (.i_clk            (clk),

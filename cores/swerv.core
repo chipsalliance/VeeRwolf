@@ -1,7 +1,7 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:SweRV_EH1:1.8
-description : SweRV EH1 RISC-V Core
+name : chipsalliance.org:cores:VeeR_EH1:1.8
+description : VeeR EH1 RISC-V Core
 
 filesets:
   rtl:
@@ -145,10 +145,10 @@ generators:
   swerv_config:
     interpreter: python3
     command: configs/swerv_config_gen.py
-    description : Create a SweRV configuration. Note! Only supports the default config
+    description : Create a VeeR configuration. Note! Only supports the default config
 
 provider:
   name    : github
   user    : chipsalliance
-  repo    : Cores-SweRV
+  repo    : Cores-VeeR-EH1
   version : 7332edc0adaa7e9a0c842d169154429e8d987786

@@ -1,7 +1,7 @@
-addrmap swervolf {
-  name = "SweRVolf core";
+addrmap veerwolf {
+  name = "VeeRwolf core";
   desc = "
-The core of SweRVolf consists of the SweRV CPU with a boot ROM, AXI4 interconnect, UART, SPI, RISC-V timer and GPIO. The core doesn't include any RAM but instead exposes a memory bus that the target-specific wrapper will connect to an appropriate memory controller. Other external connections are clock, reset, UART, GPIO, SPI and DMI (Debug Module Interface).";
+The core of VeeRwolf consists of the VeeR CPU with a boot ROM, AXI4 interconnect, UART, SPI, RISC-V timer and GPIO. The core doesn't include any RAM but instead exposes a memory bus that the target-specific wrapper will connect to an appropriate memory controller. Other external connections are clock, reset, UART, GPIO, SPI and DMI (Debug Module Interface).";
   /*  mem ram {
     mementries = 0x08ffffff;
     memwidth = 8;
@@ -44,11 +44,11 @@ The core of SweRVolf consists of the SweRV CPU with a boot ROM, AXI4 interconnec
     } init_status;
     reg {
       name="Software-controlled external interrupts";
-      desc="This register allows configuration and assertion of IRQ line 3 and 4, for testing the SweRV PIC or having two extra software-controllable interrupt sources. Interrupts can be triggered by writing to the sw_irq*n* bits when the timer bit is set to 0, or by a timeout of the irq_timer, when the timer bit is set to one. If both sw_irq3_timer and sw_irq4_timer are set to 0, the IRQ timer instead asserts an NMI when it reaches 0.
+      desc="This register allows configuration and assertion of IRQ line 3 and 4, for testing the VeeR PIC or having two extra software-controllable interrupt sources. Interrupts can be triggered by writing to the sw_irq*n* bits when the timer bit is set to 0, or by a timeout of the irq_timer, when the timer bit is set to one. If both sw_irq3_timer and sw_irq4_timer are set to 0, the IRQ timer instead asserts an NMI when it reaches 0.
 
 If sw_irq3_timer or sw_irq4_timer are asserted, the interrupt trigger is connected to
 
-![SweRVolf IRQ](swervolf_irq.png)
+![VeeRwolf IRQ](veerwolf_irq.png)
 ";      
       regwidth=8;      
       field {

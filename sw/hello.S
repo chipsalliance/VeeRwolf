@@ -1,5 +1,5 @@
 /*
-* Hello world for SweRVolf
+* Hello world for VeeRwolf
 *
 * Prints a fancy string and exits afterwards
 *
@@ -35,4 +35,4 @@ next:
 	sb zero, 0(a1)
 str:
 	.section .data
-	.string "SweRV+FuseSoC rocks\n"
+	.string "VeeR+FuseSoC rocks\n"

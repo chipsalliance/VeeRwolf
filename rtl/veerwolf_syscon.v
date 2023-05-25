@@ -16,12 +16,12 @@
 //********************************************************************************
 // $Id$
 //
-// Function: SweRVolf SoC-level controller
+// Function: VeeRwolf SoC-level controller
 // Comments:
 //
 //********************************************************************************
 
-module swervolf_syscon
+module veerwolf_syscon
   #(parameter [31:0] clk_freq_hz = 0)
   (input wire i_clk,
    input wire 	     i_rst,

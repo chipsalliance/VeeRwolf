@@ -156,7 +156,7 @@ putchar:
 	ret
 
 boot_msg:
-	.string "Booting SweRVolf...\r\n"
+	.string "Booting VeeRwolf...\r\n"
 ram_ok:
 	.string "RAM OK\r\n"
 spi_boot_str:

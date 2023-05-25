@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : :swervolf:litedram:0
+name : :veerwolf:litedram:0
 
 filesets:
   common:
