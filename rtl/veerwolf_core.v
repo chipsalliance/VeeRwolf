@@ -354,7 +354,7 @@ module veerwolf_core
       end
    endgenerate
 
-   swerv_wrapper_dmi rvtop
+   veer_wrapper_dmi rvtop
      (
       .clk     (clk),
       .rst_l   (rstn),

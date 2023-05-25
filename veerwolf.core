@@ -5,11 +5,11 @@ description : Reference SoC for the VeeR family of cores
 
 filesets:
   eh1:
-    files: [rtl/swerv_wrapper.sv : {file_type : systemVerilogSource}]
+    files: [rtl/veer_eh1_wrapper.sv : {file_type : systemVerilogSource}]
     depend: ["=chipsalliance.org:cores:VeeR_EH1:1.8"]
 
   el2:
-    files: [rtl/el2_swerv_wrapper.sv : {file_type : systemVerilogSource}]
+    files: [rtl/veer_el2_wrapper.sv : {file_type : systemVerilogSource}]
     depend: ["=chipsalliance.org:cores:VeeR_EL2:1.3"]
 
   core:
@@ -91,7 +91,7 @@ targets:
       - el2
       - core
       - basys3_files
-    generate : [intercon, swerv_el2_nexys_a7_config, version, wb_intercon]
+    generate : [intercon, veer_el2_nexys_a7_config, version, wb_intercon]
     parameters : [bootrom_file]
     tools:
       vivado: {part : xc7a35tcpg236-1}
@@ -110,7 +110,7 @@ targets:
       - "tool_verilator? (verilator_tb)"
       - "tool_verilator? (verilator_waiver)"
 
-    generate : [intercon, "cpu_el2? (el2_default_config)", "!cpu_el2? (swerv_default_config)", version, wb_intercon]
+    generate : [intercon, "cpu_el2? (el2_default_config)", "!cpu_el2? (veer_eh1_default_config)", version, wb_intercon]
     parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file=hello.vh, rom_init_file, signature, timeout, vcd]
     tools:
       rivierapro:
@@ -147,7 +147,7 @@ targets:
       - bfm
       - spi_tb
 
-    generate : [intercon, swerv_default_config, version, wb_intercon]
+    generate : [intercon, veer_eh1_default_config, version, wb_intercon]
     parameters : [SIMPRINT=true, ram_init_file, rom_init_file, flash_init_file, mem_clear=true, timeout, vcd]
     tools:
       rivierapro:
@@ -173,7 +173,7 @@ targets:
       - bootrom
       - core
       - nexys_a7_files
-    generate : [intercon, "!cpu_el2? (swerv_default_config)", "cpu_el2? (swerv_el2_nexys_a7_config)", version, wb_intercon]
+    generate : [intercon, "!cpu_el2? (veer_eh1_default_config)", "cpu_el2? (veer_el2_nexys_a7_config)", version, wb_intercon]
     parameters : [bootrom_file, "cpu_el2? (cpu_type=EL2)"]
     tools:
       vivado: {part : xc7a100tcsg324-1}
@@ -187,7 +187,7 @@ targets:
       - el2
       - core
       - arty_a7_files
-    generate : [intercon, swerv_el2_arty_a7_config, version, wb_intercon]
+    generate : [intercon, veer_el2_arty_a7_config, version, wb_intercon]
     parameters : [bootrom_file]
     tools:
       vivado: {part : xc7a35tcsg324-1}
@@ -232,20 +232,20 @@ generate:
           offset : 0x00000000
           size   : 0x08000000 #128MiB
 
-  swerv_default_config:
-    generator: swerv_config
+  veer_eh1_default_config:
+    generator: veer_eh1_config
     position : first
     parameters:
       args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
 
-  el2_default_config:
-    generator: swerv_el2_config
+  veer_el2_default_config:
+    generator: veer_el2_config
     position : first
     parameters:
       args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
 
-  swerv_el2_nexys_a7_config:
-    generator: swerv_el2_config
+  veer_el2_nexys_a7_config:
+    generator: veer_el2_config
     position : first
     parameters:
       args :
@@ -260,8 +260,8 @@ generate:
         - -set=icache_enable=0
         - -set=dccm_enable=0
 
-  swerv_el2_arty_a7_config:
-    generator: swerv_el2_config
+  veer_el2_arty_a7_config:
+    generator: veer_el2_config
     position : first
     parameters:
       args :

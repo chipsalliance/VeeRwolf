@@ -16,12 +16,12 @@
 //********************************************************************************
 // $Id$
 //
-// Function: Top wrapper file with el2_swerv/mem instantiated inside
+// Function: Top wrapper file with el2_veer/mem instantiated inside
 // Comments:
 //
 //********************************************************************************
 `default_nettype wire
-module swerv_wrapper_dmi
+module veer_wrapper_dmi
 import el2_pkg::*;
  #(
 `include "el2_param.vh"
@@ -420,8 +420,8 @@ import el2_pkg::*;
    assign  dma_hwdata[63:0]                       = '0;
    assign  dma_hreadyin                           = '0;
 
-   // Instantiate the el2_swerv core
-   el2_swerv swerv (
+   // Instantiate the el2_veer core
+   el2_veer veer (
                                 .soft_int (1'b0),
                                 .core_id  (28'd0),
                                 .*

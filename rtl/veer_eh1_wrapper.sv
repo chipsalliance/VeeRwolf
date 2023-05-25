@@ -16,15 +16,15 @@
 //********************************************************************************
 // $Id$
 //
-// Function: Top wrapper file with swerv/mem instantiated inside
+// Function: Top wrapper file with veer/mem instantiated inside
 // Comments:
 //
 //********************************************************************************
 `default_nettype wire
 `include "build.h"
 //`include "def.sv"
-module swerv_wrapper_dmi
-   import swerv_types::*;
+module veer_wrapper_dmi
+   import veer_types::*;
 (
    input logic                       clk,
    input logic                       rst_l,
@@ -333,8 +333,8 @@ module swerv_wrapper_dmi
    logic        icm_clk_override;
    logic        dec_tlu_core_ecc_disable;
 
-   // Instantiate the swerv core
-   swerv swerv (
+   // Instantiate the veer core
+   veer veer (
           .*
           );
 

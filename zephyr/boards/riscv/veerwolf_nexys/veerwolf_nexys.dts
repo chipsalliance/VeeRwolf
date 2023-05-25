@@ -2,7 +2,7 @@
 
 /dts-v1/;
 
-#include <riscv32-swerv.dtsi>
+#include <riscv32-veer.dtsi>
 
 / {
 	model = "ChipsAlliance Veerwolf-Nexys";
