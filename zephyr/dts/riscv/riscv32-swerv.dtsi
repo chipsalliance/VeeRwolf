@@ -5,14 +5,14 @@
 / {
 	#address-cells = <1>;
 	#size-cells = <1>;
-	compatible = "ChipsAlliance,SweRVolf-dev";
-	model = "ChipsAlliance,SweRVolf";
+	compatible = "ChipsAlliance,VeeRwolf-dev";
+	model = "ChipsAlliance,VeeRwolf";
 	cpus {
 		#address-cells = <1>;
 		#size-cells = <0>;
 		cpu@0 {
 			clock-frequency = <0>;
-			compatible = "ChipsAlliance,SweRV-EH1-v1.2", "riscv";
+			compatible = "ChipsAlliance,VeeR-EH1-v1.2", "riscv";
 			device_type = "cpu";
 			reg = <0>;
 			riscv,isa = "rv32imac";
@@ -23,7 +23,7 @@
 	soc {
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "ChipsAlliance,SweRVolf-soc", "simple-bus";
+		compatible = "ChipsAlliance,VeeRwolf-soc", "simple-bus";
 		ranges;
 
 		pic: interrupt-controller@f00c0000 {
@@ -56,7 +56,7 @@
 			#size-cells = <0>;
 		};
 		gpio_led0: gpio@80001010 {
-			compatible = "swervolf,gpio";
+			compatible = "veerwolf,gpio";
 			reg = <0x80001010 0x10>;
 			gpio-controller;
 			#gpio-cells = <2>;

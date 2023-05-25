@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef __RISCV32_SWERVOLF_SOC_H_
-#define __RISCV32_SWERVOLF_SOC_H_
+#ifndef __RISCV32_VEERWOLF_SOC_H_
+#define __RISCV32_VEERWOLF_SOC_H_
 
 #include "soc_common.h"
 #include <devicetree.h>

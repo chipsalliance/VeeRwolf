@@ -4,9 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-description: SweRVolf GPIO
+description: VeeRwolf GPIO
 
-compatible: "swervolf,gpio"
+compatible: "veerwolf,gpio"
 
 include: [gpio-controller.yaml, base.yaml]
 

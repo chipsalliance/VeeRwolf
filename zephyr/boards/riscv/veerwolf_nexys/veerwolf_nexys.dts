@@ -5,8 +5,8 @@
 #include <riscv32-swerv.dtsi>
 
 / {
-	model = "ChipsAlliance Swervolf-Nexys";
-	compatible = "ChipsAlliance,Swervolf-Nexys";
+	model = "ChipsAlliance Veerwolf-Nexys";
+	compatible = "ChipsAlliance,Veerwolf-Nexys";
 	aliases {
 		led0 = &led_0;
 	};

@@ -12,7 +12,7 @@ GPIO_MMIO32_INIT(led0,
 		 DT_ALIAS_LED0_GPIOS_ADDRESS,
 		 DT_ALIAS_LED0_GPIOS_MASK);
 
-/* The SweRVolf SoC can run at various CPU clock frequencies depending on which
+/* The VeeRwolf SoC can run at various CPU clock frequencies depending on which
    CPU is used and which hardware it runs on. The actual clock frequency is
    stored at synthesis time in register 0x8000103C. This value is used to set
    e.g. timer frequency but unfortunately the Zephyr UART driver does not handle

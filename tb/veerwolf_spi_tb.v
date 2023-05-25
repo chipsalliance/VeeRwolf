@@ -16,13 +16,13 @@
 //********************************************************************************
 // $Id$
 //
-// Function: Verilog testbench for SweRVolf with SPI Flash
+// Function: Verilog testbench for VeeRwolf with SPI Flash
 // Comments:
 //
 //********************************************************************************
 
 `default_nettype none
-module swervolf_spi_tb
+module veerwolf_spi_tb
   #(parameter bootrom_file  = "bootloader.vh",
     parameter flash_init_file = "hello.ubvh",
     parameter mem_clear     = 0);
@@ -54,7 +54,7 @@ module swervolf_spi_tb
    initial begin
       if ($value$plusargs("rom_init_file=%s", rom_init_file)) begin
 	 $display("Loading ROM contents from %0s", rom_init_file);
-	 $readmemh(rom_init_file, swervolf.bootrom.ram.mem);
+	 $readmemh(rom_init_file, veerwolf.bootrom.ram.mem);
       end
    end
 
@@ -166,10 +166,10 @@ module swervolf_spi_tb
       .SO      (flash_miso),
       .RSTNeg (1'b1));
 
-   swervolf_core
+   veerwolf_core
      #(.bootrom_file (bootrom_file),
        .clk_freq_hz (32'd50_000_000))
-   swervolf
+   veerwolf
      (.clk  (clk),
       .rstn (!rst),
       .dmi_reg_rdata       (),

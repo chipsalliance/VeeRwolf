@@ -16,7 +16,7 @@ void main(void)
 
   uint32_t ver_sha = sys_read32(0x80001004);
 
-  printk("\nSweRVolf version %d.%d.%d.%d (SHA %08x)\n",
+  printk("\nVeeRwolf version %d.%d.%d.%d (SHA %08x)\n",
 	 ver_major,
 	 ver_minor,
 	 ver_patch,
@@ -30,7 +30,7 @@ void main(void)
   printk(" o-[]__[]\n\n");
 
   if (ver_misc & 0x80)
-    printk("Warning! SweRVolf was built from a modified source tree\n");
+    printk("Warning! VeeRwolf was built from a modified source tree\n");
 
   uint8_t mem_status = sys_read8(0x8000100a);
   if (mem_status & 0x1)

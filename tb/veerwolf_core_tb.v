@@ -16,13 +16,13 @@
 //********************************************************************************
 // $Id$
 //
-// Function: Verilog testbench for SweRVolf
+// Function: Verilog testbench for VeeRwolf
 // Comments:
 //
 //********************************************************************************
 
 `default_nettype none
-module swervolf_core_tb
+module veerwolf_core_tb
   #(parameter bootrom_file  = "")
 `ifdef VERILATOR
   (input wire clk,
@@ -74,7 +74,7 @@ module swervolf_core_tb
    initial begin
       if ($value$plusargs("rom_init_file=%s", rom_init_file)) begin
 	 $display("Loading ROM contents from %0s", rom_init_file);
-	 $readmemh(rom_init_file, swervolf.bootrom.ram.mem);
+	 $readmemh(rom_init_file, veerwolf.bootrom.ram.mem);
       end else if (!(|bootrom_file))
 	/*
 	 Set mrac to 0xAAAA0000 and jump to address 0
@@ -84,8 +84,8 @@ module swervolf_core_tb
 	 8:   00000067                jr      zero
 
 	 */
-	swervolf.bootrom.ram.mem[0] = 64'h7c029073aaaa02b7;
-	swervolf.bootrom.ram.mem[1] = 64'h0000000000000067;
+	veerwolf.bootrom.ram.mem[0] = 64'h7c029073aaaa02b7;
+	veerwolf.bootrom.ram.mem[1] = 64'h0000000000000067;
    end
 
    wire [63:0] gpio_out;
@@ -203,10 +203,10 @@ module swervolf_core_tb
       .reg_wr_en      (dmi_reg_wr_en),
       .dmi_hard_reset (dmi_hard_reset)); 
 
-   swervolf_core
+   veerwolf_core
      #(.bootrom_file (bootrom_file),
        .clk_freq_hz (32'd50_000_000))
-   swervolf
+   veerwolf
      (.clk  (clk),
       .rstn (!rst),
       .dmi_reg_rdata       (dmi_reg_rdata),

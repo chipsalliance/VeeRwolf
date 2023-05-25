@@ -4,5 +4,5 @@
 
 set(ZEPHYR_CURRENT_LIBRARY drivers__gpio)
 
-zephyr_library_sources_ifdef(CONFIG_GPIO_SWERVOLF gpio_swervolf.c)
+zephyr_library_sources_ifdef(CONFIG_GPIO_VEERWOLF gpio_veerwolf.c)
 

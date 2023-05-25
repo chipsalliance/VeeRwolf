@@ -1,7 +1,7 @@
-if SOC_RISCV32_SWERVOLF
+if SOC_RISCV32_VEERWOLF
 
 config SOC
-	def_string "swervolf"
+	def_string "veerwolf"
 
 #Not used but must be defined
 config SYS_CLOCK_HW_CYCLES_PER_SEC
@@ -64,4 +64,4 @@ config RISCV_ROM_BASE_ADDR
 config RISCV_ROM_SIZE
 	def_hex 0x0
 
-endif # SOC_RISCV32_SWERVOLF
+endif # SOC_RISCV32_VEERWOLF

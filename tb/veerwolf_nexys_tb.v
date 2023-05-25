@@ -16,13 +16,13 @@
 //********************************************************************************
 // $Id$
 //
-// Function: Verilog testbench for SweRVolf for Nexys A7
+// Function: Verilog testbench for VeeRwolf for Nexys A7
 // Comments:
 //
 //********************************************************************************
 
 `default_nettype none
-module swervolf_nexys_tb
+module veerwolf_nexys_tb
   #(parameter bootrom_file  = "jumptoram.vh")
   ;
 
@@ -48,14 +48,14 @@ module swervolf_nexys_tb
    initial begin
       if ($value$plusargs("rom_init_file=%s", rom_init_file)) begin
 	 $display("Loading ROM contents from %0s", rom_init_file);
-	 $readmemh(rom_init_file, swervolf.bootrom.ram.mem);
+	 $readmemh(rom_init_file, veerwolf.bootrom.ram.mem);
       end
    end
 
-   swervolf_nexys
+   veerwolf_nexys
      #(.bootrom_file (bootrom_file),
        .ram_init_file (""))
-   swervolf
+   veerwolf
      (.clk         (clk),
       .rstn        (!rst),
       .ddram_a     (),
