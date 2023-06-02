@@ -124,25 +124,25 @@ targets:
 
 generate:
   veer_ahb_config:
-    generator: veer_config
+    generator: veer_eh1_config
     position : first
     parameters:
       args : ['-ahb_lite', -unset=assert_on]
 
   veer_default_config:
-    generator: veer_config
+    generator: veer_eh1_config
     position : first
     parameters:
       args : [-unset=assert_on]
 
   veer_fpga_config:
-    generator: veer_config
+    generator: veer_eh1_config
     position : first
     parameters:
       args : [-unset=assert_on, -set=fpga_optimize=1]
 
 generators:
-  veer_config:
+  veer_eh1_config:
     interpreter: python3
     command: configs/veer_config_gen.py
     description : Create a VeeR configuration. Note! Only supports the default config
