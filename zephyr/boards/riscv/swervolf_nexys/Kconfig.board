@@ -1,3 +1,0 @@
-config BOARD_SWERVOLF_NEXYS
-	bool "SweRVolf for Nexys A7"
-	depends on SOC_RISCV32_SWERVOLF

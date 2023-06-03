@@ -1,11 +1,11 @@
-# SweRVolf GPIO configuration options
+# VeeRwolf GPIO configuration options
 
 # Copyright (c) 2020 Olof Kindgren <olof.kindgren@gmail.com>
 # SPDX-License-Identifier: Apache-2.0
 
-config GPIO_SWERVOLF
-	bool "SweRVolf GPIO driver"
+config GPIO_VEERWOLF
+	bool "VeeRwolf GPIO driver"
 	select GPIO
-	depends on SOC_RISCV32_SWERVOLF
+	depends on SOC_RISCV32_VEERWOLF
 	help
-	  Enable SweRVolf GPIO driver.
+	  Enable VeeRwolf GPIO driver.

@@ -1,0 +1,4 @@
+config SOC_RISCV32_VEERWOLF
+	bool "VeeRwolf - VeeR EH1-based SoC"
+	select RISCV
+	select ATOMIC_OPERATIONS_C

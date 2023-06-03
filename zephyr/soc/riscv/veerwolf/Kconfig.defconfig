@@ -1,0 +1,67 @@
+if SOC_RISCV32_VEERWOLF
+
+config SOC
+	def_string "veerwolf"
+
+#Not used but must be defined
+config SYS_CLOCK_HW_CYCLES_PER_SEC
+	def_int 50000000
+
+config TIMER_READS_ITS_FREQUENCY_AT_RUNTIME
+       def_bool y
+
+config RISCV_SOC_INTERRUPT_INIT
+	def_bool y
+
+config RISCV_HAS_CPU_IDLE
+	def_bool n
+
+config RISCV_HAS_PLIC
+	def_bool n
+
+config SWERV_PIC
+	def_bool y
+
+config NUM_IRQS
+	def_int 64
+
+if SERIAL
+
+config UART_NS16550
+	def_bool y
+
+config UART_NS16550_PORT_0
+	def_bool y
+
+endif # SERIAL
+
+if GPIO
+
+config GPIO_MMIO32
+	def_bool y
+
+endif # GPIO
+
+if SPI
+
+config SPI_OC_SIMPLE
+	def_bool y
+
+config SPI_OC_SIMPLE_BUS_WIDTH
+	def_int 64
+
+endif # SPI
+
+config XIP
+	def_bool n
+
+config RISCV_MACHINE_TIMER
+	def_bool y
+
+config RISCV_ROM_BASE_ADDR
+	def_hex 0x00000000
+
+config RISCV_ROM_SIZE
+	def_hex 0x0
+
+endif # SOC_RISCV32_VEERWOLF

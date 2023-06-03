@@ -21,8 +21,8 @@ set_msg_config -id "DRC REQP-1840" -string "ddr2/ldc/storage" -suppress
 set_msg_config -id "Synth 8-6014" -string "VexRiscv.v" -suppress
 set_msg_config -id "Synth 8-3936" -string "memory_to_writeBack_MUL_HH_reg" -suppress
 
-#SweRV warnings
+#VeeR warnings
 set_msg_config -id "DRC REQP-1840" -string "rvtop/mem/Gen_dccm_enable.dccm/mem_bank" -suppress
 
-#SweRVolf warning
-set_msg_config -id "Synth 8-4446" -string "swervolf_nexys.v STARTUPE2" -suppress
+#VeeRwolf warning
+set_msg_config -id "Synth 8-4446" -string "veerwolf_nexys.v STARTUPE2" -suppress

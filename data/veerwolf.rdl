@@ -1,0 +1,101 @@
+addrmap veerwolf {
+  name = "VeeRwolf core";
+  desc = "
+The core of VeeRwolf consists of the VeeR CPU with a boot ROM, AXI4 interconnect, UART, SPI, RISC-V timer and GPIO. The core doesn't include any RAM but instead exposes a memory bus that the target-specific wrapper will connect to an appropriate memory controller. Other external connections are clock, reset, UART, GPIO, SPI and DMI (Debug Module Interface).";
+  /*  mem ram {
+    mementries = 0x08ffffff;
+    memwidth = 8;
+  };*/
+  regfile {
+    name = "System controller";
+    desc = "The system controller contains common system functionality such as keeping register with the SoC version information, RAM initialization status and the RISC-V machine timer.";
+    reg {
+      field { sw=r;hw=na; } patch[8];
+      field { sw=r;hw=na; } minor[8];
+      field { sw=r;hw=na; } major[8];
+      field { sw=r;hw=na; } rev[7];
+      field { sw=r;hw=na; } dirty;
+    } version;
+    reg { field {sw=r;hw=na;} sha[32]; } sha;
+    reg {
+      regwidth=8;      
+      field {
+	desc="Outputs a character in simulation. No effect on hardware";
+	sw=w;hw=r;
+      } sim_print[8];
+    } sim_print;
+    reg {    
+      regwidth=8;      
+      field {
+	desc="Exits a simulation. No effect on hardware";
+	sw=w;hw=r;
+      } sim_exit[8];
+    } sim_exit;
+    reg {    
+      regwidth=8;      
+      field {
+	desc="RAM initialization complete";
+	sw=r;hw=w;
+      } ram_init_done;
+      field {
+	desc="RAM initialization reported errors";
+	sw=r;hw=w;
+      } ram_init_error;
+    } init_status;
+    reg {
+      name="Software-controlled external interrupts";
+      desc="This register allows configuration and assertion of IRQ line 3 and 4, for testing the VeeR PIC or having two extra software-controllable interrupt sources. Interrupts can be triggered by writing to the sw_irq*n* bits when the timer bit is set to 0, or by a timeout of the irq_timer, when the timer bit is set to one. If both sw_irq3_timer and sw_irq4_timer are set to 0, the IRQ timer instead asserts an NMI when it reaches 0.
+
+If sw_irq3_timer or sw_irq4_timer are asserted, the interrupt trigger is connected to
+
+![VeeRwolf IRQ](veerwolf_irq.png)
+";      
+      regwidth=8;      
+      field {
+	desc="
+0 = IRQ3 is triggered by sw_irq3,
+
+1 = IRQ3 is triggered by irq_timer timeout";
+	sw=rw;hw=r;
+      } sw_irq3_timer;
+      field {
+	desc="IRQ3 polarity. 0 = Active high, 1 = active low";
+	sw=rw;hw=r;
+      } sw_irq3_pol;
+      field {
+	desc="0 = IRQ3 is asserted until sw_irq3 is cleared, 1 = Writing to sw_irq3 only asserts IRQ3 for one clock cycle";
+	sw=rw;hw=r;
+      } sw_irq3_edge;
+      field {
+	desc="Trigger IRQ line 3";
+	sw=rw;hw=rw;
+      } sw_irq3;
+      field {
+	desc="
+0 = IRQ4 is triggered by sw_irq4,
+
+1 = IRQ4 is triggered by irq_timer timeout";
+	sw=rw;hw=r;
+      } sw_irq4_timer;
+      field {
+	desc="IRQ4 polarity. 0 = Active high, 1 = active low";
+	sw=rw;hw=r;
+      } sw_irq4_pol;
+      field {
+	desc="0 = IRQ4 is asserted until sw_irq4 is cleared, 1 = Writing to sw_irq4 only asserts IRQ4 for one clock cycle";
+	sw=rw;hw=r;
+      } sw_irq4_edge;
+      field {
+	desc="Trigger IRQ line 4";
+	sw=rw;hw=rw;
+      } sw_irq4;
+    } sw_irq;
+    reg {
+      name="Interrupt vector for NMI";      
+      field {sw=rw;hw=r;} nmi_vec[32]; } nmi_vec;
+    /*
+    */
+  } syscon @ 0x80001000;
+    
+};
+  

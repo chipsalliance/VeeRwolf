@@ -1,0 +1,340 @@
+CAPI=2:
+
+name : ::veerwolf:0.7.5
+description : Reference SoC for the VeeR family of cores
+
+filesets:
+  eh1:
+    files: [rtl/veer_eh1_wrapper.sv : {file_type : systemVerilogSource}]
+    depend: ["=chipsalliance.org:cores:VeeR_EH1:1.9"]
+
+  el2:
+    files: [rtl/veer_el2_wrapper.sv : {file_type : systemVerilogSource}]
+    depend: ["=chipsalliance.org:cores:VeeR_EL2:1.4"]
+
+  core:
+    files:
+      - rtl/dpram64.v
+      - rtl/axi2wb.v
+      - rtl/wb_mem_wrapper.v
+      - rtl/veerwolf_syscon.v
+      - rtl/veerwolf_core.v
+    file_type : systemVerilogSource
+    depend :
+      - fusesoc:utils:generators
+      - uart16550
+      - ">=pulp-platform.org::axi:0.23.0-r1"
+      - simple_spi
+      - wb_intercon
+
+  bfm:
+    files:
+      - tb/uart_decoder.v
+    file_type : verilogSource
+
+  tb:
+    files:
+      - sw/hello.vh : {file_type : user, copyto : hello.vh}
+      - rtl/axi_ram.v : {file_type : verilogSource}
+      - tb/veerwolf_core_tb.v : {file_type : systemVerilogSource}
+
+  verilator_tb:
+    files: [tb/tb.cpp : {file_type : cppSource}]
+    depend : [">=::jtag_vpi:0-r5"]
+  verilator_waiver: {files: [data/verilator_waiver.vlt : {file_type : vlt}]}
+
+  spi_tb:
+    files:
+      - rtl/axi_ram.v : {file_type : verilogSource}
+      - tb/s25fl128s.v
+      - tb/veerwolf_spi_tb.v
+      - sw/hello.ubvh : {file_type : user, copyto : hello.ubvh}
+    file_type : verilogSource
+
+  nexys_a7_files:
+    files :
+      - data/vivado_waiver.tcl : {file_type : tclSource}
+      - data/veerwolf_nexys.xdc : {file_type : xdc}
+      - rtl/clk_gen_nexys.v : {file_type : verilogSource}
+      - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
+      - rtl/veerwolf_nexys.v    : {file_type : systemVerilogSource}
+    depend : [":veerwolf:litedram"]
+
+  arty_a7_files:
+    files :
+      - data/vivado_waiver.tcl : {file_type : tclSource}
+      - data/veerwolf_arty.xdc : {file_type : xdc}
+      - rtl/clk_gen_arty.v : {file_type : verilogSource}
+      - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
+      - rtl/veerwolf_arty.v    : {file_type : systemVerilogSource}
+    depend : [":veerwolf:litedram"]
+
+  basys3_files:
+    files :
+      - data/vivado_waiver.tcl : {file_type : tclSource}
+      - data/veerwolf_basys3.xdc : {file_type : xdc}
+      - rtl/axi_ram.v : {file_type : verilogSource}
+      - rtl/clk_gen_basys3.v : {file_type : verilogSource}
+      - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
+      - rtl/veerwolf_basys3.v    : {file_type : systemVerilogSource}
+
+  bootrom:
+    files :
+      - sw/bootloader.vh : {file_type : user, copyto : bootloader.vh}
+
+targets:
+  basys3:
+    default_tool : vivado
+    description : FPGA image with VeeR EL2 for the Digilent Basys 3 FPGA board
+    filesets :
+      - bootrom
+      - el2
+      - core
+      - basys3_files
+    generate : [intercon, veer_el2_nexys_a7_config, version, wb_intercon]
+    parameters : [bootrom_file]
+    tools:
+      vivado: {part : xc7a35tcpg236-1}
+    toplevel : veerwolf_basys3
+
+  sim:
+    default_tool : verilator
+    description : Default simulation target
+    filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
+      - core
+      - "!tool_verilator? (bfm)"
+      - tb
+      - bootrom
+      - "tool_verilator? (verilator_tb)"
+      - "tool_verilator? (verilator_waiver)"
+
+    generate : [intercon, "cpu_el2? (veer_el2_default_config)", "!cpu_el2? (veer_eh1_default_config)", version, wb_intercon]
+    parameters : [SIMPRINT=true, jtag_vpi_enable, ram_init_file=hello.vh, rom_init_file, signature, timeout, vcd]
+    tools:
+      rivierapro:
+        vlog_options :
+          - config/common_defines.vh
+          - -timescale 1ns/1ps
+        compilation_mode : common
+      modelsim:
+        vlog_options :
+          - -mfcu
+          - -cuautoname=du
+          - src/pulp-platform.org__axi_0.25.0/include/axi/typedef.svh #Shady temporary workaround
+          - config/common_defines.vh
+          - -timescale 1ns/1ns
+          - -svinputport=compat
+          - -suppress 2583
+      verilator:
+        verilator_options : [--trace, -Wno-fatal]
+      xsim:
+        compilation_mode : common
+        #-d XSIM is required to disable formal properties in axi & common_cells
+        #For interactive wave debug, also add "-debug all" or "-debug typical"
+        xelab_options : [-d, XSIM]
+    toplevel : veerwolf_core_tb
+
+  spi_tb:
+    default_tool : modelsim
+    description : Simulation target with real SPI Flash model
+    filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
+      - bootrom
+      - core
+      - bfm
+      - spi_tb
+
+    generate : [intercon, veer_eh1_default_config, version, wb_intercon]
+    parameters : [SIMPRINT=true, ram_init_file, rom_init_file, flash_init_file, mem_clear=true, timeout, vcd]
+    tools:
+      rivierapro:
+        vlog_options :
+          - config/common_defines.vh
+          - -timescale 1ns/1ps
+        compilation_mode : common
+      modelsim:
+        vlog_options :
+          - -mfcu
+          - -cuautoname=du
+          - src/pulp-platform.org__axi_0.25.0/include/axi/typedef.svh #Shady temporary workaround
+          - config/common_defines.vh
+          - -timescale 1ns/1ns
+    toplevel : veerwolf_spi_tb
+
+  nexys_a7:
+    default_tool : vivado
+    description : FPGA image with VeeR EH1 or EL2 for the Digilent Nexys A7 FPGA board
+    filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
+      - bootrom
+      - core
+      - nexys_a7_files
+    generate : [intercon, "!cpu_el2? (veer_eh1_default_config)", "cpu_el2? (veer_el2_nexys_a7_config)", version, wb_intercon]
+    parameters : [bootrom_file, "cpu_el2? (cpu_type=EL2)"]
+    tools:
+      vivado: {part : xc7a100tcsg324-1}
+    toplevel : veerwolf_nexys_a7
+
+  arty_a7:
+    default_tool : vivado
+    description : FPGA image with VeeR EL2 for the Digilent Arty A7 FPGA board
+    filesets :
+      - bootrom
+      - el2
+      - core
+      - arty_a7_files
+    generate : [intercon, veer_el2_arty_a7_config, version, wb_intercon]
+    parameters : [bootrom_file]
+    tools:
+      vivado: {part : xc7a35tcsg324-1}
+    toplevel : veerwolf_arty_a7
+
+generate:
+  wb_intercon:
+    generator: wb_intercon_gen
+    parameters:
+      masters:
+        io:
+          slaves : [rom, sys, spi_flash, uart]
+      slaves:
+        rom:
+          offset : 0x00000000
+          size   : 0x00001000
+        sys:
+          offset : 0x00001000
+          size   : 0x00000040
+        spi_flash:
+          offset : 0x00001040
+          size   : 0x00000040
+        uart:
+          offset : 0x00002000
+          size   : 0x00001000
+  intercon:
+    generator: axi_intercon_gen
+    parameters:
+      masters:
+        ifu:
+          id_width : 3
+          read_only : true
+        lsu:
+          id_width : 4
+        sb:
+          id_width : 1
+      slaves:
+        io:
+          offset : 0x80000000
+          size   : 0x00004000
+        ram:
+          offset : 0x00000000
+          size   : 0x08000000 #128MiB
+
+  veer_eh1_default_config:
+    generator: veer_eh1_config
+    position : first
+    parameters:
+      args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
+
+  veer_el2_default_config:
+    generator: veer_el2_config
+    position : first
+    parameters:
+      args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
+
+  veer_el2_nexys_a7_config:
+    generator: veer_el2_config
+    position : first
+    parameters:
+      args :
+        - -unset=assert_on
+        - -set=reset_vec=0x80000000
+        - -set=ret_stack_size=2
+        - -set=btb_size=32
+        - -set=bht_size=128
+        - -set=dccm_size=16
+        - -set=dccm_num_banks=2
+        - -set=iccm_enable=0
+        - -set=icache_enable=0
+        - -set=dccm_enable=0
+
+  veer_el2_arty_a7_config:
+    generator: veer_el2_config
+    position : first
+    parameters:
+      args :
+        - -unset=assert_on
+        - -set=reset_vec=0x80000000
+        - -set=ret_stack_size=2
+        - -set=btb_enable=0
+        - -set=btb_size=8
+        - -set=bht_size=32
+        - -set=dccm_size=16
+        - -set=dccm_num_banks=2
+        - -set=iccm_enable=0
+        - -set=icache_enable=0
+        - -set=dccm_enable=0
+        - -set=dma_buf_depth=2
+        - -set=div_bit=1
+        - -set=pic_total_int=2
+
+# - -target=default_ahb
+
+  version:
+    generator: gitversion
+
+parameters:
+  SIMPRINT:
+    datatype    : bool
+    description : Enable simulation character output
+    paramtype   : vlogdefine
+
+  cpu_type:
+    datatype    : str
+    description : Controls whether to use VeeR EH1 or VeeR EL2. Implicitly set by the target
+    paramtype   : vlogparam
+
+  mem_clear:
+    datatype    : bool
+    description : Initialize on-chip RAM to zero on simulation start
+    paramtype   : vlogparam
+
+  bootrom_file:
+    datatype: file
+    description : Verilog hex file to use as boot ROM
+    paramtype : vlogparam
+
+  jtag_vpi_enable:
+    datatype : bool
+    description : Enable JTAG simulation server
+    paramtype : plusarg
+
+  ram_init_file:
+    datatype: file
+    description : Verilog hex file to use as initial on-chip RAM contents
+    paramtype : plusarg
+
+  rom_init_file:
+    datatype: file
+    description : Verilog hex file to use as initial bootrom RAM contents
+    paramtype : plusarg
+
+  flash_init_file:
+    datatype: file
+    description : Verilog hex file to use as initial SPI Flash contents
+    paramtype : vlogparam
+
+  signature:
+    datatype : file
+    paramtype : plusarg
+
+  timeout:
+    datatype : int
+    paramtype : plusarg
+
+  vcd:
+    datatype : bool
+    description : Dump VCD
+    paramtype : plusarg

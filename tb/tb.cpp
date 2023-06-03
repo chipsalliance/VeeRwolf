@@ -16,7 +16,7 @@
 //********************************************************************************
 // $Id$
 //
-// Function: Verilator testbench for SweRVolf
+// Function: Verilator testbench for VeeRwolf
 // Comments:
 //
 //********************************************************************************
@@ -27,7 +27,7 @@
 #include <jtagServer.h>
 
 #include "verilated_vcd_c.h"
-#include "Vswervolf_core_tb.h"
+#include "Vveerwolf_core_tb.h"
 
 using namespace std;
 
@@ -102,7 +102,7 @@ int main(int argc, char **argv, char **env)
 {
   Verilated::commandArgs(argc, argv);
   bool gpio0 = false;
-  Vswervolf_core_tb* top = new Vswervolf_core_tb;
+  Vveerwolf_core_tb* top = new Vveerwolf_core_tb;
 
   VerilatedVcdC * tfp = 0;
   const char *vcd = Verilated::commandArgsPlusMatch("vcd=");

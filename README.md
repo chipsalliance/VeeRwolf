@@ -1,23 +1,23 @@
-SweRVolf
+VeeRwolf
 ========
 
-[![LibreCores](https://www.librecores.org/olofk/swervolf/badge.svg?style=flat)](https://www.librecores.org/olofk/swervolf)
+VeeRwolf is a [FuseSoC](https://github.com/olofk/fusesoc)-based reference platform for the VeeR family of RISC-V cores. Currently, [VeeR EH1](https://github.com/chipsalliance/Cores-VeeR-EH1) and [VeeR EL2](https://github.com/chipsalliance/Cores-VeeR-EL2) are supported. See [CPU configuration](#cpu-configuration) to learn how to switch between them.
 
-SweRVolf is a [FuseSoC](https://github.com/olofk/fusesoc)-based reference platform for the SweRV family of RISC-V cores. Currently, [SweRV EH1](https://github.com/chipsalliance/Cores-SweRV) and [SweRV EL2](https://github.com/chipsalliance/Cores-SweRV-EL2) are supported. See [CPU configuration](#cpu-configuration) to learn how to switch between them.
+This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), [Zephyr OS](https://www.zephyrproject.org), [TockOS](https://github.com/tock/tock/tree/master/boards/swervolf) or other software in simulators or on FPGA boards. Focus is on portability, extendability and ease of use; to allow VeeR users to quickly get software running, modify the SoC to their needs or port it to new target devices.
 
-This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), [Zephyr OS](https://www.zephyrproject.org), [TockOS](https://github.com/tock/tock/tree/master/boards/swervolf) or other software in simulators or on FPGA boards. Focus is on portability, extendability and ease of use; to allow SweRV users to quickly get software running, modify the SoC to their needs or port it to new target devices.
+This project was previously called SweRVolf. The last released version using the old name is v0.7.5
 
 # Structure
 
 To ease portability, the SoC consists of a portable technology-agnostic core with target-specific wrappers. This chapter describes the functionality of the core and the technology-specific targets.
 
-## SweRVolf Core
+## VeeRwolf Core
 
-The core of SweRVolf consists of the SweRV CPU with a boot ROM, AXI4 interconnect, UART, SPI, RISC-V timer and GPIO. The core doesn't include any RAM but instead exposes a memory bus that the target-specific wrapper will connect to an appropriate memory controller. Other external connections are clock, reset, UART, GPIO, SPI and DMI (Debug Module Interface).
+The core of VeeRwolf consists of the VeeR CPU with a boot ROM, AXI4 interconnect, UART, SPI, RISC-V timer and GPIO. The core doesn't include any RAM but instead exposes a memory bus that the target-specific wrapper will connect to an appropriate memory controller. Other external connections are clock, reset, UART, GPIO, SPI and DMI (Debug Module Interface).
 
-![](swervolf_core.png)
+![](veerwolf_core.png)
 
-*SwerVolf Core*
+*VeeRwolf Core*
 
 
 ### Memory map
@@ -31,11 +31,11 @@ The core of SweRVolf consists of the SweRV CPU with a boot ROM, AXI4 interconnec
 
 #### RAM
 
-The SweRVolf core does not contain a memory controller but allocates the first 128MiB of the address for RAM that can be used by a target application and exposes an AXI bus to the wrapper.
+The VeeRwolf core does not contain a memory controller but allocates the first 128MiB of the address for RAM that can be used by a target application and exposes an AXI bus to the wrapper.
 
 #### Boot ROM
 
-The boot ROM contains a first-stage bootloader. After system reset, SweRV will start fetching its first instructions from this area.
+The boot ROM contains a first-stage bootloader. After system reset, VeeR will start fetching its first instructions from this area.
 
 To select a bootloader, set the `bootrom_file` parameter. See the [Booting](#booting) chapter for more information about available bootloaders.
 
@@ -46,10 +46,10 @@ The system controller contains common system functionality such as keeping regis
 
 | Address  | Register              | Description |
 | -------- | --------------------- | -----------
-| 0x00     | version_patch | SweRVolf patch version |
-| 0x01     | version_minor | SweRVolf minor version |
-| 0x02     | version_major |SweRVolf major version |
-| 0x03     | version_misc | Bit 7 is set when SweRVolf was built from modified sources |
+| 0x00     | version_patch | VeeRwolf patch version |
+| 0x01     | version_minor | VeeRwolf minor version |
+| 0x02     | version_major |VeeRwolf major version |
+| 0x03     | version_misc | Bit 7 is set when VeeRwolf was built from modified sources |
 |          |              | Bit 6:0 revision since last patch version |
 | 0x04-0x07     | version_sha | SHA hash of the build
 | 0x08     | sim_print | Outputs a character in simulation. No effect on hardware
@@ -73,9 +73,9 @@ The system controller contains common system functionality such as keeping regis
 
 ##### syscon_base+0x000B sw_irq
 
-![](swervolf_irq.png)
+![](veerwolf_irq.png)
 
-This register allows configuration and assertion of IRQ line 3 and 4, for testing the SweRV PIC or having two extra software-controllable interrupt sources. Interrupts can be triggered by writing to the sw_irq*n* bits when the timer bit is set to 0, or by a timeout of the irq_timer, when the timer bit is set to one. If both sw_irq3_timer and sw_irq4_timer are set to 0, the IRQ timer instead asserts an NMI when it reaches 0.
+This register allows configuration and assertion of IRQ line 3 and 4, for testing the VeeR PIC or having two extra software-controllable interrupt sources. Interrupts can be triggered by writing to the sw_irq*n* bits when the timer bit is set to 0, or by a timeout of the irq_timer, when the timer bit is set to one. If both sw_irq3_timer and sw_irq4_timer are set to 0, the IRQ timer instead asserts an NMI when it reaches 0.
 
 If sw_irq3_timer or sw_irq4_timer are asserted, the interrupt trigger is connected to 
 
@@ -100,15 +100,15 @@ Bit 0 enables or disables one-shot IRQ countdown timer. Automatically disables i
 
 #### UART
 
-SweRVolf contains a ns16550-compatible UART
+VeeRwolf contains a ns16550-compatible UART
 
-## SweRVolf sim
+## VeeRwolf sim
 
-SweRVolf sim is a simulation target that wraps the SweRVolf core in a testbench to be used by verilator or event-driven simulators such as QuestaSim. It can be used for full-system simulations that executes programs running on SweRV. It also supports connecting a debugger through OpenOCD and JTAG VPI. The [Debugging](#debugging) chapter contains more information on how to connect a debugger.
+VeeRwolf sim is a simulation target that wraps the VeeRwolf core in a testbench to be used by verilator or event-driven simulators such as QuestaSim. It can be used for full-system simulations that executes programs running on VeeR. It also supports connecting a debugger through OpenOCD and JTAG VPI. The [Debugging](#debugging) chapter contains more information on how to connect a debugger.
 
-![](swervolf_sim.png)
+![](veerwolf_sim.png)
 
-*SwerVolf Simulation target*
+*VeeRwolf Simulation target*
 
 The simulation target exposes a number of parameters for compile-time and run-time configuration. These parameters are all exposed as FuseSoC parameters. The most relevant parameters are:
 
@@ -118,13 +118,13 @@ The simulation target exposes a number of parameters for compile-time and run-ti
 
 Memory files suitable for loading with `--ram_init_file` can be created from binary files with the `sw/makehex.py` script
 
-## SweRVolf Nexys
+## VeeRwolf Nexys
 
-SweRVolf Nexys is a version of the SweRVolf SoC created for the Digilent Nexys A7 board. It uses the on-board 128MB DDR2 for RAM, has GPIO connected to LED, supports booting from SPI Flash and uses the microUSB port for UART and JTAG communication. The default bootloader for the SweRVolf Nexys target will attempt to load a program stored in SPI Flash by default.
+VeeRwolf Nexys is a version of the VeeRwolf SoC created for the Digilent Nexys A7 board. It uses the on-board 128MB DDR2 for RAM, has GPIO connected to LED, supports booting from SPI Flash and uses the microUSB port for UART and JTAG communication. The default bootloader for the VeeRwolf Nexys target will attempt to load a program stored in SPI Flash by default.
 
-![](swervolf_nexys.png)
+![](veerwolf_nexys.png)
 
-*SwerVolf Nexys A7 target*
+*VeeRwolf Nexys A7 target*
 
 ### I/O
 
@@ -157,13 +157,13 @@ UART and JTAG communication is tunneled through the microUSB port on the board a
 
 An SPI controller is connected to the on-board SPI Flash. This can be used for storing data such as program to be loaded into memory during boot. The [SPI uImage loader](#spi-uimage-loader) chapter goes into more detail on how to prepare, write and boot a program stored in SPI Flash
 
-## SweRVolf Basys 3
+## VeeRwolf Basys 3
 
-SweRVolf Basys 3 is a version of the SweRVolf SoC created for the Digilent Basys 3 board. It uses 64kB on-chip memory for RAM, has GPIO connected to LEDs and switches, supports booting from SPI Flash and uses the microUSB port for UART and JTAG communication. The default bootloader for the SweRVolf Basys 3 target will attempt to load a program stored in SPI Flash by default.
+VeeRwolf Basys 3 is a version of the VeeRwolf SoC created for the Digilent Basys 3 board. It uses 64kB on-chip memory for RAM, has GPIO connected to LEDs and switches, supports booting from SPI Flash and uses the microUSB port for UART and JTAG communication. The default bootloader for the VeeRwolf Basys 3 target will attempt to load a program stored in SPI Flash by default.
 
-![](swervolf_basys3.png)
+![](veerwolf_basys3.png)
 
-*SwerVolf Basys 3 target*
+*VeeRwolf Basys 3 target*
 
 ### I/O
 
@@ -200,11 +200,11 @@ An SPI controller is connected to the on-board SPI Flash. This can be used for s
 
 Install [verilator](https://www.veripool.org/wiki/verilator)
 
-Create an empty directory, e.g. named swervolf, to use as the root of the project. This directory will from now on be called `$WORKSPACE`. All further commands will be run from `$WORKSPACE` unless otherwise stated. After entering the workspace directory, run `export WORKSPACE=$(pwd)` to set the $WORKSPACE shell variable.
+Create an empty directory, e.g. named veerwolf, to use as the root of the project. This directory will from now on be called `$WORKSPACE`. All further commands will be run from `$WORKSPACE` unless otherwise stated. After entering the workspace directory, run `export WORKSPACE=$(pwd)` to set the $WORKSPACE shell variable.
 
 1. Make sure you have [FuseSoC](https://github.com/olofk/fusesoc) version 1.12 or newer installed or install it with `pip install fusesoc`
 2. Add the FuseSoC base library to the workspace with `fusesoc library add fusesoc-cores https://github.com/fusesoc/fusesoc-cores`
-3. Add the swervolf library with `fusesoc library add swervolf https://github.com/chipsalliance/Cores-SweRVolf`
+3. Add the veerwolf library with `fusesoc library add veerwolf https://github.com/chipsalliance/VeeRwolf`
 4. Make sure you have verilator installed to run the simulation. **Note** This requires at least version 3.918. The version that is shipped with Ubuntu 18.04 will NOT work
 
 Your workspace shall now look like this:
@@ -212,64 +212,64 @@ Your workspace shall now look like this:
     $WORKSPACE
     └──fusesoc_libraries
        ├──fusesoc-cores
-       └──swervolf
+       └──veerwolf
 
-After step 3, the SweRVolf sources will be located in `$WORKSPACE/fusesoc_libraries/swervolf`. For convenience, this directory will from now on be refered to as `$SWERVOLF_ROOT`. Run `export SWERVOLF_ROOT=$WORKSPACE/fusesoc_libraries/swervolf` to set this as a shell variable
+After step 3, the VeeRwolf sources will be located in `$WORKSPACE/fusesoc_libraries/veerwolf`. For convenience, this directory will from now on be refered to as `$VEERWOLF_ROOT`. Run `export VEERWOLF_ROOT=$WORKSPACE/fusesoc_libraries/veerwolf` to set this as a shell variable
 
 ## Running the SoC
 
-The SweRVolf SoC can be run in simulation or on hardware (Digilent Nexys A7 currently supported). In either case FuseSoC is used to launch the simulation or build and run the FPGA build. To select what to run, use the `fusesoc run` command with the `--target` parameter. To run in simulation use
+The VeeRwolf SoC can be run in simulation or on hardware (Digilent Nexys A7 currently supported). In either case FuseSoC is used to launch the simulation or build and run the FPGA build. To select what to run, use the `fusesoc run` command with the `--target` parameter. To run in simulation use
 
-    fusesoc run --target=sim swervolf
+    fusesoc run --target=sim veerwolf
 
 This will load a small example program that prints a string and exits. If you want to rerun the program without rebuilding the simulation model, you can add the --run parameter
 
-    fusesoc run --target=sim --run swervolf
+    fusesoc run --target=sim --run veerwolf
 
 To build (and optionally program) an image for a Nexys A7 board, run
 
-    fusesoc run --target=nexys_a7 swervolf
+    fusesoc run --target=nexys_a7 veerwolf
 
 All targets support different compile- and run-time options. To see all options for a target run
 
-    fusesoc run --target=$TARGET swervolf --help
+    fusesoc run --target=$TARGET veerwolf --help
 
 To list all available targets, run
 
-    fusesoc core show swervolf
+    fusesoc core show veerwolf
 
 To build and run on Riviera-Pro simulator
 
-    fusesoc run --target=sim --tool=rivierapro swervolf
+    fusesoc run --target=sim --tool=rivierapro veerwolf
 
 After building any of the targets, there will now be a `build` in your workspace. This directory contains everything needed to rebuild the target. It can be safely removed and gets rebuilt when building a target again. To use a different build directory, pass `--build-root=<output dir>` to the run arguments.
 
 ### Run a precompiled example in simulation
 
-In simulation, SweRVolf supports preloading an application to memory with the `--ram_init_file` parameter. SweRVolf comes bundled with some example applications in the `sw` directory.
+In simulation, VeeRwolf supports preloading an application to memory with the `--ram_init_file` parameter. VeeRwolf comes bundled with some example applications in the `sw` directory.
 
-To build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim swervolf --ram_init_file=$SWERVOLF_ROOT/sw/zephyr_hello.vh`.
-To build and run this example on Riviera-Pro: `fusesoc run --target=sim --tool=rivierapro swervolf --ram_init_file=$SWERVOLF_ROOT/sw/zephyr_hello.vh`.
+To build the simulation model and run the bundled Zephyr Hello world example in a simulator. `fusesoc run --target=sim veerwolf --ram_init_file=$VEERWOLF_ROOT/sw/zephyr_hello.vh`.
+To build and run this example on Riviera-Pro: `fusesoc run --target=sim --tool=rivierapro veerwolf --ram_init_file=$VEERWOLF_ROOT/sw/zephyr_hello.vh`.
 
 After running the above command, the simulation model should be built and run. At the end it will output
 
     Releasing reset
     ***** Booting Zephyr OS zephyr-v1.14.0 *****
-    Hello World! swervolf_nexys
+    Hello World! veerwolf_nexys
 
 At this point the simulation can be aborted with `Ctrl-C`.
 
 Another example to run is the Zephyr philosophers demo.
 
-    fusesoc run --run --target=sim swervolf --ram_init_file=$SWERVOLF_ROOT/sw/zephyr_philosophers.vh
+    fusesoc run --run --target=sim veerwolf --ram_init_file=$VEERWOLF_ROOT/sw/zephyr_philosophers.vh
 
 * Note the `--run` option which will prevent rebuilding the simulator model
 
 ### Run RISC-V compliance tests
 
-**Note:** The following instructions are valid for version 1.0 of the RISC-V compliance tests. The target-specific support for SweRVolf has not yet been ported to newer versions.
+**Note:** The following instructions are valid for version 1.0 of the RISC-V compliance tests. The target-specific support for VeeRwolf has not yet been ported to newer versions.
 
-1. Build the simulation model, if that hasn't already been done, with `fusesoc run --target=sim --setup --build swervolf`
+1. Build the simulation model, if that hasn't already been done, with `fusesoc run --target=sim --setup --build veerwolf`
 2. Download the RISC-V compliance tests to the workspace with `git clone https://github.com/riscv/riscv-compliance --branch 1.0`. Your directory structure should now look like this:
 
         $WORKSPACE
@@ -277,24 +277,24 @@ Another example to run is the Zephyr philosophers demo.
         ├──fusesoc_libraries
         └──riscv-compliance
 
-3. Enter the riscv-compliance directory and run `make TARGETDIR=$SWERVOLF_ROOT/riscv-target RISCV_TARGET=swerv RISCV_DEVICE=rv32i RISCV_ISA=rv32i TARGET_SIM=$WORKSPACE/build/swervolf_0.7.5/sim-verilator/Vswervolf_core_tb`
+3. Enter the riscv-compliance directory and run `make TARGETDIR=$VEERWOLF_ROOT/riscv-target RISCV_TARGET=veer RISCV_DEVICE=rv32i RISCV_ISA=rv32i TARGET_SIM=$WORKSPACE/build/veerwolf_0.7.5/sim-verilator/Vveerwolf_core_tb`
 
 *Note: Other test suites can be run by replacing RISCV_ISA=rv32imc with rv32im or rv32i*
 
-*Note: The `TARGET_SIM` path needs to be updated to reflect the actual location of `Vswervolf_core_tb`*
+*Note: The `TARGET_SIM` path needs to be updated to reflect the actual location of `Vveerwolf_core_tb`*
 
 ### Run on hardware
 
-The SweRVolf SoC can be built for a Digilent Nexys A7 board with
+The VeeRwolf SoC can be built for a Digilent Nexys A7 board with
 
-    fusesoc run --target=nexys_a7 swervolf
+    fusesoc run --target=nexys_a7 veerwolf
 
-If the board is connected, it will automatically be programmed when the FPGA image has been built. It can also be programmed manually afterwards by running `fusesoc run --target=nexys_a7 --run swervolf` or running OpenOCD as described in the debugging chapter.
+If the board is connected, it will automatically be programmed when the FPGA image has been built. It can also be programmed manually afterwards by running `fusesoc run --target=nexys_a7 --run veerwolf` or running OpenOCD as described in the debugging chapter.
 
 The default bootloader will boot from SPI Flash, RAM or serial depending on the boot mode set by the switches. The default bootloader can be replaced with the `--bootrom_file` parameter. Note that the boot ROM is not connected to the data port, so it can only execute instructions. Data can not be read or written to this segment. The below example will compile the memtest application and use that as boot ROM instead.
 
-    make -C ../cores/Cores-SweRVolf/sw memtest.vh
-    fusesoc run --target=nexys_a7 swervolf --bootrom_file=$SWERVOLF_ROOT/sw/memtest.vh
+    make -C ../$VEERWOLF_ROOT/sw memtest.vh
+    fusesoc run --target=nexys_a7 veerwolf --bootrom_file=$VEERWOLF_ROOT/sw/memtest.vh
 
 ## Build Zephyr applications
 
@@ -305,9 +305,9 @@ The default bootloader will boot from SPI Flash, RAM or serial depending on the 
 
 1.Create a West (Zephyr's build tool) workspace in the same directory as the FuseSoC workspace by running
     west init
-2. Add the SweRVolf-specific drivers and BSP with
+2. Add the VeeRwolf-specific drivers and BSP with
 
-    west config manifest.path fusesoc_libraries/swervolf
+    west config manifest.path fusesoc_libraries/veerwolf
     west update
 
    The workspace should now look like this
@@ -315,27 +315,27 @@ The default bootloader will boot from SPI Flash, RAM or serial depending on the 
         $WORKSPACE
         ├──fusesoc_libraries
         |  ├──...
-        |  └──swervolf
+        |  └──veerwolf
         ├──...
         └──zephyr
 
 3. Enter the directory of the application to build. Zephyr comes with a number of example applications in the samples directory (`$WORKSPACE/zephyr/samples`), e.g. `$WORKSPACE/zephyr/samples/basic/blinky` contains the Zephyr blinky example. From now on, the program to build and run will be called `$APP`
-4. Build the code with `west build -b swervolf_nexys`
+4. Build the code with `west build -b veerwolf_nexys`
 
-After building the code there will now be an executable .elf file in `build/zephyr/zephyr.elf` and a binary file in `build/zephyr/zephyr.bin`. The executable file can be loaded into SwerVolf with a debugger and the binary file can be further converted and loaded into RAM for simulations.
+After building the code there will now be an executable .elf file in `build/zephyr/zephyr.elf` and a binary file in `build/zephyr/zephyr.bin`. The executable file can be loaded into VeeRwolf with a debugger and the binary file can be further converted and loaded into RAM for simulations.
 
 To load the .elf file with a debugger, see [Loading programs with OpenOCD](#loading-programs-with-openocd)
 
 To use the .bin file in a simulator, it must first be converted into a suitable verilog hex file. From the directory where the application was built, run
-    `python3 $SWERVOLF_ROOT/sw/makehex.py build/zephyr/zephyr.bin > $WORKSPACE/$APP.hex` to create a hex file in the workspace directory. This can now be loaded into a simulator with
+    `python3 $VEERWOLF_ROOT/sw/makehex.py build/zephyr/zephyr.bin > $WORKSPACE/$APP.hex` to create a hex file in the workspace directory. This can now be loaded into a simulator with
 
-    fusesoc run --target=sim swervolf --ram_init_file=$APP.hex
+    fusesoc run --target=sim veerwolf --ram_init_file=$APP.hex
 
-The SweRVolf demo application in `$SWERVOLF_ROOT/sw/swervolf_zephyr_demo` is also a Zephyr program and can be built in the same way
+The VeeRwolf demo application in `$VEERWOLF_ROOT/sw/veerwolf_zephyr_demo` is also a Zephyr program and can be built in the same way
 
 ## Debugging
 
-SweRVolf supports debugging both on hardware and in simulation. There are different procedures on how to connect the debugger, but once connected, the same commands can be used (although it's a lot slower in simulations).
+VeeRwolf supports debugging both on hardware and in simulation. There are different procedures on how to connect the debugger, but once connected, the same commands can be used (although it's a lot slower in simulations).
 
 ### Prerequisites
 
@@ -350,9 +350,9 @@ Install the RISC-V-specific version of OpenOCD. (The OpenOCD code shall be no ol
 
 ### Connecting debugger to simulation
 
-When a SweRVolf simulation is launched with the `--jtag_vpi_enable`, it will start a JTAG server waiting for a client to connect and send JTAG commands.
+When a VeeRwolf simulation is launched with the `--jtag_vpi_enable`, it will start a JTAG server waiting for a client to connect and send JTAG commands.
 
-    fusesoc run --target=sim swervolf --jtag_vpi_enable
+    fusesoc run --target=sim veerwolf --jtag_vpi_enable
 
 After compilation, the simulation should now say
 
@@ -360,7 +360,7 @@ After compilation, the simulation should now say
 
 This means that it's ready to accept a JTAG client.
 
-Open a new terminal, navigate to the workspace directory and run `openocd -f $SWERVOLF_ROOT/data/swervolf_sim.cfg` to connect OpenOCD to the simulation instance. If successful, OpenOCD should output
+Open a new terminal, navigate to the workspace directory and run `openocd -f $VEERWOLF_ROOT/data/veerwolf_sim.cfg` to connect OpenOCD to the simulation instance. If successful, OpenOCD should output
 
     Info : only one transport option; autoselect 'jtag'
     Info : Set server port to 5555
@@ -379,18 +379,18 @@ Open a new terminal, navigate to the workspace directory and run `openocd -f $SW
 and the simulation should report
 
     Waiting for client connection...ok
-    Preloading TOP.swervolf_core_tb.swervolf.bootrom.ram from jumptoram.vh
+    Preloading TOP.veerwolf_core_tb.veerwolf.bootrom.ram from jumptoram.vh
     Releasing reset
 
 Open a third terminal and connect to the debug session through OpenOCD with `telnet localhost 4444`. From this terminal, it is now possible to view and control the state of of the CPU and memory. Try this by running `mwb 0x80001010 1`. This will write to the GPIO register. To verify that it worked, there should now be a message from the simulation instance saying `gpio0 is on`. By writing 0 to the same register (`mwb 0x80001010 0`), the gpio will be turned off.
 
 ### Connecting debugger to Nexys A7
 
-SweRVolf can be debugged using the same USB cable that is used for programming the FPGA, communicating over UART and powering the board. There is however one restriction. If the Vivado programmer has been used, it will have exclusive access to the JTAG channel. For that reason it is recommended to avoid using the Vivado programming tool and instead use OpenOCD for programming the FPGA as well. Unplugging and plugging the USB cable back will make Vivado lose the grip on the JTAG port.
+VeeRwolf can be debugged using the same USB cable that is used for programming the FPGA, communicating over UART and powering the board. There is however one restriction. If the Vivado programmer has been used, it will have exclusive access to the JTAG channel. For that reason it is recommended to avoid using the Vivado programming tool and instead use OpenOCD for programming the FPGA as well. Unplugging and plugging the USB cable back will make Vivado lose the grip on the JTAG port.
 
 Programming the board with OpenOCD can be performed by running (from $WORKSPACE)
 
-    openocd -f $SWERVOLF_ROOT/data/swervolf_nexys_program.cfg
+    openocd -f $VEERWOLF_ROOT/data/veerwolf_nexys_program.cfg
 
 To change the default FPGA image to load, add `-c "set BITFILE /path/to/bitfile"` as the first argument to openocd.
 
@@ -400,12 +400,12 @@ If everything goes as expected, this should output
     Info : clock speed 10000 kHz
     Info : JTAG tap: xc7.tap tap/device found: 0x13631093 (mfg: 0x049 (Xilinx), part: 0x3631, ver: 0x1)
     Warn : gdb services need one or more targets defined
-    loaded file build/swervolf_0/nexys_a7-vivado/swervolf_0.bit to pld device 0 in 3s 201521us
+    loaded file build/veerwolf_0/nexys_a7-vivado/veerwolf_0.bit to pld device 0 in 3s 201521us
     shutdown command invoked
 
-OpenOCD can now be connected to SweRVolf by running
+OpenOCD can now be connected to VeeRwolf by running
 
-    openocd -f $SWERVOLF_ROOT/data/swervolf_nexys_debug.cfg
+    openocd -f $VEERWOLF_ROOT/data/veerwolf_nexys_debug.cfg
 
 This should output
 
@@ -430,7 +430,7 @@ After the program has been loaded, set the program counter to address zero with 
 
 ## Booting
 
-SweRVolf is set up by default to read its initial instructions from address 0x80000000 which point to the on-chip boot ROM. A default bootloader is provided which has the capability to boot from SPI Flash, RAM or serial depending on the GPIO pins connected to bits 7:6 in register 0x80001013. The table below summarizes the boot modes
+VeeRwolf is set up by default to read its initial instructions from address 0x80000000 which point to the on-chip boot ROM. A default bootloader is provided which has the capability to boot from SPI Flash, RAM or serial depending on the GPIO pins connected to bits 7:6 in register 0x80001013. The table below summarizes the boot modes
 
 | bit7 | bit6 | Boot mode         |
 | ---- | ---- | ----------------- |
@@ -453,7 +453,7 @@ The `mkimage` tool available from u-boot is used to prepare an image to be writt
 
     mkimage -A riscv -C none -T standalone -a 0x0 -e 0x0 -n '' -d $IMAGE.bin $IMAGE.ub
 
-Refer to the uimage manual for a description of each parameter. There are also Makefile targets in `$SWERVOLF_ROOT/sw/Makefile` that can be used as reference.
+Refer to the uimage manual for a description of each parameter. There are also Makefile targets in `$VEERWOLF_ROOT/sw/Makefile` that can be used as reference.
 
 ### Writing SPI Flash
 
@@ -461,7 +461,7 @@ Refer to the uimage manual for a description of each parameter. There are also M
 
 In order to test the SPI image loading mechanism in simulation, a specific FuseSoC target, `spi_tb` is available. If no run-time parameters are supplied it will load a prebuilt image containing the `hello` program (source available in `sw/hello.S`) from Flash, execute it and exit. This testbench will not work in Verilator as it uses a non synthesizable model of the SPI Flash. The default simulator is instead ModelSim. Other simulators can be used by adding the `--tool=$TOOL` argument to the command-line.
 
-    fusesoc run --target=spi_tb swervolf
+    fusesoc run --target=spi_tb veerwolf
 
 The simulated Flash contents can be changed at compile-time with the `--flash_init_file` parameter. The model expects a uImage in verilog hex format. Such files can be created by running
 
@@ -472,11 +472,11 @@ The simulated Flash contents can be changed at compile-time with the `--flash_in
 For Nexys A7, OpenOCD is used to write to Flash. As the connection to the SPI Flash goes through the FPGA, this consists of a two-stage process where a proxy FPGA image is first written, which will handle communication between OpenOCD and the SPI Flash
 
 1. Obtain the proxy FPGA image from [here](https://github.com/quartiq/bscan_spi_bitstreams/blob/master/bscan_spi_xc7a100t.bit) and place it in `$WORKSPACE`
-2. Run `openocd -c "set BINFILE $IMAGE" -f $SWERVOLF_ROOT/data/swervolf_nexys_write_flash.cfg`, where `$IMAGE` is the path to the uImage file that should be written to Flash
+2. Run `openocd -c "set BINFILE $IMAGE" -f $VEERWOLF_ROOT/data/veerwolf_nexys_write_flash.cfg`, where `$IMAGE` is the path to the uImage file that should be written to Flash
 
 ### Set up SPI uImage loader
 
-The final step is to prepare the bootloader for SweRVolf which will be responsible for reading the image from Flash, copy it to RAM and execute it. This process is the same for both simulation and hardware targets. Note that both the `spi_tb` target and `nexys_a7` target will have this as the default boot loader so in most cases nothing else needs to be done. There are however a couple of defines in `sw/spi_uimage_loader.S` that might need to be adjusted if the SPI controller is mapped to another base address or if the image is not stored at address 0 in the Flash.
+The final step is to prepare the bootloader for VeeRwolf which will be responsible for reading the image from Flash, copy it to RAM and execute it. This process is the same for both simulation and hardware targets. Note that both the `spi_tb` target and `nexys_a7` target will have this as the default boot loader so in most cases nothing else needs to be done. There are however a couple of defines in `sw/spi_uimage_loader.S` that might need to be adjusted if the SPI controller is mapped to another base address or if the image is not stored at address 0 in the Flash.
 
 ### Serial boot
 
@@ -484,4 +484,4 @@ In serial boot mode, the UART waits for a program in Intel Hex format to be sent
 
 ## CPU configuration
 
-SweRVolf currently supports the SweRV EH1 and EL2 cores. For all targets SweRV EH1 is used by default unless there are hardware limitations (e.g. FPGA size) that only allows using SweRV EL2. All targets can optionally use SweRV EL2 by passing  `--flag=cpu_el2` as a run option to FuseSoC, e.g. `fusesoc run --target=sim --flag=cpu_el2 swervolf` will run the default simulation example using SweRV EL2. Also note that the max frequency of the processors can differ. E.g. on the Nexys A7 board SweRV EH1 will run at 50MHz while SweRV EL2 runs at 25MHz. The `clk_freq_hz` register in the system controller will always show the correct value. The bootloader and Zephyr board support is also set up to automatically adapt timer and UART speeds to the runtime-detected clock speed.
+VeeRwolf currently supports the VeeR EH1 and EL2 cores. For all targets VeeR EH1 is used by default unless there are hardware limitations (e.g. FPGA size) that only allows using VeeR EL2. All targets can optionally use VeeR EL2 by passing  `--flag=cpu_el2` as a run option to FuseSoC, e.g. `fusesoc run --target=sim --flag=cpu_el2 veerwolf` will run the default simulation example using VeeR EL2. Also note that the max frequency of the processors can differ. E.g. on the Nexys A7 board VeeR EH1 will run at 50MHz while VeeR EL2 runs at 25MHz. The `clk_freq_hz` register in the system controller will always show the correct value. The bootloader and Zephyr board support is also set up to automatically adapt timer and UART speeds to the runtime-detected clock speed.

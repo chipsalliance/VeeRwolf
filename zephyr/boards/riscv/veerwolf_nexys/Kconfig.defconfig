@@ -1,0 +1,10 @@
+
+config BOARD
+	default "veerwolf_nexys"
+	depends on BOARD_VEERWOLF_NEXYS
+if FLASH
+
+config SPI_NOR
+	def_bool y
+
+endif
