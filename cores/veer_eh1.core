@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : chipsalliance.org:cores:VeeR_EH1:1.8
+name : chipsalliance.org:cores:VeeR_EH1:1.9
 description : VeeR EH1 RISC-V Core
 
 filesets:
@@ -151,4 +151,4 @@ provider:
   name    : github
   user    : chipsalliance
   repo    : Cores-VeeR-EH1
-  version : 7332edc0adaa7e9a0c842d169154429e8d987786
+  version : 915fb34a5b38ef14c5d5c05431765ad8b912bc3

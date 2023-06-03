@@ -6,7 +6,7 @@ description : Reference SoC for the VeeR family of cores
 filesets:
   eh1:
     files: [rtl/veer_eh1_wrapper.sv : {file_type : systemVerilogSource}]
-    depend: ["=chipsalliance.org:cores:VeeR_EH1:1.8"]
+    depend: ["=chipsalliance.org:cores:VeeR_EH1:1.9"]
 
   el2:
     files: [rtl/veer_el2_wrapper.sv : {file_type : systemVerilogSource}]
