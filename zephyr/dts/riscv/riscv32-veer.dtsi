@@ -61,7 +61,7 @@
 			gpio-controller;
 			#gpio-cells = <2>;
 			ngpios = <32>;
-			label = "FPGA_LED0";
+			label = "LED0";
 		};
 
 	};
