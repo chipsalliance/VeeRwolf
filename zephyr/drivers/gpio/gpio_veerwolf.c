@@ -133,21 +133,22 @@ static const struct gpio_driver_api gpio_veerwolf_driver_api = {
 /* Device Instantiation */
 
 #define GPIO_VEERWOLF_INIT(n) \
-	static const struct gpio_veerwolf_cfg gpio_veerwolf_cfg_##n = { \
-		.reg_addr = \
-		(volatile uint32_t *) DT_INST_REG_ADDR(n), \
-		.nr_gpios = DT_INST_PROP(n, ngpios), \
-	}; \
-	static struct gpio_veerwolf_data gpio_veerwolf_data_##n; \
-\
-	DEVICE_AND_API_INIT(veerwolf_gpio_##n, \
-			    DT_INST_LABEL(n), \
-			    gpio_veerwolf_init, \
-			    &gpio_veerwolf_data_##n, \
-			    &gpio_veerwolf_cfg_##n, \
-			    POST_KERNEL, \
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
-			    &gpio_veerwolf_driver_api \
-			   );
+	static const struct gpio_veerwolf_cfg gpio_veerwolf_cfg_##n = {	\
+		.reg_addr =						\
+		(volatile uint32_t *) DT_INST_REG_ADDR(n),		\
+		.nr_gpios = DT_INST_PROP(n, ngpios),			\
+	};								\
+	static struct gpio_veerwolf_data gpio_veerwolf_data_##n;	\
+									\
+	DEVICE_DEFINE(veerwolf_gpio_##n,				\
+		      DT_INST_LABEL(n),					\
+		      gpio_veerwolf_init,				\
+		      NULL,						\
+		      &gpio_veerwolf_data_##n,				\
+		      &gpio_veerwolf_cfg_##n,				\
+		      POST_KERNEL,					\
+		      CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
+		      &gpio_veerwolf_driver_api				\
+		      );
 
 DT_INST_FOREACH_STATUS_OKAY(GPIO_VEERWOLF_INIT)
