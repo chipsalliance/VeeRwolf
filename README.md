@@ -77,7 +77,7 @@ The system controller contains common system functionality such as keeping regis
 
 This register allows configuration and assertion of IRQ line 3 and 4, for testing the VeeR PIC or having two extra software-controllable interrupt sources. Interrupts can be triggered by writing to the sw_irq*n* bits when the timer bit is set to 0, or by a timeout of the irq_timer, when the timer bit is set to one. If both sw_irq3_timer and sw_irq4_timer are set to 0, the IRQ timer instead asserts an NMI when it reaches 0.
 
-If sw_irq3_timer or sw_irq4_timer are asserted, the interrupt trigger is connected to 
+If sw_irq3_timer or sw_irq4_timer are asserted, the interrupt trigger is connected to
 
 | Bits | Name         | Description |
 | ---- | ------------ | -----------
@@ -215,6 +215,25 @@ Your workspace shall now look like this:
        └──veerwolf
 
 After step 3, the VeeRwolf sources will be located in `$WORKSPACE/fusesoc_libraries/veerwolf`. For convenience, this directory will from now on be refered to as `$VEERWOLF_ROOT`. Run `export VEERWOLF_ROOT=$WORKSPACE/fusesoc_libraries/veerwolf` to set this as a shell variable
+
+Install [Zephyr SDK](https://github.com/zephyrproject-rtos/sdk-ng/tags)
+
+In order to  build zephyr application the zephyr SDK must be installed.  Attempting to build with west build will tell you which version is needed (if not already installed).  It is probably best to go with the oldest recommended version, since it is possible to fail by using a too new SDK (e.g. a compiler that needs options the build system (which is part of the OS release, not the SDK) does not yet know how to provide).
+
+Different versions of the zephyr SDK can be found at (https://github.com/zephyrproject-rtos/sdk-ng/tags).  Installation details differ between the versions, but tend to be either a self-contained installer script (e.g. zephyr-sdk-0.13.2-linux-aarch64-setup.run that is applied by
+
+chmod a+x zephyr-sdk-0.13.2-linux-aarch64-setup.run
+
+./zephyr-sdk-0.13.2-linux-aarch64-setup.run
+
+or an archive with an installer script (e.g. zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz) which needs to be extracted and the installer run by
+tar xvf zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz
+cd zephyr-sdk-0.16.1
+./setup.sh
+
+Install [Vivado](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools)
+
+Vivado is needed to synthesize the design for the nexys A7 target.  The standard edition is available free of charge from Xilinx/AMD, but the user needs to register and fill out an export license form.  A good place to start is probably https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools.html.  Someone doing this for the first time can probably expand on these notes, I already had a registered xilinx user so probably short-circuited part of the process.
 
 ## Running the SoC
 
