@@ -2,28 +2,43 @@
 
 //These non-critical warnings must be fixed upstream. In the meantime they are waived to easier spot other warnings
 
-//pulp-platform.org::axi:0.23.0
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_id_prepend.sv" -lines 85-86
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_id_prepend.sv" -lines 93-94
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_atop_filter.sv" -lines 120
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux.sv" -lines 459
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux.sv" -lines 467
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux.sv" -lines 479
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 126
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 162-163
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 174
-lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 182
-lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 216
-lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_pkg.sv" -lines 234
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_mux.sv" -lines 61
-lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_0.23.0-r1/src/axi_demux.sv" -lines 48
+//pulp-platform.org::axi:0.25.0
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_id_prepend.sv" -lines 85-86
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_id_prepend.sv" -lines 93-94
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_demux.sv" -lines 460
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_demux.sv" -lines 467
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_demux.sv" -lines 479
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_pkg.sv" -lines 126
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_pkg.sv" -lines 162-163
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_pkg.sv" -lines 174
+lint_off -rule WIDTH -file "*/pulp-platform.org__axi_0.25.0/src/axi_pkg.sv" -lines 182
+lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_0.25.0/src/axi_pkg.sv" -lines 216
+lint_off -rule CASEINCOMPLETE -file "*/pulp-platform.org__axi_0.25.0/src/axi_pkg.sv" -lines 234
+lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__axi_0.25.0/src/axi_demux.sv" -lines 48-49
 
-//pulp-platform.org::common_cells:1.16.4
-lint_off -rule CMPCONST -file "*/pulp-platform.org__common_cells_*/src/deprecated/fifo_v2.sv" -lines 48
-lint_off -rule WIDTH -file "*/pulp-platform.org__common_cells_1.16.4/src/rr_arb_tree.sv" -lines 195
+
+//pulp-platform.org::common_cells:1.20.0
+lint_off -rule UNOPTFLAT -file "*/pulp-platform.org__common_cells_1.20.0/src/lzc.sv" -lines 59-61
+lint_off -rule UNSIGNED  -file "*/pulp-platform.org__common_cells_1.20.0/src/rr_arb_tree.sv" -lines 208-209
 
 //::simple_spi:1.6-r1
 lint_off -rule CASEINCOMPLETE -file "*/simple_spi_1.6/rtl/verilog/simple_spi_top.v" -lines 244
 
-//chipsalliance.org:cores:VeeR_EH1:1.8
-lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EH1_1.8/design/pic_ctrl.sv" -lines 467-468
+//chipsalliance.org:cores:VeeR_EH1:1.9
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EH1_1.9/design/pic_ctrl.sv" -lines 467-468
+
+//chipsalliance.org:cores:VeeR_EL2:1.4
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/dec/el2_dec_decode_ctl.sv" -lines 345-346
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/lsu/el2_lsu_lsc_ctl.sv" -lines 144-145
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/exu/el2_exu_div_ctl.sv" -lines 1346-1347
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/lsu/el2_lsu.sv" -lines 211-212
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/dec/el2_dec_decode_ctl.sv" -lines 394-395
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/lsu/el2_lsu.sv" -lines 225-226
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/ifu/el2_ifu_ifc_ctl.sv" -lines 83-84
+lint_off -rule UNOPTFLAT -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/el2_pic_ctrl.sv" -lines 543-544
+
+//There are 349 width warnings in VeeR EL2 which is too much to handle individually at this point
+lint_off -rule WIDTH -file "*/chipsalliance.org_cores_VeeR_EL2_1.4/design/*"
+
+//This is needed to silence a warning in a file included by el2_wrapper
+lint_off -rule WIDTH -file "*/veer_el2_wrapper.sv" -lines 28-29
