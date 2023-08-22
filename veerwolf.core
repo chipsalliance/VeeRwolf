@@ -221,6 +221,11 @@ generate:
           id_width : 3
           read_only : true
         lsu:
+           # This value is really dependent on the number of outstanding LSU
+           # loads (lsu_num_nbload in the veer config), but since we don't
+           # have access to that value here, we hardcode it to the worst-case
+           # value of four and hope that the synthesis tools will optimize
+           # away the unused bits.
           id_width : 4
         sb:
           id_width : 1
@@ -242,7 +247,7 @@ generate:
     generator: veer_el2_config
     position : first
     parameters:
-      args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1]
+      args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1, -set=pic_total_int=8]
 
   veer_el2_nexys_a7_config:
     generator: veer_el2_config
@@ -259,6 +264,7 @@ generate:
         - -set=iccm_enable=0
         - -set=icache_enable=0
         - -set=dccm_enable=0
+        - -set=pic_total_int=8
 
   veer_el2_arty_a7_config:
     generator: veer_el2_config
@@ -278,7 +284,7 @@ generate:
         - -set=dccm_enable=0
         - -set=dma_buf_depth=2
         - -set=div_bit=1
-        - -set=pic_total_int=2
+        - -set=pic_total_int=8
 
 # - -target=default_ahb
 

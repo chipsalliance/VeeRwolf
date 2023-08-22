@@ -141,7 +141,7 @@ module veerwolf_core_tb
    axi_ram
      #(.DATA_WIDTH (64),
        .ADDR_WIDTH ($clog2(RAM_SIZE)),
-       .ID_WIDTH  (`RV_LSU_BUS_TAG+2))
+       .ID_WIDTH  (6))
    ram
      (.clk       (clk),
       .rst       (rst),

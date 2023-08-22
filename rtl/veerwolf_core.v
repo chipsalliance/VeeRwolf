@@ -151,7 +151,7 @@ module veerwolf_core
 
    axi2wb
      #(.AW (16),
-       .IW (`RV_LSU_BUS_TAG+3))
+       .IW (6))
    axi2wb
      (
       .i_clk       (clk),
@@ -354,6 +354,23 @@ module veerwolf_core
       end
    endgenerate
 
+   /* There is currently no nice way to ensure consistency between
+    the ID width specified in the VeeR config and the width specified
+    when generating the AXI interconnect. The interconnect is sized
+    for the worst case value (4), so we explicitly resize the ID signals
+    to this.
+    */
+
+   wire [`RV_LSU_BUS_TAG-1:0] lsu_awid_int;
+   wire [`RV_LSU_BUS_TAG-1:0] lsu_arid_int;
+   wire [`RV_LSU_BUS_TAG-1:0] lsu_bid_int;
+   wire [`RV_LSU_BUS_TAG-1:0] lsu_rid_int;
+
+   assign lsu_awid = 4'(lsu_awid_int);
+   assign lsu_arid = 4'(lsu_arid_int);
+   assign lsu_bid_int = lsu_bid[`RV_LSU_BUS_TAG-1:0];
+   assign lsu_rid_int = lsu_rid[`RV_LSU_BUS_TAG-1:0];
+
    veer_wrapper_dmi rvtop
      (
       .clk     (clk),
@@ -375,7 +392,7 @@ module veerwolf_core
       //-------------------------- LSU AXI signals--------------------------
       .lsu_axi_awvalid  (lsu_awvalid),
       .lsu_axi_awready  (lsu_awready),
-      .lsu_axi_awid     (lsu_awid   ),
+      .lsu_axi_awid     (lsu_awid_int),
       .lsu_axi_awaddr   (lsu_awaddr ),
       .lsu_axi_awregion (lsu_awregion),
       .lsu_axi_awlen    (lsu_awlen  ),
@@ -395,11 +412,11 @@ module veerwolf_core
       .lsu_axi_bvalid   (lsu_bvalid),
       .lsu_axi_bready   (lsu_bready),
       .lsu_axi_bresp    (lsu_bresp ),
-      .lsu_axi_bid      (lsu_bid   ),
+      .lsu_axi_bid      (lsu_bid_int),
 
       .lsu_axi_arvalid  (lsu_arvalid ),
       .lsu_axi_arready  (lsu_arready ),
-      .lsu_axi_arid     (lsu_arid    ),
+      .lsu_axi_arid     (lsu_arid_int),
       .lsu_axi_araddr   (lsu_araddr  ),
       .lsu_axi_arregion (lsu_arregion),
       .lsu_axi_arlen    (lsu_arlen   ),
@@ -412,7 +429,7 @@ module veerwolf_core
 
       .lsu_axi_rvalid   (lsu_rvalid),
       .lsu_axi_rready   (lsu_rready),
-      .lsu_axi_rid      (lsu_rid   ),
+      .lsu_axi_rid      (lsu_rid_int),
       .lsu_axi_rdata    (lsu_rdata ),
       .lsu_axi_rresp    (lsu_rresp ),
       .lsu_axi_rlast    (lsu_rlast ),

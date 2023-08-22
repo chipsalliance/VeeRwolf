@@ -36,8 +36,8 @@ import el2_pkg::*;
 
 
    output logic [31:0]                     trace_rv_i_insn_ip,
-   output logic [31:0]                     trace_rv_i_address_ip,
-   output logic [1:0]                      trace_rv_i_valid_ip,
+   output logic [63:0]                     trace_rv_i_address_ip,
+   output logic [2:0]                      trace_rv_i_valid_ip,
    output logic [1:0]                      trace_rv_i_exception_ip,
    output logic [4:0]                      trace_rv_i_ecause_ip,
    output logic [1:0]                      trace_rv_i_interrupt_ip,
@@ -424,6 +424,10 @@ import el2_pkg::*;
    el2_veer veer (
                                 .soft_int (1'b0),
                                 .core_id  (28'd0),
+                                .trace_rv_i_address_ip (trace_rv_i_address_ip[31:0]),
+                                .trace_rv_i_valid_ip (trace_rv_i_valid_ip[0]),
+                                .trace_rv_i_exception_ip (trace_rv_i_exception_ip[0]),
+                                .trace_rv_i_interrupt_ip (trace_rv_i_interrupt_ip[0]),
                                 .*
                                 );
 
