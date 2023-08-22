@@ -97,6 +97,23 @@ targets:
       vivado: {part : xc7a35tcpg236-1}
     toplevel : veerwolf_basys3
 
+  lint:
+    default_tool : verilator
+    description : Run static code checks (linting)
+    filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
+      - core
+      - bootrom
+      - "tool_verilator? (verilator_waiver)"
+
+    generate : [intercon, "cpu_el2? (veer_el2_default_config)", "!cpu_el2? (veer_eh1_default_config)", version, wb_intercon]
+    parameters : [rom_init_file]
+    tools:
+      verilator:
+        mode: lint-only
+    toplevel : veerwolf_core
+
   sim:
     default_tool : verilator
     description : Default simulation target
