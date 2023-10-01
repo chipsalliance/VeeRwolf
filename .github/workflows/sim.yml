@@ -1,0 +1,22 @@
+name: Run basic testbench
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Basic testbench
+    env:
+      REPO : VeeRwolf
+      VLNV : veerwolf
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: VeeRwolf
+      - run: sudo apt install verilator
+      - run: pip3 install fusesoc
+      - run: fusesoc library add fusesoc-cores https://github.com/fusesoc/fusesoc-cores
+      - run: fusesoc library add $REPO $GITHUB_WORKSPACE/$REPO
+      - run: fusesoc run --target=sim $VLNV --timeout=20000
