@@ -83,8 +83,11 @@ module veerwolf_syscon
 `ifndef VERSION_MINOR
  `define VERSION_MINOR 255
 `endif
+`ifndef VERSION_PATCH
+ `define VERSION_PATCH 255
+`endif
 `ifndef VERSION_REV
- `define VERSION_REV 255
+ `define VERSION_REV 127
 `endif
 `ifndef VERSION_SHA
  `define VERSION_SHA deadbeef
