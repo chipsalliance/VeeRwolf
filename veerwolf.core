@@ -60,6 +60,15 @@ filesets:
       - rtl/veerwolf_nexys.v    : {file_type : systemVerilogSource}
     depend : [":veerwolf:litedram"]
 
+  nexys_video_files:
+    files :
+      - data/vivado_waiver.tcl : {file_type : tclSource}
+      - data/veerwolf_nexys_video.xdc : {file_type : xdc}
+      - rtl/axi_ram.v : {file_type : verilogSource}
+      - rtl/clk_gen_nexys.v : {file_type : verilogSource}
+      - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
+      - rtl/veerwolf_nexys_video.v    : {file_type : systemVerilogSource}
+
   arty_a7_files:
     files :
       - data/vivado_waiver.tcl : {file_type : tclSource}
@@ -195,6 +204,21 @@ targets:
     tools:
       vivado: {part : xc7a100tcsg324-1}
     toplevel : veerwolf_nexys_a7
+
+  nexys_video:
+    default_tool : vivado
+    description : FPGA image with VeeR EL2 for the Digilent Nexys Video A7 FPGA board
+    filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
+      - bootrom
+      - core
+      - nexys_video_files
+    generate : [intercon, "!cpu_el2? (veer_eh1_default_config)", "cpu_el2? (veer_el2_nexys_a7_config)", version, wb_intercon]
+    parameters : [bootrom_file, "cpu_el2? (cpu_type=EL2)"]
+    tools:
+      vivado: {part : xc7a200tsbg484-1}
+    toplevel : veerwolf_nexys_video
 
   arty_a7:
     default_tool : vivado
