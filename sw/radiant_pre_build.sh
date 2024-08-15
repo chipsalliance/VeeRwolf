@@ -22,3 +22,5 @@ else
     incl_path='src/veerwolf-veer_eh1_default_config_0.7.5;src/veerwolf-wb_intercon_0.7.5;src/chipsalliance.org_cores_VeeR_EH1_1.9/design/include;config;'$incl_path
 fi
 sed 's@.*include path.*@prj_set_impl_opt -impl "impl" "include path" '"\"$incl_path\"@" -i veerwolf_0.7.5.tcl
+
+sed '/prj_open veerwolf_0_7_5.rdf/a prj_set_strategy "Area" \nprj_save' -i veerwolf_0.7.5_run.tcl
