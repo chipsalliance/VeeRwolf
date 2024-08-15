@@ -152,7 +152,7 @@ targets:
       - bootrom
       - core
       - agilex5_files
-    generate : [intercon, "!cpu_el2? (veer_eh1_default_config)", "cpu_el2? (veer_el2_agilex5_config)", version, wb_intercon]
+    generate : [intercon, "!cpu_el2? (veer_eh1_default_config)", "cpu_el2? (veer_el2_array_config)", version, wb_intercon]
     parameters : [bootrom_file, "cpu_el2? (cpu_type=EL2)"]
     tools:
       quartus:
