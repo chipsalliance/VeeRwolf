@@ -27,6 +27,20 @@ filesets:
       - simple_spi
       - ::wb_intercon:1.4.1
 
+  nospi_core:
+    files:
+      - rtl/dpram64.v
+      - rtl/axi2wb.v
+      - rtl/wb_mem_wrapper.v
+      - rtl/veerwolf_syscon.v
+      - rtl/veerwolf_nospi.v
+    file_type : systemVerilogSource
+    depend :
+      - fusesoc:utils:generators
+      - uart16550
+      - ">=pulp-platform.org::axi:0.23.0-r1"
+      - ::wb_intercon:1.4.1
+
   bfm:
     files:
       - tb/uart_decoder.v
@@ -37,6 +51,14 @@ filesets:
       - sw/hello.vh : {file_type : user, copyto : hello.vh}
       - rtl/axi_ram.v : {file_type : verilogSource}
       - tb/veerwolf_core_tb.v : {file_type : systemVerilogSource}
+
+  array_tb:
+    files:
+      - tb/veerwolf_core_tb.v : {file_type : systemVerilogSource}
+      - tb/veerwolf_array_tb.v    : {file_type : systemVerilogSource}
+      - rtl/veerwolf_tile.v    : {file_type : systemVerilogSource}
+      - rtl/axi_ram.v : {file_type : verilogSource}
+      - tb/array_tb.cpp : {file_type : cppSource}
 
   verilator_tb:
     files: [tb/tb.cpp : {file_type : cppSource}]
@@ -58,6 +80,23 @@ filesets:
       - rtl/clk_gen_agilex.v : {file_type : verilogSource}
       - rtl/veerwolf_agilex.v    : {file_type : systemVerilogSource}
       - rtl/axi_ram.v : {file_type : verilogSource}
+
+  agilex5_array_files:
+    files :
+      - data/agilex5_array.sdc : {file_type : SDC}
+      - data/agilex5_array.tcl : {file_type : tclSource}
+      - rtl/clk_gen_agilex.v : {file_type : verilogSource}
+      - rtl/veerwolf_array_agilex.v    : {file_type : systemVerilogSource}
+      - rtl/veerwolf_tile.v    : {file_type : systemVerilogSource}
+      - rtl/axi_ram.v : {file_type : verilogSource}
+  
+  avant_array_files:
+    files:
+      - data/avant_array.sdc : {file_type : PDC}
+      - rtl/veerwolf_array_avant.v   : {file_type : systemVerilogSource}
+      - rtl/veerwolf_tile.v    : {file_type : systemVerilogSource}
+      - rtl/axi_ram.v : {file_type : verilogSource}
+      - sw/radiant_pre_build.sh : {file_type : user, copyto : radiant_pre_build.sh}
 
   nexys_a7_files:
     files :
@@ -99,6 +138,10 @@ filesets:
     files :
       - sw/bootloader.vh : {file_type : user, copyto : bootloader.vh}
 
+  array_bootrom:
+    files :
+      - sw/array_rom.vh : {file_type : user, copyto : array_rom.vh}
+
 targets:
   agilex5:
     default_tool : quartus
@@ -109,13 +152,46 @@ targets:
       - bootrom
       - core
       - agilex5_files
-    generate : [intercon, "!cpu_el2? (veer_eh1_default_config)", "cpu_el2? (veer_el2_default_config)", version, wb_intercon]
+    generate : [intercon, "!cpu_el2? (veer_eh1_default_config)", "cpu_el2? (veer_el2_agilex5_config)", version, wb_intercon]
     parameters : [bootrom_file, "cpu_el2? (cpu_type=EL2)"]
     tools:
       quartus:
         family : Agilex 5
         device : A5ED065BB32AE6SR0
     toplevel : veerwolf_agilex
+
+  agilex5_array:
+    default_tool : quartus
+    description : FPGA image VeeR EH1/EL2 array for the Intel Agilex 5 FPGA E-Series DK A5E065BB32AES1 Premium devkit
+    filesets :
+      - el2
+      - array_bootrom
+      - nospi_core
+      - agilex5_array_files
+    generate : [tilearray: {count: 18}, intercon, veer_el2_array_config, version, wb_nospi_intercon]
+    parameters : [bootrom_file, "cpu_type=EL2"]
+    tools:
+      quartus:
+        family : Agilex 5
+        device : A5ED065BB32AE6SR0
+    toplevel : veerwolf_array_agilex
+
+  avant_array:
+    default_tool : radiant
+    description : FPGA image VeeR EH1/EL2 array for Lattice Avant E-Series
+    filesets :
+      - el2
+      - array_bootrom
+      - nospi_core
+      - avant_array_files
+    generate : [tilearray: {count: 13}, intercon, veer_el2_array_config, version, wb_nospi_intercon]
+    parameters : [bootrom_file, "cpu_type=EL2"]
+    hooks :
+      pre_build : [radiant_patch_script]
+    tools:
+      radiant:
+        part: LAV-AT-E70ES1-1LFG1156C
+    toplevel : veerwolf_array_avant
 
   basys3:
     default_tool : vivado
@@ -186,6 +262,23 @@ targets:
         #For interactive wave debug, also add "-debug all" or "-debug typical"
         xelab_options : [-d, XSIM]
     toplevel : veerwolf_core_tb
+
+  array_sim:
+    default_tool : verilator
+    description : Simulate the Veerwolf array project
+    filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
+      - nospi_core
+      - array_tb
+      - array_bootrom
+      - verilator_waiver
+    generate : [tilearray, intercon, "cpu_el2? (veer_el2_array_config)", "!cpu_el2? (veer_eh1_default_config)", version, wb_nospi_intercon]
+    parameters : [SIMPRINT=true, rom_init_file, signature, timeout, "cpu_el2? (cpu_type=EL2)"]
+    tools:
+      verilator:
+        verilator_options : [--trace, -Wno-fatal]
+    toplevel : veerwolf_array_tb
 
   spi_tb:
     default_tool : modelsim
@@ -260,6 +353,11 @@ targets:
     toplevel : veerwolf_arty_a7
 
 generate:
+  tilearray:
+    generator: tilearray_gen
+    parameters: 
+      count : 2
+
   wb_intercon:
     generator: wb_intercon_gen
     parameters:
@@ -303,6 +401,23 @@ generate:
           offset : 0x00000000
           size   : 0x08000000 #128MiB
 
+  wb_nospi_intercon:
+    generator: wb_intercon_gen
+    parameters:
+      masters:
+        io:
+          slaves : [rom, sys, uart]
+      slaves:
+        rom:
+          offset : 0x00000000
+          size   : 0x00001000
+        sys:
+          offset : 0x00001000
+          size   : 0x00000040
+        uart:
+          offset : 0x00002000
+          size   : 0x00001000
+
   veer_eh1_default_config:
     generator: veer_eh1_config
     position : first
@@ -314,6 +429,24 @@ generate:
     position : first
     parameters:
       args : [-unset=assert_on, -set=reset_vec=0x80000000, -set=fpga_optimize=1, -set=pic_total_int=8]
+
+  veer_el2_array_config:
+    generator: veer_el2_config
+    position : first
+    parameters:
+      args :
+        - -unset=assert_on
+        - -set=reset_vec=0x80000000
+        - -set=fpga_optimize=1
+        - -set=ret_stack_size=2
+        - -set=btb_size=32
+        - -set=bht_size=128
+        - -set=dccm_size=16
+        - -set=dccm_num_banks=2
+        - -set=iccm_enable=0
+        - -set=icache_enable=0
+        - -set=dccm_enable=0
+        - -set=pic_total_int=8
 
   veer_el2_nexys_a7_config:
     generator: veer_el2_config
@@ -356,6 +489,11 @@ generate:
 
   version:
     generator: gitversion
+
+generators:
+  tilearray_gen:
+    interpreter: python3
+    command: sw/tile_array_gen.py
 
 parameters:
   SIMPRINT:
@@ -410,3 +548,7 @@ parameters:
     datatype : bool
     description : Dump VCD
     paramtype : plusarg
+
+scripts:
+  radiant_patch_script:
+    cmd : [bash, "radiant_pre_build.sh"]
