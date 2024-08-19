@@ -145,9 +145,9 @@ module veerwolf_core
 
    wire [15:2] 		       wb_adr;
 
-   assign		       wb_m2s_io_adr = {16'd0,wb_adr,2'b00};
-   assign wb_m2s_io_cti = 3'b000;
-   assign wb_m2s_io_bte = 2'b00;
+   assign		       wb_io_adr = {16'd0,wb_adr,2'b00};
+   assign wb_io_cti = 3'b000;
+   assign wb_io_bte = 2'b00;
 
    axi2wb
      #(.AW (16),
@@ -157,14 +157,14 @@ module veerwolf_core
       .i_clk       (clk),
       .i_rst       (~rst_n),
       .o_wb_adr    (wb_adr),
-      .o_wb_dat    (wb_m2s_io_dat),
-      .o_wb_sel    (wb_m2s_io_sel),
-      .o_wb_we     (wb_m2s_io_we),
-      .o_wb_cyc    (wb_m2s_io_cyc),
-      .o_wb_stb    (wb_m2s_io_stb),
-      .i_wb_rdt    (wb_s2m_io_dat),
-      .i_wb_ack    (wb_s2m_io_ack),
-      .i_wb_err    (wb_s2m_io_err),
+      .o_wb_dat    (wb_io_dat),
+      .o_wb_sel    (wb_io_sel),
+      .o_wb_we     (wb_io_we),
+      .o_wb_cyc    (wb_io_cyc),
+      .o_wb_stb    (wb_io_stb),
+      .i_wb_rdt    (wb_io_rdt),
+      .i_wb_ack    (wb_io_ack),
+      .i_wb_err    (wb_io_err),
 
       .i_awaddr    (io_awaddr[15:0]),
       .i_awid      (io_awid),
@@ -199,17 +199,17 @@ module veerwolf_core
    bootrom
      (.i_clk    (wb_clk),
       .i_rst    (wb_rst),
-      .i_wb_adr (wb_m2s_rom_adr[$clog2(BOOTROM_SIZE)-1:2]),
-      .i_wb_dat (wb_m2s_rom_dat),
-      .i_wb_sel (wb_m2s_rom_sel),
-      .i_wb_we  (wb_m2s_rom_we),
-      .i_wb_cyc (wb_m2s_rom_cyc),
-      .i_wb_stb (wb_m2s_rom_stb),
-      .o_wb_rdt (wb_s2m_rom_dat),
-      .o_wb_ack (wb_s2m_rom_ack));
+      .i_wb_adr (wb_rom_adr[$clog2(BOOTROM_SIZE)-1:2]),
+      .i_wb_dat (wb_rom_dat),
+      .i_wb_sel (wb_rom_sel),
+      .i_wb_we  (wb_rom_we),
+      .i_wb_cyc (wb_rom_cyc),
+      .i_wb_stb (wb_rom_stb),
+      .o_wb_rdt (wb_rom_rdt),
+      .o_wb_ack (wb_rom_ack));
 
-   assign wb_s2m_rom_err = 1'b0;
-   assign wb_s2m_rom_rty = 1'b0;
+   assign wb_rom_err = 1'b0;
+   assign wb_rom_rty = 1'b0;
 
    veerwolf_syscon
      #(.clk_freq_hz (clk_freq_hz))
@@ -227,20 +227,20 @@ module veerwolf_core
       .o_nmi_vec        (nmi_vec),
       .o_nmi_int        (nmi_int),
 
-      .i_wb_adr         (wb_m2s_sys_adr[5:0]),
-      .i_wb_dat         (wb_m2s_sys_dat),
-      .i_wb_sel         (wb_m2s_sys_sel),
-      .i_wb_we          (wb_m2s_sys_we),
-      .i_wb_cyc         (wb_m2s_sys_cyc),
-      .i_wb_stb         (wb_m2s_sys_stb),
-      .o_wb_rdt         (wb_s2m_sys_dat),
-      .o_wb_ack         (wb_s2m_sys_ack));
+      .i_wb_adr         (wb_sys_adr[5:0]),
+      .i_wb_dat         (wb_sys_dat),
+      .i_wb_sel         (wb_sys_sel),
+      .i_wb_we          (wb_sys_we),
+      .i_wb_cyc         (wb_sys_cyc),
+      .i_wb_stb         (wb_sys_stb),
+      .o_wb_rdt         (wb_sys_rdt),
+      .o_wb_ack         (wb_sys_ack));
 
-   assign wb_s2m_sys_err = 1'b0;
-   assign wb_s2m_sys_rty = 1'b0;
+   assign wb_sys_err = 1'b0;
+   assign wb_sys_rty = 1'b0;
 
    wire [7:0] 		       spi_rdt;
-   assign wb_s2m_spi_flash_dat = {24'd0,spi_rdt};
+   assign wb_spi_flash_rdt = {24'd0,spi_rdt};
 
    simple_spi spi
      (// Wishbone slave interface
@@ -290,13 +290,13 @@ module veerwolf_core
 
        TODO: Make something sensible here instead
        */
-      .adr_i  (wb_m2s_spi_flash_adr[2] ? 3'd0 : wb_m2s_spi_flash_adr[5:3]),
-      .dat_i  (wb_m2s_spi_flash_dat[7:0]),
-      .we_i   (wb_m2s_spi_flash_we),
-      .cyc_i  (wb_m2s_spi_flash_cyc),
-      .stb_i  (wb_m2s_spi_flash_stb),
+      .adr_i  (wb_spi_flash_adr[2] ? 3'd0 : wb_spi_flash_adr[5:3]),
+      .dat_i  (wb_spi_flash_dat[7:0]),
+      .we_i   (wb_spi_flash_we),
+      .cyc_i  (wb_spi_flash_cyc),
+      .stb_i  (wb_spi_flash_stb),
       .dat_o  (spi_rdt),
-      .ack_o  (wb_s2m_spi_flash_ack),
+      .ack_o  (wb_spi_flash_ack),
       .inta_o (spi0_irq),
       // SPI interface
       .sck_o  (o_flash_sclk),
@@ -304,26 +304,26 @@ module veerwolf_core
       .mosi_o (o_flash_mosi),
       .miso_i (i_flash_miso));
 
-   assign wb_s2m_spi_flash_err = 1'b0;
-   assign wb_s2m_spi_flash_rty = 1'b0;
+   assign wb_spi_flash_err = 1'b0;
+   assign wb_spi_flash_rty = 1'b0;
 
    wire [7:0] 		       uart_rdt;
-   assign wb_s2m_uart_dat = {24'd0, uart_rdt};
-   assign wb_s2m_uart_err = 1'b0;
-   assign wb_s2m_uart_rty = 1'b0;
+   assign wb_uart_rdt = {24'd0, uart_rdt};
+   assign wb_uart_err = 1'b0;
+   assign wb_uart_rty = 1'b0;
 
    uart_top uart16550_0
      (// Wishbone slave interface
       .wb_clk_i	(clk),
       .wb_rst_i	(~rst_n),
-      .wb_adr_i	(wb_m2s_uart_adr[4:2]),
-      .wb_dat_i	(wb_m2s_uart_dat[7:0]),
-      .wb_we_i	(wb_m2s_uart_we),
-      .wb_cyc_i	(wb_m2s_uart_cyc),
-      .wb_stb_i	(wb_m2s_uart_stb),
+      .wb_adr_i	(wb_uart_adr[4:2]),
+      .wb_dat_i	(wb_uart_dat[7:0]),
+      .wb_we_i	(wb_uart_we),
+      .wb_cyc_i	(wb_uart_cyc),
+      .wb_stb_i	(wb_uart_stb),
       .wb_sel_i	(4'b0), // Not used in 8-bit mode
       .wb_dat_o	(uart_rdt),
-      .wb_ack_o	(wb_s2m_uart_ack),
+      .wb_ack_o	(wb_uart_ack),
 
       // Outputs
       .int_o     (uart_irq),

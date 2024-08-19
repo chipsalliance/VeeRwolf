@@ -25,7 +25,7 @@ filesets:
       - uart16550
       - ">=pulp-platform.org::axi:0.23.0-r1"
       - simple_spi
-      - wb_intercon
+      - ::wb_intercon:1.4.1
 
   bfm:
     files:
@@ -50,6 +50,14 @@ filesets:
       - tb/veerwolf_spi_tb.v
       - sw/hello.ubvh : {file_type : user, copyto : hello.ubvh}
     file_type : verilogSource
+
+  agilex5_files:
+    files :
+      - data/agilex5.sdc : {file_type : SDC}
+      - data/agilex5.tcl : {file_type : tclSource}
+      - rtl/clk_gen_agilex.v : {file_type : verilogSource}
+      - rtl/veerwolf_agilex.v    : {file_type : systemVerilogSource}
+      - rtl/axi_ram.v : {file_type : verilogSource}
 
   nexys_a7_files:
     files :
@@ -92,6 +100,23 @@ filesets:
       - sw/bootloader.vh : {file_type : user, copyto : bootloader.vh}
 
 targets:
+  agilex5:
+    default_tool : quartus
+    description : FPGA image with VeeR EH1 or EL2 for the Intel Agilex 5 FPGA E-Series DK A5E065BB32AES1 Premium devkit
+    filesets :
+      - "cpu_el2? (el2)"
+      - "!cpu_el2? (eh1)"
+      - bootrom
+      - core
+      - agilex5_files
+    generate : [intercon, "!cpu_el2? (veer_eh1_default_config)", "cpu_el2? (veer_el2_default_config)", version, wb_intercon]
+    parameters : [bootrom_file, "cpu_el2? (cpu_type=EL2)"]
+    tools:
+      quartus:
+        family : Agilex 5
+        device : A5ED065BB32AE6SR0
+    toplevel : veerwolf_agilex
+
   basys3:
     default_tool : vivado
     description : FPGA image with VeeR EL2 for the Digilent Basys 3 FPGA board
