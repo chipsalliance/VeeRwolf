@@ -62,10 +62,10 @@ module veerwolf_core_tb
 
    initial begin
       if (|$test$plusargs("jtag_vpi_enable"))
-	$display("JTAG VPI enabled. Not loading RAM");
+	      $display("JTAG VPI enabled. Not loading RAM");
       else if ($value$plusargs("ram_init_file=%s", ram_init_file)) begin
-	 $display("Loading RAM contents from %0s", ram_init_file);
-	 $readmemh(ram_init_file, ram.mem);
+	      $display("Loading RAM contents from %0s", ram_init_file);
+	      $readmemh(ram_init_file, ram.mem);
       end
    end
 
@@ -73,19 +73,19 @@ module veerwolf_core_tb
 
    initial begin
       if ($value$plusargs("rom_init_file=%s", rom_init_file)) begin
-	 $display("Loading ROM contents from %0s", rom_init_file);
-	 $readmemh(rom_init_file, veerwolf.bootrom.ram.mem);
-      end else if (!(|bootrom_file))
-	/*
-	 Set mrac to 0xAAAA0000 and jump to address 0
-	 if no bootloader is selected
-	 0:   aaaa02b7                lui     t0,0xaaaa0
-	 4:   7c029073                csrw    0x7c0,t0
-	 8:   00000067                jr      zero
-
-	 */
-	veerwolf.bootrom.ram.mem[0] = 64'h7c029073aaaa02b7;
-	veerwolf.bootrom.ram.mem[1] = 64'h0000000000000067;
+         $display("Loading ROM contents from %0s", rom_init_file);
+         $readmemh(rom_init_file, veerwolf.bootrom.ram.mem);
+      end else if (!(|bootrom_file)) begin
+        /*
+         Set mrac to 0xAAAA0000 and jump to address 0
+         if no bootloader is selected
+         0:   aaaa02b7                lui     t0,0xaaaa0
+         4:   7c029073                csrw    0x7c0,t0
+         8:   00000067                jr      zero
+         */
+         veerwolf.bootrom.ram.mem[0] = 64'h7c029073aaaa02b7;
+         veerwolf.bootrom.ram.mem[1] = 64'h0000000000000067;
+      end
    end
 
    wire [63:0] gpio_out;
