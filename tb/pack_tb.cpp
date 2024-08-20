@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include <signal.h>
 
-#include "Vveerwolf_array_top.h"
+#include "Vveerwolf_pack_top.h"
 
 // For std::unique_ptr
 #include <memory>
@@ -140,7 +140,7 @@ int main(int argc, char **argv, char **env)
   contextp->debug(0);
 
   uint16_t gpios[2] = {0, 0};
-  const unique_ptr<Vveerwolf_array_top> top{new Vveerwolf_array_top{contextp.get(), "TOP"}};
+  const unique_ptr<Vveerwolf_pack_top> top{new Vveerwolf_pack_top{contextp.get(), "TOP"}};
 
   volatile uart_context_t uart_context;
   int baud_rate = 115200;

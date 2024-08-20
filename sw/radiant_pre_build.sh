@@ -10,9 +10,9 @@ sed "s/unsigned'/uint'/" -i src/pulp-platform.org__common_cells_1.20.0/src/strea
 
 incl_path='src/pulp-platform.org__common_cells_1.20.0/include;src/pulp-platform.org__axi_0.25.0/include;src/uart16550_1.5.5-r1/rtl/verilog;src/wb_common_1.0.3;src/veerwolf-intercon_0.7.5'
 
-if test -d 'src/veerwolf-veer_el2_array_config_0.7.5' ; then
-    incl_path='src/veerwolf-veer_el2_array_config_0.7.5;src/veerwolf-wb_nospi_intercon_0.7.5;'$incl_path
-    sed "1s/.*/parameter el2_pkg::el2_param_t pt = \'{/" -i src/veerwolf-veer_el2_array_config_0.7.5/el2_param.vh 
+if test -d 'src/veerwolf-veer_el2_pack_config_0.7.5' ; then
+    incl_path='src/veerwolf-veer_el2_pack_config_0.7.5;src/veerwolf-wb_nospi_intercon_0.7.5;'$incl_path
+    sed "1s/.*/parameter el2_pkg::el2_param_t pt = \'{/" -i src/veerwolf-veer_el2_pack_config_0.7.5/el2_param.vh 
     sed '/package el2_pkg;/a`include "el2_pdef.vh"' -i src/chipsalliance.org_cores_VeeR_EL2_1.4/design/include/el2_def.sv
 elif test -d 'src/veerwolf-veer_el2_default_config_0.7.5' ; then
     incl_path='src/veerwolf-veer_el2_default_config_0.7.5;src/veerwolf-wb_intercon_0.7.5;'$incl_path

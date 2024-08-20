@@ -16,14 +16,14 @@
 //********************************************************************************
 // $Id$
 //
-// Function: VeeRwolf array toplevel
+// Function: VeeRwolf toplevel for Lattice Avant E-Series
 // Comments:
 //
 //********************************************************************************
 
 `default_nettype none
-module veerwolf_array_tb
-  #(parameter bootrom_file = "bootloader.vh",
+module veerwolf_pack_avant
+  #(parameter bootrom_file = "pack_rom.vh",
     parameter cpu_type = "EL2")
    (input wire 	       clk,
     input wire 	       rstn,
@@ -35,11 +35,33 @@ module veerwolf_array_tb
    wire [63:0] 	       gpio_out;
    reg [15:0] 	       led_int_r;
 
-   veerwolf_array
-     #(.array_code (bootrom_file))
+   wire 	 clk_core;
+   wire 	 rst_core;
+
+   reg    rst_reg1;
+   reg    rst_reg2;
+
+   assign rst_core = rst_reg2;
+   assign clk_core = clk;
+
+   // ================================================================
+   // Synchronize Reset
+   // ================================================================
+   always @(posedge clk) begin
+    if (!rstn) begin
+      rst_reg1 <= 1'b1;
+      rst_reg2 <= 1'b1;
+    end else begin
+      rst_reg1 <= 1'b0;
+      rst_reg2 <= rst_reg1;
+    end
+   end
+
+   veerwolf_pack
+     #(.pack_code (bootrom_file))
    veerwolfs
-    (.clk_core (clk),
-     .rst_core (~rstn),
+    (.clk_core (clk_core),
+     .rst_core (rst_core),
      .i_uart_rx (i_uart_rx),
      .o_uart_tx (o_uart_tx),
      .i_sw (i_sw),

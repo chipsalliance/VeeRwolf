@@ -22,8 +22,8 @@
 //********************************************************************************
 
 `default_nettype none
-module veerwolf_array_agilex
-  #(parameter bootrom_file = "array_rom.vh",
+module veerwolf_pack_agilex
+  #(parameter bootrom_file = "pack_rom.vh",
     parameter cpu_type = "EL2")
    (input wire 	       clk,
     input wire 	       rstn,
@@ -46,8 +46,8 @@ module veerwolf_array_agilex
       .o_clk_core (clk_core),
       .o_rst_core (rst_core));
 
-   veerwolf_array
-     #(.array_code (bootrom_file))
+   veerwolf_pack
+     #(.pack_code (bootrom_file))
    veerwolfs
     (.clk_core (clk_core),
      .rst_core (rst_core),
