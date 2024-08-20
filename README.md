@@ -11,7 +11,9 @@ VeeRwolves
 ==========
 
 ![](veerwolves.svg)
-VeeRwolves is a pack of VeeRwolf cores in a daisy-chain configuration primarily intended for comparing the capacity of FPGAs
+
+VeeRwolves is a pack of VeeRwolf cores in a daisy-chain configuration primarily intended for comparing the capacity of FPGAs.  The cores self contained and run out of ROM with GPIO and UART peripherals.  The UART and GPIO outputs from each core are passed to the next in a daisy-chain fashion.  The ROM code reads the UART and GPIO inputs, increments the value, and repeats the incremented value on its output so that the final output is the input value plus the number of cores.
+
 ![](veerwolf-chain.png)
 
 # Structure
