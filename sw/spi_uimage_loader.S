@@ -146,7 +146,7 @@ copy_to_ram:
 	addi	s4, s4, 4
 
 	/* Check if file is completely copied */
-	bge	s0, s4, copy_to_ram
+	bgt	s0, s4, copy_to_ram
 
 	/* Jump to entry point */
 goto_reset:
